@@ -3,19 +3,25 @@ package pgtalk
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"testing"
 
+	"github.com/emicklei/pgtalk/products"
 	"github.com/jackc/pgx/v4"
 )
 
 func TestReadProductTable(t *testing.T) {
-
 	ta, err := LoadTables(context.Background(), testConnect, "public")
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Logf("%#v", ta)
+}
+
+func TestAccessProductTable(t *testing.T) {
+	products, err := products.Table(testConnect).Select(products.ID, products.Code)
+	log.Printf("%v,%v,%v", *products[0].ID, *products[0].Code, err)
 }
 
 var testConnect *pgx.Conn
