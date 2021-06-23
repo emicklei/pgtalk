@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/emicklei/pgtalk/categories"
 	"github.com/emicklei/pgtalk/products"
 	"github.com/jackc/pgx/v4"
 )
@@ -33,6 +34,14 @@ func TestSelectProductsWhere(t *testing.T) {
 	t.Log(q.SQL())
 	products, err := q.Exec(testConnect)
 	log.Printf("%v,%v,%v", *products[0].ID, *products[0].Code, err)
+}
+
+func TestInnerJoin(t *testing.T) {
+	q := products.Select(products.Code).
+		Join(categories.Select(categories.Title), products.ID, categories.ID)
+	t.Log(q.SQL())
+	// productsAndCategories, err := q.Exec(testConnect)
+	// log.Printf("%v,%v,%v", *products[0].ID, *products[0].Code, err)
 }
 
 var testConnect *pgx.Conn

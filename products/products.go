@@ -6,9 +6,10 @@ import (
 )
 
 type Product struct {
-	ID    *int64
-	Code  *string
-	Price *int64
+	ID         *int64
+	Code       *string
+	Price      *int64
+	CategoryID *int64
 }
 
 var ID = xs.NewInt8Access(
@@ -27,6 +28,14 @@ var Code = xs.NewTextAccess(
 		e.Code = i
 	})
 
+var CategoryID = xs.NewInt8Access(
+	"products",
+	"categoryID",
+	func(dest interface{}, i *int64) {
+		e := dest.(*Product)
+		e.CategoryID = i
+	})
+
 func Select(as ...xs.ReadWrite) ProductsQuerySet {
 	return ProductsQuerySet{xs.MakeQuerySet("products", as)}
 }
@@ -34,6 +43,8 @@ func Select(as ...xs.ReadWrite) ProductsQuerySet {
 type ProductsQuerySet struct {
 	xs.QuerySet
 }
+
+func (s ProductsQuerySet) Unwrap() xs.QuerySet { return s.QuerySet }
 
 // Where is
 func (s ProductsQuerySet) Where(condition xs.SQLWriter) ProductsQuerySet {

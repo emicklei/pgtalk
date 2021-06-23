@@ -84,3 +84,27 @@ func (d QuerySet) Exec(conn *pgx.Conn, factory func() interface{}, appender func
 	}
 	return
 }
+
+type Unwrappable interface {
+	Unwrap() QuerySet
+}
+
+func (d QuerySet) Join(otherQuerySet Unwrappable, onLeft, onRight ReadWrite) InnerJoin {
+	return InnerJoin{
+		LeftSet:  d,
+		RightSet: otherQuerySet.Unwrap(),
+		OnLeft:   onLeft,
+		onRight:  onRight,
+	}
+}
+
+type InnerJoin struct {
+	LeftSet  QuerySet
+	RightSet QuerySet
+	OnLeft   ReadWrite
+	onRight  ReadWrite
+}
+
+func (i InnerJoin) SQL() string {
+	return "a"
+}
