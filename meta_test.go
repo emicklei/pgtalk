@@ -20,7 +20,7 @@ func TestReadProductTable(t *testing.T) {
 }
 
 func TestAccessProductTable(t *testing.T) {
-	products, err := products.Table(testConnect).Select(products.ID, products.Code)
+	products, err := products.Select(products.ID, products.Code).Exec(testConnect)
 	log.Printf("%v,%v,%v", *products[0].ID, *products[0].Code, err)
 }
 

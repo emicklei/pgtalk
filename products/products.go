@@ -16,9 +16,9 @@ type Product struct {
 	Price *int64
 }
 
-func Table(conn *pgx.Conn) *ProductsQuery {
-	return &ProductsQuery{conn: conn}
-}
+// func Table(conn *pgx.Conn) *ProductsQuery {
+// 	return &ProductsQuery{conn: conn}
+// }
 
 var ID = xs.NewInt8Access(
 	"id",
@@ -35,19 +35,23 @@ var Code = xs.NewTextAccess(
 	})
 
 type ProductsQuery struct {
-	conn *pgx.Conn
+	selectors []xs.ReadWrite
 }
 
-func (d *ProductsQuery) Select(as ...xs.ReadWrite) (list []*Product, err error) {
+func Select(as ...xs.ReadWrite) ProductsQuery {
+	return ProductsQuery{selectors: as}
+}
+
+func (d ProductsQuery) Exec(conn *pgx.Conn) (list []*Product, err error) {
 	// TODO use GORM here
 	buf := new(bytes.Buffer)
-	for i, each := range as {
+	for i, each := range d.selectors {
 		if i > 0 {
 			io.WriteString(buf, ",")
 		}
 		io.WriteString(buf, each.Name())
 	}
-	rows, err := d.conn.Query(context.Background(), fmt.Sprintf("select %s from products", buf))
+	rows, err := conn.Query(context.Background(), fmt.Sprintf("select %s from products", buf))
 	if err != nil {
 		return
 	}
@@ -55,7 +59,7 @@ func (d *ProductsQuery) Select(as ...xs.ReadWrite) (list []*Product, err error) 
 	for rows.Next() {
 		entity := new(Product)
 		sw := []interface{}{}
-		for _, each := range as {
+		for _, each := range d.selectors {
 			rw := xs.ScanToWrite{
 				RW:     each,
 				Entity: entity,
