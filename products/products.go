@@ -12,6 +12,7 @@ type Product struct {
 }
 
 var ID = xs.NewInt8Access(
+	"products",
 	"id",
 	func(dest interface{}, i *int64) {
 		e := dest.(*Product)
@@ -19,6 +20,7 @@ var ID = xs.NewInt8Access(
 	})
 
 var Code = xs.NewTextAccess(
+	"products",
 	"code",
 	func(dest interface{}, i *string) {
 		e := dest.(*Product)

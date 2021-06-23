@@ -11,12 +11,13 @@ type ReadWrite interface {
 	Value(entity interface{}, fieldValue interface{})
 }
 type Int8Access struct {
-	name   string
-	writer func(dest interface{}, i *int64)
+	tableName string
+	name      string
+	writer    func(dest interface{}, i *int64)
 }
 
-func NewInt8Access(name string, writer func(dest interface{}, i *int64)) Int8Access {
-	return Int8Access{name: name, writer: writer}
+func NewInt8Access(tableName string, columnName string, writer func(dest interface{}, i *int64)) Int8Access {
+	return Int8Access{tableName: tableName, name: columnName, writer: writer}
 }
 
 func (a Int8Access) Value(entity interface{}, fieldValue interface{}) {
@@ -28,13 +29,19 @@ func (a Int8Access) Equals(i int) BinaryOperator {
 	return MakeBinaryOperator(a, "=", Printer{i})
 }
 
-func (a Int8Access) SQL() string { return a.name }
+func (a Int8Access) SQL(ctx SQLContext) string {
+	alias := ctx.TableAlias(a.tableName)
+	if alias != "" {
+		return fmt.Sprintf("%s.%s", alias, a.name)
+	}
+	return a.name
+}
 
 type Printer struct {
 	v interface{}
 }
 
-func (p Printer) SQL() string { return fmt.Sprintf("%v", p.v) }
+func (p Printer) SQL(ctx SQLContext) string { return fmt.Sprintf("%v", p.v) }
 
 type ScanToWrite struct {
 	RW     ReadWrite
@@ -49,16 +56,17 @@ func (s ScanToWrite) Scan(fieldValue interface{}) error {
 func (a Int8Access) Name() string { return a.name }
 
 type TextAccess struct {
-	name   string
-	writer func(dest interface{}, i *string)
+	tableName string
+	name      string
+	writer    func(dest interface{}, i *string)
 }
 
 func (a TextAccess) Equals(s string) BinaryOperator {
 	return MakeBinaryOperator(a, "=", LiteralString(s))
 }
 
-func NewTextAccess(name string, writer func(dest interface{}, i *string)) TextAccess {
-	return TextAccess{name: name, writer: writer}
+func NewTextAccess(tableName string, columnName string, writer func(dest interface{}, i *string)) TextAccess {
+	return TextAccess{tableName: tableName, name: columnName, writer: writer}
 }
 
 func (a TextAccess) Value(entity interface{}, fieldValue interface{}) {
@@ -68,11 +76,17 @@ func (a TextAccess) Value(entity interface{}, fieldValue interface{}) {
 
 func (a TextAccess) Name() string { return a.name }
 
-func (a TextAccess) SQL() string { return a.name }
+func (a TextAccess) SQL(ctx SQLContext) string {
+	alias := ctx.TableAlias(a.tableName)
+	if alias != "" {
+		return fmt.Sprintf("%s.%s", alias, a.name)
+	}
+	return a.name
+}
 
 type LiteralString string
 
-func (l LiteralString) SQL() string {
+func (l LiteralString) SQL(ctx SQLContext) string {
 	b := new(bytes.Buffer)
 	io.WriteString(b, "'")
 	io.WriteString(b, string(l))
@@ -84,4 +98,4 @@ type NoCondition struct{}
 
 var EmptyCondition = NoCondition{}
 
-func (n NoCondition) SQL() string { return "" }
+func (n NoCondition) SQL(ctx SQLContext) string { return "" }
