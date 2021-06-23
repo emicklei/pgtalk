@@ -1,5 +1,11 @@
 package xs
 
+import (
+	"bytes"
+	"fmt"
+	"io"
+)
+
 type ReadWrite interface {
 	Name() string
 	Value(entity interface{}, fieldValue interface{})
@@ -18,6 +24,18 @@ func (a Int8Access) Value(entity interface{}, fieldValue interface{}) {
 	a.writer(entity, &i)
 }
 
+func (a Int8Access) Equals(i int) BinaryOperator {
+	return MakeBinaryOperator(a, "=", Printer{i})
+}
+
+func (a Int8Access) SQL() string { return a.name }
+
+type Printer struct {
+	v interface{}
+}
+
+func (p Printer) SQL() string { return fmt.Sprintf("%v", p.v) }
+
 type ScanToWrite struct {
 	RW     ReadWrite
 	Entity interface{}
@@ -35,6 +53,10 @@ type TextAccess struct {
 	writer func(dest interface{}, i *string)
 }
 
+func (a TextAccess) Equals(s string) BinaryOperator {
+	return MakeBinaryOperator(a, "=", LiteralString(s))
+}
+
 func NewTextAccess(name string, writer func(dest interface{}, i *string)) TextAccess {
 	return TextAccess{name: name, writer: writer}
 }
@@ -45,3 +67,21 @@ func (a TextAccess) Value(entity interface{}, fieldValue interface{}) {
 }
 
 func (a TextAccess) Name() string { return a.name }
+
+func (a TextAccess) SQL() string { return a.name }
+
+type LiteralString string
+
+func (l LiteralString) SQL() string {
+	b := new(bytes.Buffer)
+	io.WriteString(b, "'")
+	io.WriteString(b, string(l))
+	io.WriteString(b, "'")
+	return b.String()
+}
+
+type NoCondition struct{}
+
+var EmptyCondition = NoCondition{}
+
+func (n NoCondition) SQL() string { return "" }

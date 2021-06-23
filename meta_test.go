@@ -24,6 +24,17 @@ func TestAccessProductTable(t *testing.T) {
 	log.Printf("%v,%v,%v", *products[0].ID, *products[0].Code, err)
 }
 
+func TestSelectProductsWhere(t *testing.T) {
+	q := products.
+		Select(products.ID, products.Code).
+		Where(products.Code.Equals("F42").
+			And(products.ID.Equals(1))).
+		Limit(1)
+	t.Log(q.SQL())
+	products, err := q.Exec(testConnect)
+	log.Printf("%v,%v,%v", *products[0].ID, *products[0].Code, err)
+}
+
 var testConnect *pgx.Conn
 
 func TestMain(m *testing.M) {
