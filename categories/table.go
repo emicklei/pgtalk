@@ -5,13 +5,15 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+var tableInfo = xs.TableInfo{Name: "categories", Alias: "t2"}
+
 type Category struct {
 	ID    *int64
 	Title *string
 }
 
 var ID = xs.NewInt8Access(
-	"categories",
+	tableInfo,
 	"id",
 	func(dest interface{}, i *int64) {
 		e := dest.(*Category)
@@ -19,7 +21,7 @@ var ID = xs.NewInt8Access(
 	})
 
 var Title = xs.NewTextAccess(
-	"categories",
+	tableInfo,
 	"title",
 	func(dest interface{}, i *string) {
 		e := dest.(*Category)
@@ -27,7 +29,9 @@ var Title = xs.NewTextAccess(
 	})
 
 func Select(as ...xs.ReadWrite) CategorysQuerySet {
-	return CategorysQuerySet{xs.MakeQuerySet("categories", as)}
+	return CategorysQuerySet{xs.MakeQuerySet(tableInfo, as, func() interface{} {
+		return new(Category)
+	})}
 }
 
 type CategorysQuerySet struct {
@@ -48,9 +52,7 @@ func (s CategorysQuerySet) Limit(limit int) CategorysQuerySet {
 
 // Exec is
 func (s CategorysQuerySet) Exec(conn *pgx.Conn) (list []*Category, err error) {
-	err = s.QuerySet.Exec(conn, func() interface{} {
-		return new(Category)
-	}, func(each interface{}) {
+	err = s.QuerySet.Exec(conn, func(each interface{}) {
 		list = append(list, each.(*Category))
 	})
 	return

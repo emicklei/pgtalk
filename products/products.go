@@ -5,6 +5,8 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+var tableInfo = xs.TableInfo{Name: "products", Alias: "t1"}
+
 type Product struct {
 	ID         *int64
 	Code       *string
@@ -13,7 +15,7 @@ type Product struct {
 }
 
 var ID = xs.NewInt8Access(
-	"products",
+	tableInfo,
 	"id",
 	func(dest interface{}, i *int64) {
 		e := dest.(*Product)
@@ -21,7 +23,7 @@ var ID = xs.NewInt8Access(
 	})
 
 var Code = xs.NewTextAccess(
-	"products",
+	tableInfo,
 	"code",
 	func(dest interface{}, i *string) {
 		e := dest.(*Product)
@@ -29,15 +31,19 @@ var Code = xs.NewTextAccess(
 	})
 
 var CategoryID = xs.NewInt8Access(
-	"products",
-	"categoryID",
+	tableInfo,
+	"category_id",
 	func(dest interface{}, i *int64) {
 		e := dest.(*Product)
 		e.CategoryID = i
 	})
 
+var AllColumns = []xs.ReadWrite{ID, Code, CategoryID}
+
 func Select(as ...xs.ReadWrite) ProductsQuerySet {
-	return ProductsQuerySet{xs.MakeQuerySet("products", as)}
+	return ProductsQuerySet{xs.MakeQuerySet(tableInfo, as, func() interface{} {
+		return new(Product)
+	})}
 }
 
 type ProductsQuerySet struct {
@@ -58,9 +64,7 @@ func (s ProductsQuerySet) Limit(limit int) ProductsQuerySet {
 
 // Exec is
 func (s ProductsQuerySet) Exec(conn *pgx.Conn) (list []*Product, err error) {
-	err = s.QuerySet.Exec(conn, func() interface{} {
-		return new(Product)
-	}, func(each interface{}) {
+	err = s.QuerySet.Exec(conn, func(each interface{}) {
 		list = append(list, each.(*Product))
 	})
 	return

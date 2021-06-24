@@ -2,15 +2,8 @@ package xs
 
 import "fmt"
 
-type SQLContext struct {
-}
-
-func (s SQLContext) TableAlias(tableName string) string {
-	return "t1"
-}
-
 type SQLWriter interface {
-	SQL(ctx SQLContext) string
+	SQL() string
 }
 
 type BinaryOperator struct {
@@ -19,8 +12,8 @@ type BinaryOperator struct {
 	Right    SQLWriter
 }
 
-func (o BinaryOperator) SQL(ctx SQLContext) string {
-	return fmt.Sprintf("(%s %s %s)", o.Left.SQL(ctx), o.Operator, o.Right.SQL(ctx))
+func (o BinaryOperator) SQL() string {
+	return fmt.Sprintf("(%s %s %s)", o.Left.SQL(), o.Operator, o.Right.SQL())
 }
 
 func MakeBinaryOperator(left SQLWriter, operator string, right SQLWriter) BinaryOperator {

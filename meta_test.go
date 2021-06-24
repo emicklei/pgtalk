@@ -36,12 +36,29 @@ func TestSelectProductsWhere(t *testing.T) {
 	log.Printf("%v,%v,%v", *products[0].ID, *products[0].Code, err)
 }
 
-func TestInnerJoin(t *testing.T) {
-	q := products.Select(products.Code).
-		Join(categories.Select(categories.Title), products.ID, categories.ID)
+func TestSelectAllColumns(t *testing.T) {
+	q := products.
+		Select(products.AllColumns...).
+		Limit(2)
 	t.Log(q.SQL())
-	// productsAndCategories, err := q.Exec(testConnect)
-	// log.Printf("%v,%v,%v", *products[0].ID, *products[0].Code, err)
+
+	products, err := q.Exec(testConnect)
+	log.Printf("%v,%v,%v", *products[0].ID, *products[0].Code, err)
+}
+
+func TestInnerJoin(t *testing.T) {
+	q := products.Select(products.Code).Where(products.Code.Equals("F42")).
+		Join(categories.Select(categories.Title)).
+		On(products.ID, categories.ID)
+	t.Log(q.SQL())
+
+	productsAndCategories, _ := q.Exec(testConnect)
+	for productsAndCategories.HasNext() {
+		l, r := productsAndCategories.Next()
+		p := l.(*products.Product)
+		c := r.(*categories.Category)
+		t.Logf("%#v,%#v", *p.Code, *c.Title)
+	}
 }
 
 var testConnect *pgx.Conn
