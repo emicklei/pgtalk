@@ -13,8 +13,14 @@ type TableInfo struct {
 
 type ReadWrite interface {
 	Name() string
+	// temp name
 	WriteInto(entity interface{}, fieldValue interface{})
+	// temp name
+	SetSQL() string
 }
+
+var EmptyReadWrite = []ReadWrite{}
+
 type Int8Access struct {
 	tableInfo   TableInfo
 	name        string
@@ -24,6 +30,14 @@ type Int8Access struct {
 
 func NewInt8Access(info TableInfo, columnName string, writer func(dest interface{}, i *int64)) Int8Access {
 	return Int8Access{tableInfo: info, name: columnName, writer: writer}
+}
+
+func (a Int8Access) SetSQL() string {
+	return fmt.Sprintf("%d", a.insertValue)
+}
+
+func (a Int8Access) BetweenAnd(begin int64, end int64) BetweenAnd {
+	return MakeBetweenAnd(a, Printer{begin}, Printer{end})
 }
 
 func (a Int8Access) WriteInto(entity interface{}, fieldValue interface{}) {
@@ -89,6 +103,10 @@ func (a TextAccess) Name() string { return a.name }
 
 func (a TextAccess) SQL() string {
 	return fmt.Sprintf("%s.%s", a.tableInfo.Alias, a.name)
+}
+
+func (a TextAccess) SetSQL() string {
+	return fmt.Sprintf("'%s'", a.insertValue)
 }
 
 type LiteralString string

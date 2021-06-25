@@ -70,10 +70,14 @@ func (s ProductsQuerySet) Exec(conn *pgx.Conn) (list []*Product, err error) {
 	return
 }
 
-type ProductsMutationSet struct {
-	xs.MutationSet
+func Insert(as ...xs.ReadWrite) xs.MutationSet {
+	return xs.MakeMutationSet(tableInfo, as, xs.MutationInsert)
 }
 
-func Insert(as ...xs.ReadWrite) ProductsMutationSet {
-	return ProductsMutationSet{xs.MakeMutationSet(tableInfo, as)}
+func Delete() xs.MutationSet {
+	return xs.MakeMutationSet(tableInfo, xs.EmptyReadWrite, xs.MutationDelete)
+}
+
+func Update(as ...xs.ReadWrite) xs.MutationSet {
+	return xs.MakeMutationSet(tableInfo, as, xs.MutationUpdate)
 }

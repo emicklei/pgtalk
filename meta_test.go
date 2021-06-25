@@ -62,7 +62,24 @@ func TestInnerJoin(t *testing.T) {
 }
 
 func TestInsert(t *testing.T) {
-	m := products.Insert(products.ID.Value(1), products.Code.Value("test"), products.CategoryID.Value(1))
+	m := products.Insert(
+		products.ID.Value(10),
+		products.Code.Value("test"),
+		products.CategoryID.Value(1))
+	t.Log(m.SQL())
+}
+
+func TestUpdate(t *testing.T) {
+	m := products.Update(
+		products.ID.Value(10),
+		products.Code.Value("test"),
+		products.CategoryID.Value(1)).
+		Where(products.ID.Value(10))
+	t.Log(m.SQL())
+}
+
+func TestDelete(t *testing.T) {
+	m := products.Delete().Where(products.ID.Equals(10))
 	t.Log(m.SQL())
 }
 
