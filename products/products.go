@@ -14,31 +14,13 @@ type Product struct {
 	CategoryID *int64
 }
 
-var ID = xs.NewInt8Access(
-	tableInfo,
-	"id",
-	func(dest interface{}, i *int64) {
-		e := dest.(*Product)
-		e.ID = i
-	})
-
-var Code = xs.NewTextAccess(
-	tableInfo,
-	"code",
-	func(dest interface{}, i *string) {
-		e := dest.(*Product)
-		e.Code = i
-	})
-
-var CategoryID = xs.NewInt8Access(
-	tableInfo,
-	"category_id",
-	func(dest interface{}, i *int64) {
-		e := dest.(*Product)
-		e.CategoryID = i
-	})
-
-var AllColumns = []xs.ReadWrite{ID, Code, CategoryID}
+var (
+	ID         = xs.NewInt8Access(tableInfo, "id", func(dest interface{}, i *int64) { dest.(*Product).ID = i })
+	Code       = xs.NewTextAccess(tableInfo, "code", func(dest interface{}, i *string) { dest.(*Product).Code = i })
+	CategoryID = xs.NewInt8Access(tableInfo, "category_id", func(dest interface{}, i *int64) { dest.(*Product).CategoryID = i })
+	// or make this func?
+	AllColumns = []xs.ReadWrite{ID, Code, CategoryID}
+)
 
 func Select(as ...xs.ReadWrite) ProductsQuerySet {
 	return ProductsQuerySet{xs.MakeQuerySet(tableInfo, as, func() interface{} {
