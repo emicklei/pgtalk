@@ -48,7 +48,7 @@ func (q QuerySet) WhereSection() string {
 	return q.condition.SQL()
 }
 
-// String returns the full SQL query
+// SQL returns the full SQL query
 func (q QuerySet) SQL() string {
 	// TEMP
 	where := q.WhereSection()
@@ -131,54 +131,46 @@ func (i InnerJoin) On(onLeft, onRight ReadWrite) InnerJoin {
 	}
 }
 
-func (i InnerJoin) Exec(conn *pgx.Conn) (it *InnerJoinIterator, err error) {
+func (i InnerJoin) Exec(conn *pgx.Conn) (it InnerJoinIterator, err error) {
 	rows, err := conn.Query(context.Background(), i.SQL())
 	if err != nil {
 		return
 	}
-	defer rows.Close()
-	results := []interface{}{}
-	for rows.Next() {
-		leftEntity := i.LeftSet.factory()
-		rightEntity := i.RightSet.factory()
-		sw := []interface{}{}
-		// left
-		for _, each := range i.LeftSet.selectors {
-			rw := ScanToWrite{
-				RW:     each,
-				Entity: leftEntity,
-			}
-			sw = append(sw, rw)
-		}
-		// right
-		for _, each := range i.RightSet.selectors {
-			rw := ScanToWrite{
-				RW:     each,
-				Entity: rightEntity,
-			}
-			sw = append(sw, rw)
-		}
-		if err = rows.Scan(sw...); err != nil {
-			return
-		}
-		results = append(results, []interface{}{leftEntity, rightEntity})
-	}
-	it = &InnerJoinIterator{0, results}
-	return
+	return InnerJoinIterator{leftSet: i.LeftSet, rightSet: i.RightSet, rows: rows}, nil
 }
 
 type InnerJoinIterator struct {
-	index       int
-	entityPairs []interface{}
+	leftSet  QuerySet
+	rightSet QuerySet
+	rows     pgx.Rows
 }
 
-func (it *InnerJoinIterator) HasNext() bool {
-	return it.index < len(it.entityPairs)
+func (i *InnerJoinIterator) HasNext() bool {
+	if i.rows.Next() {
+		return true
+	} else {
+		i.rows.Close()
+	}
+	return false
 }
 
-func (it *InnerJoinIterator) Next() (left interface{}, right interface{}) {
-	left = it.entityPairs[it.index].([]interface{})[0]
-	right = it.entityPairs[it.index].([]interface{})[1]
-	it.index++
-	return
+func (i *InnerJoinIterator) Next(left interface{}, right interface{}) error {
+	sw := []interface{}{}
+	// left
+	for _, each := range i.leftSet.selectors {
+		rw := ScanToWrite{
+			RW:     each,
+			Entity: left,
+		}
+		sw = append(sw, rw)
+	}
+	// right
+	for _, each := range i.rightSet.selectors {
+		rw := ScanToWrite{
+			RW:     each,
+			Entity: right,
+		}
+		sw = append(sw, rw)
+	}
+	return i.rows.Scan(sw...)
 }

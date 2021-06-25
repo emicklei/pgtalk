@@ -69,3 +69,11 @@ func (s ProductsQuerySet) Exec(conn *pgx.Conn) (list []*Product, err error) {
 	})
 	return
 }
+
+type ProductsMutationSet struct {
+	xs.MutationSet
+}
+
+func Insert(as ...xs.ReadWrite) ProductsMutationSet {
+	return ProductsMutationSet{xs.MakeMutationSet(tableInfo, as)}
+}

@@ -43,7 +43,7 @@ func TestSelectAllColumns(t *testing.T) {
 	t.Log(q.SQL())
 
 	products, err := q.Exec(testConnect)
-	log.Printf("%v,%v,%v", *products[0].ID, *products[0].Code, err)
+	log.Printf("%#v,%v", products[0], err)
 }
 
 func TestInnerJoin(t *testing.T) {
@@ -54,11 +54,16 @@ func TestInnerJoin(t *testing.T) {
 
 	productsAndCategories, _ := q.Exec(testConnect)
 	for productsAndCategories.HasNext() {
-		l, r := productsAndCategories.Next()
-		p := l.(*products.Product)
-		c := r.(*categories.Category)
+		p := new(products.Product)
+		c := new(categories.Category)
+		productsAndCategories.Next(p, c)
 		t.Logf("%#v,%#v", *p.Code, *c.Title)
 	}
+}
+
+func TestInsert(t *testing.T) {
+	m := products.Insert(products.ID.Value(1), products.Code.Value("test"), products.CategoryID.Value(1))
+	t.Log(m.SQL())
 }
 
 var testConnect *pgx.Conn

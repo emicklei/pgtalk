@@ -13,21 +13,26 @@ type TableInfo struct {
 
 type ReadWrite interface {
 	Name() string
-	Value(entity interface{}, fieldValue interface{})
+	WriteInto(entity interface{}, fieldValue interface{})
 }
 type Int8Access struct {
-	tableInfo TableInfo
-	name      string
-	writer    func(dest interface{}, i *int64)
+	tableInfo   TableInfo
+	name        string
+	writer      func(dest interface{}, i *int64)
+	insertValue int64
 }
 
 func NewInt8Access(info TableInfo, columnName string, writer func(dest interface{}, i *int64)) Int8Access {
 	return Int8Access{tableInfo: info, name: columnName, writer: writer}
 }
 
-func (a Int8Access) Value(entity interface{}, fieldValue interface{}) {
+func (a Int8Access) WriteInto(entity interface{}, fieldValue interface{}) {
 	var i int64 = fieldValue.(int64)
 	a.writer(entity, &i)
+}
+
+func (a Int8Access) Value(v int64) Int8Access {
+	return Int8Access{tableInfo: a.tableInfo, name: a.name, writer: a.writer, insertValue: v}
 }
 
 func (a Int8Access) Equals(i int) BinaryOperator {
@@ -50,16 +55,21 @@ type ScanToWrite struct {
 }
 
 func (s ScanToWrite) Scan(fieldValue interface{}) error {
-	s.RW.Value(s.Entity, fieldValue)
+	s.RW.WriteInto(s.Entity, fieldValue)
 	return nil
 }
 
 func (a Int8Access) Name() string { return a.name }
 
 type TextAccess struct {
-	tableInfo TableInfo
-	name      string
-	writer    func(dest interface{}, i *string)
+	tableInfo   TableInfo
+	name        string
+	writer      func(dest interface{}, i *string)
+	insertValue string
+}
+
+func (a TextAccess) Value(v string) TextAccess {
+	return TextAccess{tableInfo: a.tableInfo, name: a.name, writer: a.writer, insertValue: v}
 }
 
 func (a TextAccess) Equals(s string) BinaryOperator {
@@ -70,7 +80,7 @@ func NewTextAccess(info TableInfo, columnName string, writer func(dest interface
 	return TextAccess{tableInfo: info, name: columnName, writer: writer}
 }
 
-func (a TextAccess) Value(entity interface{}, fieldValue interface{}) {
+func (a TextAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 	var i string = fieldValue.(string)
 	a.writer(entity, &i)
 }
