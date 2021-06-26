@@ -74,7 +74,7 @@ func TestUpdate(t *testing.T) {
 		products.ID.Value(10),
 		products.Code.Value("test"),
 		products.CategoryID.Value(1)).
-		Where(products.ID.Value(10))
+		Where(products.ID.Equals(10))
 	t.Log(m.SQL())
 }
 
