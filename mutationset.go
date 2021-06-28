@@ -48,7 +48,8 @@ func (m MutationSet) SQL() string {
 }
 
 func (m MutationSet) Where(condition SQLWriter) MutationSet {
-	return MutationSet{tableInfo: m.tableInfo, selectors: m.selectors, condition: condition, operationType: m.operationType}
+	m.condition = condition
+	return m
 }
 
 // todo

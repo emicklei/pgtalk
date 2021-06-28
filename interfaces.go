@@ -20,6 +20,7 @@ type Unwrappable interface {
 
 type ColumnAccessor interface {
 	Name() string
+	SQL() string
 	// temp name
 	WriteInto(entity interface{}, fieldValue interface{})
 	// temp name

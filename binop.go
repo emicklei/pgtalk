@@ -2,6 +2,10 @@ package pgtalk
 
 import "fmt"
 
+const (
+	validComparisonOperators = "= > < >= <= <>"
+)
+
 type SQLWriter interface {
 	SQL() string
 }

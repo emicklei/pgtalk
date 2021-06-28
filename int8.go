@@ -1,6 +1,9 @@
 package pgtalk
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Int8Access can Read a column value (int8) and Write a column value and Set a struct field (int64).
 type Int8Access struct {
@@ -33,6 +36,13 @@ func (a Int8Access) Value(v int64) Int8Access {
 
 func (a Int8Access) Equals(i int) BinaryOperator {
 	return MakeBinaryOperator(a, "=", ValuePrinter{i})
+}
+
+func (a Int8Access) Compare(op string, i int) BinaryOperator {
+	if !strings.Contains(validComparisonOperators, op) {
+		panic("invalid comparison operator:" + op)
+	}
+	return MakeBinaryOperator(a, op, ValuePrinter{i})
 }
 
 func (a Int8Access) SQL() string {

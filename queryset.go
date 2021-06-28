@@ -5,6 +5,9 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
+
+	"github.com/jackc/pgx/v4"
 )
 
 type QuerySet struct {
@@ -13,6 +16,9 @@ type QuerySet struct {
 	condition SQLWriter
 	limit     int
 	factory   NewEntityFunc
+	groupBy   []ColumnAccessor
+	having    SQLWriter
+	orderBy   []ColumnAccessor
 }
 
 func MakeQuerySet(tableInfo TableInfo, selectors []ColumnAccessor, factory NewEntityFunc) QuerySet {
@@ -33,9 +39,7 @@ func (q QuerySet) SelectSection() string {
 		if i > 0 {
 			io.WriteString(buf, ",")
 		}
-		io.WriteString(buf, q.tableInfo.Alias)
-		io.WriteString(buf, ".")
-		io.WriteString(buf, each.Name())
+		io.WriteString(buf, each.SQL())
 	}
 	return buf.String()
 }
@@ -58,15 +62,43 @@ func (q QuerySet) SQL() string {
 	return fmt.Sprintf("SELECT %s FROM %s%s%s", q.SelectSection(), q.FromSection(), where, limit)
 }
 
-func (q QuerySet) Where(condition SQLWriter) QuerySet {
-	return QuerySet{tableInfo: q.tableInfo, selectors: q.selectors, condition: condition, factory: q.factory}
+func (q QuerySet) Where(condition SQLWriter) QuerySet     { q.condition = condition; return q }
+func (q QuerySet) Limit(limit int) QuerySet               { q.limit = limit; return q }
+func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet { q.groupBy = cas; return q }
+func (q QuerySet) Having(condition SQLWriter) QuerySet    { q.having = condition; return q }
+func (q QuerySet) OrderBy(cas ...ColumnAccessor) QuerySet { q.orderBy = cas; return q }
+
+func (d QuerySet) Exec(conn Connection) *EntityIterator {
+	rows, err := conn.Query(context.Background(), d.SQL())
+	return &EntityIterator{queryError: err, rows: rows}
 }
 
-func (q QuerySet) Limit(limit int) QuerySet {
-	return QuerySet{tableInfo: q.tableInfo, selectors: q.selectors, condition: q.condition, limit: limit, factory: q.factory}
+type EntityIterator struct {
+	queryError error
+	rows       pgx.Rows
 }
 
-func (d QuerySet) Exec(conn Connection, appender func(each interface{})) (err error) {
+func (i *EntityIterator) HasNext() bool {
+	if i.queryError != nil {
+		return false
+	}
+	if i.rows.Next() {
+		return true
+	}
+	i.rows.Close()
+	return false
+}
+
+func (i *EntityIterator) Next(entity interface{}) error {
+	list := i.rows.FieldDescriptions()
+	for _, each := range list {
+		log.Println(each.Name)
+		log.Println(each.TableAttributeNumber)
+	}
+	return nil
+}
+
+func (d QuerySet) ExecWithAppender(conn Connection, appender func(each interface{})) (err error) {
 	rows, err := conn.Query(context.Background(), d.SQL())
 	if err != nil {
 		return
@@ -88,6 +120,13 @@ func (d QuerySet) Exec(conn Connection, appender func(each interface{})) (err er
 		appender(entity)
 	}
 	return
+}
+
+func (q QuerySet) Count(cas ...ColumnAccessor) QuerySet {
+	for _, each := range cas {
+		q.selectors = append(q.selectors, Count{accessor: each})
+	}
+	return q
 }
 
 func (d QuerySet) Join(otherQuerySet Unwrappable) Join {
@@ -121,3 +160,12 @@ func (d QuerySet) FullJoin(otherQuerySet Unwrappable) Join {
 		Type:     FullOuterJoinType,
 	}
 }
+
+type Count struct {
+	accessor ColumnAccessor
+}
+
+func (c Count) Name() string               { return c.accessor.Name() }
+func (c Count) SQL() string                { return fmt.Sprintf("COUNT(%s)", c.accessor.SQL()) }
+func (c Count) ValueAsSQL() string         { return "" }
+func (c Count) WriteInto(e, v interface{}) {}

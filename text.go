@@ -1,6 +1,9 @@
 package pgtalk
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type TextAccess struct {
 	tableInfo   TableInfo
@@ -19,6 +22,13 @@ func (a TextAccess) Value(v string) TextAccess {
 
 func (a TextAccess) Equals(s string) BinaryOperator {
 	return MakeBinaryOperator(a, "=", LiteralString(s))
+}
+
+func (a TextAccess) Compare(op string, s string) BinaryOperator {
+	if !strings.Contains(validComparisonOperators, op) {
+		panic("invalid comparison operator:" + op)
+	}
+	return MakeBinaryOperator(a, op, LiteralString(s))
 }
 
 func (a TextAccess) WriteInto(entity interface{}, fieldValue interface{}) {

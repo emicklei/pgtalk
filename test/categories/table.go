@@ -51,7 +51,7 @@ func (s CategorysQuerySet) Limit(limit int) CategorysQuerySet {
 
 // Exec is
 func (s CategorysQuerySet) Exec(conn pgtalk.Connection) (list []*Category, err error) {
-	err = s.QuerySet.Exec(conn, func(each interface{}) {
+	err = s.QuerySet.ExecWithAppender(conn, func(each interface{}) {
 		list = append(list, each.(*Category))
 	})
 	return

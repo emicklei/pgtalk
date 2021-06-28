@@ -43,9 +43,19 @@ func (s ProductsQuerySet) Limit(limit int) ProductsQuerySet {
 	return ProductsQuerySet{QuerySet: s.QuerySet.Limit(limit)}
 }
 
+// GroupBy is
+func (s ProductsQuerySet) GroupBy(cas ...pgtalk.ColumnAccessor) ProductsQuerySet {
+	return ProductsQuerySet{QuerySet: s.QuerySet.GroupBy(cas...)}
+}
+
+// GroupBy is
+func (s ProductsQuerySet) OrderBy(cas ...pgtalk.ColumnAccessor) ProductsQuerySet {
+	return ProductsQuerySet{QuerySet: s.QuerySet.OrderBy(cas...)}
+}
+
 // Exec is
 func (s ProductsQuerySet) Exec(conn pgtalk.Connection) (list []*Product, err error) {
-	err = s.QuerySet.Exec(conn, func(each interface{}) {
+	err = s.QuerySet.ExecWithAppender(conn, func(each interface{}) {
 		list = append(list, each.(*Product))
 	})
 	return

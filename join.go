@@ -28,8 +28,8 @@ func (i Join) SQL() string {
 	return "SELECT " + i.LeftSet.SelectSection() + "," + i.RightSet.SelectSection() +
 		" FROM " + i.LeftSet.FromSection() +
 		" INNER JOIN " + i.RightSet.FromSection() +
-		" ON (" + i.LeftSet.tableInfo.Alias + "." + i.OnLeft.Name() +
-		" = " + i.RightSet.tableInfo.Alias + "." + i.OnRight.Name() +
+		" ON (" + i.OnLeft.SQL() +
+		" = " + i.OnRight.SQL() +
 		") WHERE " + i.LeftSet.WhereSection()
 }
 
