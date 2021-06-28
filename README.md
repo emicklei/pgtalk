@@ -2,7 +2,7 @@
 
 ## example
 
-With generated Go code from a table definition (product), you can write a execute
+With generated Go code from a table definition (products), you can write and execute
 
     q :=products.Select(products.Code).Where(products.Code.Equals("F42")).
         LeftJoin(categories.Select(categories.Title)).
