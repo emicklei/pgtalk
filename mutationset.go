@@ -1,4 +1,4 @@
-package xs
+package pgtalk
 
 import (
 	"bytes"
@@ -14,12 +14,12 @@ const (
 
 type MutationSet struct {
 	tableInfo     TableInfo
-	selectors     []ReadWrite
+	selectors     []ColumnAccessor
 	condition     SQLWriter
 	operationType int
 }
 
-func MakeMutationSet(tableInfo TableInfo, selectors []ReadWrite, operationType int) MutationSet {
+func MakeMutationSet(tableInfo TableInfo, selectors []ColumnAccessor, operationType int) MutationSet {
 	return MutationSet{
 		tableInfo:     tableInfo,
 		selectors:     selectors,
@@ -48,7 +48,7 @@ func (m MutationSet) SQL() string {
 }
 
 func (m MutationSet) Where(condition SQLWriter) MutationSet {
-	return MutationSet{tableInfo: m.tableInfo, selectors: m.selectors, condition: condition}
+	return MutationSet{tableInfo: m.tableInfo, selectors: m.selectors, condition: condition, operationType: m.operationType}
 }
 
 // todo
@@ -84,7 +84,7 @@ func (m MutationSet) SetSection() string {
 		if i > 0 {
 			io.WriteString(buf, ",")
 		}
-		fmt.Fprintf(buf, "%s = %s", each.Name(), each.SetSQL())
+		fmt.Fprintf(buf, "%s = %s", each.Name(), each.ValueAsSQL())
 	}
 	return buf.String()
 }

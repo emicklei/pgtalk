@@ -1,18 +1,17 @@
 package categories
 
 import (
-	"github.com/emicklei/pgtalk/xs"
-	"github.com/jackc/pgx/v4"
+	"github.com/emicklei/pgtalk"
 )
 
-var tableInfo = xs.TableInfo{Name: "categories", Alias: "t2"}
+var tableInfo = pgtalk.TableInfo{Name: "categories", Alias: "t2"}
 
 type Category struct {
 	ID    *int64
 	Title *string
 }
 
-var ID = xs.NewInt8Access(
+var ID = pgtalk.NewInt8Access(
 	tableInfo,
 	"id",
 	func(dest interface{}, i *int64) {
@@ -20,7 +19,7 @@ var ID = xs.NewInt8Access(
 		e.ID = i
 	})
 
-var Title = xs.NewTextAccess(
+var Title = pgtalk.NewTextAccess(
 	tableInfo,
 	"title",
 	func(dest interface{}, i *string) {
@@ -28,20 +27,20 @@ var Title = xs.NewTextAccess(
 		e.Title = i
 	})
 
-func Select(as ...xs.ReadWrite) CategorysQuerySet {
-	return CategorysQuerySet{xs.MakeQuerySet(tableInfo, as, func() interface{} {
+func Select(as ...pgtalk.ColumnAccessor) CategorysQuerySet {
+	return CategorysQuerySet{pgtalk.MakeQuerySet(tableInfo, as, func() interface{} {
 		return new(Category)
 	})}
 }
 
 type CategorysQuerySet struct {
-	xs.QuerySet
+	pgtalk.QuerySet
 }
 
-func (s CategorysQuerySet) Unwrap() xs.QuerySet { return s.QuerySet }
+func (s CategorysQuerySet) Unwrap() pgtalk.QuerySet { return s.QuerySet }
 
 // Where is
-func (s CategorysQuerySet) Where(condition xs.SQLWriter) CategorysQuerySet {
+func (s CategorysQuerySet) Where(condition pgtalk.SQLWriter) CategorysQuerySet {
 	return CategorysQuerySet{QuerySet: s.QuerySet.Where(condition)}
 }
 
@@ -51,7 +50,7 @@ func (s CategorysQuerySet) Limit(limit int) CategorysQuerySet {
 }
 
 // Exec is
-func (s CategorysQuerySet) Exec(conn *pgx.Conn) (list []*Category, err error) {
+func (s CategorysQuerySet) Exec(conn pgtalk.Connection) (list []*Category, err error) {
 	err = s.QuerySet.Exec(conn, func(each interface{}) {
 		list = append(list, each.(*Category))
 	})

@@ -1,4 +1,4 @@
-package xs
+package pgtalk
 
 import (
 	"bytes"
@@ -11,24 +11,16 @@ type TableInfo struct {
 	Alias string
 }
 
-type ReadWrite interface {
-	Name() string
-	// temp name
-	WriteInto(entity interface{}, fieldValue interface{})
-	// temp name
-	ValueAsSQL() string
-}
+var EmptyColumnAccessor = []ColumnAccessor{}
 
-var EmptyReadWrite = []ReadWrite{}
-
-type Printer struct {
+type ValuePrinter struct {
 	v interface{}
 }
 
-func (p Printer) SQL() string { return fmt.Sprintf("%v", p.v) }
+func (p ValuePrinter) SQL() string { return fmt.Sprintf("%v", p.v) }
 
 type ScanToWrite struct {
-	RW     ReadWrite
+	RW     ColumnAccessor
 	Entity interface{}
 }
 

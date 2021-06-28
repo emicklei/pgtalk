@@ -1,4 +1,4 @@
-package xs
+package pgtalk
 
 import "fmt"
 
@@ -19,7 +19,7 @@ func (a Int8Access) ValueAsSQL() string {
 }
 
 func (a Int8Access) BetweenAnd(begin int64, end int64) BetweenAnd {
-	return MakeBetweenAnd(a, Printer{begin}, Printer{end})
+	return MakeBetweenAnd(a, ValuePrinter{begin}, ValuePrinter{end})
 }
 
 func (a Int8Access) WriteInto(entity interface{}, fieldValue interface{}) {
@@ -32,7 +32,7 @@ func (a Int8Access) Value(v int64) Int8Access {
 }
 
 func (a Int8Access) Equals(i int) BinaryOperator {
-	return MakeBinaryOperator(a, "=", Printer{i})
+	return MakeBinaryOperator(a, "=", ValuePrinter{i})
 }
 
 func (a Int8Access) SQL() string {

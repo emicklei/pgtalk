@@ -1,4 +1,4 @@
-package pgtalk
+package main
 
 import (
 	"context"

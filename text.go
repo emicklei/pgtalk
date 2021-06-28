@@ -1,4 +1,4 @@
-package xs
+package pgtalk
 
 import "fmt"
 
