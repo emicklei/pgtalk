@@ -44,3 +44,14 @@ type NoCondition struct{}
 var EmptyCondition = NoCondition{}
 
 func (n NoCondition) SQL() string { return "" }
+
+type columnInfo struct {
+	tableInfo  TableInfo
+	columnName string
+}
+
+func (c columnInfo) Name() string { return c.columnName }
+
+func (c columnInfo) SQL() string {
+	return fmt.Sprintf("%s.%s", c.tableInfo.Alias, c.columnName)
+}

@@ -7,14 +7,13 @@ import (
 
 // Int8Access can Read a column value (int8) and Write a column value and Set a struct field (int64).
 type Int8Access struct {
-	tableInfo   TableInfo
-	columnName  string
+	columnInfo
 	fieldWriter func(dest interface{}, i *int64)
 	insertValue int64
 }
 
 func NewInt8Access(info TableInfo, columnName string, writer func(dest interface{}, i *int64)) Int8Access {
-	return Int8Access{tableInfo: info, columnName: columnName, fieldWriter: writer}
+	return Int8Access{columnInfo: columnInfo{tableInfo: info, columnName: columnName}, fieldWriter: writer}
 }
 
 func (a Int8Access) ValueAsSQL() string {
@@ -31,7 +30,8 @@ func (a Int8Access) WriteInto(entity interface{}, fieldValue interface{}) {
 }
 
 func (a Int8Access) Value(v int64) Int8Access {
-	return Int8Access{tableInfo: a.tableInfo, columnName: a.columnName, fieldWriter: a.fieldWriter, insertValue: v}
+	a.insertValue = v
+	return a
 }
 
 func (a Int8Access) Equals(i int) BinaryOperator {
@@ -44,8 +44,3 @@ func (a Int8Access) Compare(op string, i int) BinaryOperator {
 	}
 	return MakeBinaryOperator(a, op, ValuePrinter{i})
 }
-
-func (a Int8Access) SQL() string {
-	return fmt.Sprintf("%s.%s", a.tableInfo.Alias, a.columnName)
-}
-func (a Int8Access) Name() string { return a.columnName }

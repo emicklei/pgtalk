@@ -42,21 +42,21 @@ func (i Join) On(onLeft, onRight ColumnAccessor) Join {
 	}
 }
 
-func (i Join) Exec(conn Connection) (it InnerJoinIterator, err error) {
+func (i Join) Exec(conn Connection) (it JoinResultIterator, err error) {
 	rows, err := conn.Query(context.Background(), i.SQL())
 	if err != nil {
 		return
 	}
-	return InnerJoinIterator{leftSet: i.LeftSet, rightSet: i.RightSet, rows: rows}, nil
+	return JoinResultIterator{leftSet: i.LeftSet, rightSet: i.RightSet, rows: rows}, nil
 }
 
-type InnerJoinIterator struct {
+type JoinResultIterator struct {
 	leftSet  QuerySet
 	rightSet QuerySet
 	rows     pgx.Rows
 }
 
-func (i *InnerJoinIterator) HasNext() bool {
+func (i *JoinResultIterator) HasNext() bool {
 	if i.rows.Next() {
 		return true
 	} else {
@@ -65,7 +65,11 @@ func (i *InnerJoinIterator) HasNext() bool {
 	return false
 }
 
-func (i *InnerJoinIterator) Next(left interface{}, right interface{}) error {
+func (i *JoinResultIterator) Err() error {
+	return i.rows.Err()
+}
+
+func (i *JoinResultIterator) Next(left interface{}, right interface{}) error {
 	sw := []interface{}{}
 	// left
 	for _, each := range i.leftSet.selectors {

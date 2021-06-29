@@ -6,18 +6,18 @@ import (
 )
 
 type TextAccess struct {
-	tableInfo   TableInfo
-	columnName  string
+	columnInfo
 	fieldWriter func(dest interface{}, i *string)
 	insertValue string
 }
 
 func NewTextAccess(info TableInfo, columnName string, writer func(dest interface{}, i *string)) TextAccess {
-	return TextAccess{tableInfo: info, columnName: columnName, fieldWriter: writer}
+	return TextAccess{columnInfo: columnInfo{tableInfo: info, columnName: columnName}, fieldWriter: writer}
 }
 
 func (a TextAccess) Value(v string) TextAccess {
-	return TextAccess{tableInfo: a.tableInfo, columnName: a.columnName, fieldWriter: a.fieldWriter, insertValue: v}
+	a.insertValue = v
+	return a
 }
 
 func (a TextAccess) Equals(s string) BinaryOperator {
@@ -34,12 +34,6 @@ func (a TextAccess) Compare(op string, s string) BinaryOperator {
 func (a TextAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 	var i string = fieldValue.(string)
 	a.fieldWriter(entity, &i)
-}
-
-func (a TextAccess) Name() string { return a.columnName }
-
-func (a TextAccess) SQL() string {
-	return fmt.Sprintf("%s.%s", a.tableInfo.Alias, a.columnName)
 }
 
 func (a TextAccess) ValueAsSQL() string {

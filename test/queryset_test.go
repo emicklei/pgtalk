@@ -63,7 +63,6 @@ type ProductWithCount struct {
 }
 
 func TestSelectProductWithCount(t *testing.T) {
-	t.Skip()
 	q := products.Select(products.Code).Count(products.ID)
 	if got, want := q.SQL(), `SELECT t1.code,COUNT(t1.id) FROM products t1`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
@@ -72,5 +71,6 @@ func TestSelectProductWithCount(t *testing.T) {
 	for it.HasNext() {
 		pc := new(ProductWithCount)
 		_ = it.Next(pc)
+		t.Logf("%#v", pc)
 	}
 }

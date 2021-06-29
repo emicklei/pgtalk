@@ -68,17 +68,21 @@ func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet { q.groupBy = cas; ret
 func (q QuerySet) Having(condition SQLWriter) QuerySet    { q.having = condition; return q }
 func (q QuerySet) OrderBy(cas ...ColumnAccessor) QuerySet { q.orderBy = cas; return q }
 
-func (d QuerySet) Exec(conn Connection) *EntityIterator {
+func (d QuerySet) Exec(conn Connection) *ResultIterator {
 	rows, err := conn.Query(context.Background(), d.SQL())
-	return &EntityIterator{queryError: err, rows: rows}
+	return &ResultIterator{queryError: err, rows: rows}
 }
 
-type EntityIterator struct {
+type ResultIterator struct {
 	queryError error
 	rows       pgx.Rows
 }
 
-func (i *EntityIterator) HasNext() bool {
+func (i *ResultIterator) Err() error {
+	return i.queryError
+}
+
+func (i *ResultIterator) HasNext() bool {
 	if i.queryError != nil {
 		return false
 	}
@@ -89,7 +93,7 @@ func (i *EntityIterator) HasNext() bool {
 	return false
 }
 
-func (i *EntityIterator) Next(entity interface{}) error {
+func (i *ResultIterator) Next(entity interface{}) error {
 	list := i.rows.FieldDescriptions()
 	for _, each := range list {
 		log.Println(each.Name)
