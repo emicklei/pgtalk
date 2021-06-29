@@ -39,3 +39,11 @@ func (a TextAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 func (a TextAccess) ValueAsSQL() string {
 	return fmt.Sprintf("'%s'", a.insertValue)
 }
+
+func (a TextAccess) NotNull() NullCheck {
+	return NullCheck{Operand: a, IsNot: true}
+}
+
+func (a TextAccess) Like(pattern string) BinaryOperator {
+	return MakeBinaryOperator(a, "LIKE", ValuePrinter{pattern})
+}

@@ -28,10 +28,26 @@ func MakeBinaryOperator(left SQLWriter, operator string, right SQLWriter) Binary
 	}
 }
 
-func (o BinaryOperator) And(right SQLWriter) SQLWriter {
+func (o BinaryOperator) And(right SQLWriter) BinaryOperator {
 	return BinaryOperator{
 		Left:     o,
 		Operator: "AND",
 		Right:    right,
+	}
+}
+
+func (o BinaryOperator) Or(right SQLWriter) BinaryOperator {
+	return BinaryOperator{
+		Left:     o,
+		Operator: "OR",
+		Right:    right,
+	}
+}
+
+func (o BinaryOperator) Like(pattern string) BinaryOperator {
+	return BinaryOperator{
+		Left:     o,
+		Operator: "LIKE",
+		Right:    ValuePrinter{pattern},
 	}
 }

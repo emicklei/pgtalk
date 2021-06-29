@@ -44,3 +44,7 @@ func (a Int8Access) Compare(op string, i int) BinaryOperator {
 	}
 	return MakeBinaryOperator(a, op, ValuePrinter{i})
 }
+
+func (a Int8Access) NotNull() NullCheck {
+	return NullCheck{Operand: a, IsNot: true}
+}

@@ -13,12 +13,14 @@ import (
 type QuerySet struct {
 	tableInfo TableInfo
 	selectors []ColumnAccessor
+	distinct  bool
 	condition SQLWriter
 	limit     int
 	factory   NewEntityFunc
 	groupBy   []ColumnAccessor
 	having    SQLWriter
 	orderBy   []ColumnAccessor
+	sortOrder string
 }
 
 func MakeQuerySet(tableInfo TableInfo, selectors []ColumnAccessor, factory NewEntityFunc) QuerySet {
@@ -59,9 +61,16 @@ func (q QuerySet) SQL() string {
 	if q.limit > 0 {
 		limit = fmt.Sprintf(" LIMIT %d", q.limit)
 	}
-	return fmt.Sprintf("SELECT %s FROM %s%s%s", q.SelectSection(), q.FromSection(), where, limit)
+	distinct := ""
+	if q.distinct {
+		distinct = "DISTINCT "
+	}
+	return fmt.Sprintf("SELECT %s%s FROM %s%s%s", distinct, q.SelectSection(), q.FromSection(), where, limit)
 }
 
+func (q QuerySet) Distinct() QuerySet                     { q.distinct = true; return q }
+func (q QuerySet) Ascending() QuerySet                    { q.sortOrder = "ASC"; return q }
+func (q QuerySet) Decending() QuerySet                    { q.sortOrder = "DESC"; return q }
 func (q QuerySet) Where(condition SQLWriter) QuerySet     { q.condition = condition; return q }
 func (q QuerySet) Limit(limit int) QuerySet               { q.limit = limit; return q }
 func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet { q.groupBy = cas; return q }

@@ -57,6 +57,20 @@ func TestLeftJoin(t *testing.T) {
 	}
 }
 
+func TestFullSelect(t *testing.T) {
+	t.Skip()
+	q := products.
+		Select(products.AllColumns...).
+		Distinct().
+		Where(products.Code.Compare(">", "A").And(products.CategoryID.NotNull())).
+		GroupBy(products.CategoryID).
+		OrderBy(products.CategoryID).
+		Ascending()
+	if got, want := q.SQL(), ``; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
+
 type ProductWithCount struct {
 	*products.Product
 	Count int
