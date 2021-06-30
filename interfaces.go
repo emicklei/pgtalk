@@ -26,3 +26,7 @@ type ColumnAccessor interface {
 	// temp name
 	ValueAsSQL() string
 }
+
+type SQLWriter interface {
+	SQL() string
+}

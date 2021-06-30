@@ -14,7 +14,9 @@ var testConnect *pgx.Conn
 func TestMain(m *testing.M) {
 	connectionString := os.Getenv("PGTALK_CONN")
 	if len(connectionString) == 0 {
-		os.Exit(1)
+		println("no database env set")
+		os.Exit(m.Run())
+		return
 	}
 	fmt.Println("db open ...")
 	conn, err := pgx.Connect(context.Background(), connectionString)

@@ -30,6 +30,15 @@ func TestSelectAllColumns(t *testing.T) {
 	}
 }
 
+func TestIn(t *testing.T) {
+	q := products.
+		Select(products.AllColumns...).
+		Where(products.Code.In("F42", "f42"))
+	if got, want := q.SQL(), `SELECT t1.id,t1.code,t1.category_id FROM products t1 WHERE (t1.code IN ('F42','f42'))`; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
+
 func TestInnerJoin(t *testing.T) {
 	q := products.Select(products.Code).Where(products.Code.Equals("F42")).
 		Join(categories.Select(categories.Title)).

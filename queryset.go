@@ -70,7 +70,7 @@ func (q QuerySet) SQL() string {
 
 func (q QuerySet) Distinct() QuerySet                     { q.distinct = true; return q }
 func (q QuerySet) Ascending() QuerySet                    { q.sortOrder = "ASC"; return q }
-func (q QuerySet) Decending() QuerySet                    { q.sortOrder = "DESC"; return q }
+func (q QuerySet) Descending() QuerySet                   { q.sortOrder = "DESC"; return q }
 func (q QuerySet) Where(condition SQLWriter) QuerySet     { q.condition = condition; return q }
 func (q QuerySet) Limit(limit int) QuerySet               { q.limit = limit; return q }
 func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet { q.groupBy = cas; return q }

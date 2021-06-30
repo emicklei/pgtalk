@@ -57,6 +57,15 @@ func (m MutationSet) On() MutationSet {
 	return m
 }
 
+func (m MutationSet) columnsSectionOn(buf io.Writer) {
+	for i, each := range m.selectors {
+		if i > 0 {
+			io.WriteString(buf, ",")
+		}
+		io.WriteString(buf, each.Name())
+	}
+}
+
 func (m MutationSet) ColumnsSection() string {
 	buf := new(bytes.Buffer)
 	for i, each := range m.selectors {

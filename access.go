@@ -19,6 +19,25 @@ type ValuePrinter struct {
 
 func (p ValuePrinter) SQL() string { return fmt.Sprintf("%v", p.v) }
 
+type ValuesPrinter struct {
+	vs []interface{}
+}
+
+func (p ValuesPrinter) SQL() string {
+	b := new(bytes.Buffer)
+	fmt.Fprintf(b, "(")
+	for i, each := range p.vs {
+		if i > 0 {
+			fmt.Fprintf(b, ",")
+		}
+		if s, ok := each.(string); ok {
+			fmt.Fprintf(b, "'%s'", s)
+		}
+	}
+	fmt.Fprintf(b, ")")
+	return b.String()
+}
+
 type ScanToWrite struct {
 	RW     ColumnAccessor
 	Entity interface{}

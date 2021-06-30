@@ -6,10 +6,6 @@ const (
 	validComparisonOperators = "= > < >= <= <>"
 )
 
-type SQLWriter interface {
-	SQL() string
-}
-
 type BinaryOperator struct {
 	Operator string
 	Left     SQLWriter
