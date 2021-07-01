@@ -15,3 +15,8 @@ With generated Go code from a table definition (products), you can write and exe
 		_ = it.Next(p, c)
 		t.Logf("%s,%s", *p.Code, *c.Title)
 	}
+
+## supported Column Types
+
+- text
+- bigint

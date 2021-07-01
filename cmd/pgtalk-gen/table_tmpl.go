@@ -1,78 +1,79 @@
 package main
 
 var tableTemplateSrc = `
-package products
+package {{.GoPackage}}
 
 import (
 	"github.com/emicklei/pgtalk"
 )
 
-var tableInfo = pgtalk.TableInfo{Name: "products", Alias: "t1"}
+var tableInfo = pgtalk.TableInfo{Name: "{{.TableName}}", Alias: "{{.TableAlias}}"}
 
-type Product struct {
-	ID         *int64
-	Code       *string
-	Price      *int64
-	CategoryID *int64
+type {{.GoType}} struct {
+{{range .Fields}}
+	{{.GoName}}	{{.GoType}}
+{{end}}
 }
 
 var (
-	ID         = pgtalk.NewInt8Access(tableInfo, "id", func(dest interface{}, i *int64) { dest.(*Product).ID = i })
-	Code       = pgtalk.NewTextAccess(tableInfo, "code", func(dest interface{}, i *string) { dest.(*Product).Code = i })
-	CategoryID = pgtalk.NewInt8Access(tableInfo, "category_id", func(dest interface{}, i *int64) { dest.(*Product).CategoryID = i })
-	// or make this func?
-	AllColumns = []pgtalk.ColumnAccessor{ID, Code, CategoryID}
+{{range .Fields}}	
+	{{.GoName}} = pgtalk.{{.FactoryMethod}}(tableInfo, "{{.Name}}", func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v })
+{{end}}
 )
 
-func Select(as ...pgtalk.ColumnAccessor) ProductsQuerySet {
-	return ProductsQuerySet{pgtalk.MakeQuerySet(tableInfo, as, func() interface{} {
-		return new(Product)
+func AllColumns() (all []pgtalk.ColumnAccessor) {
+	return append(all{{range .Fields}},{{.GoName}}{{end}})
+}
+
+func Select(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet {
+	return {{.GoType}}sQuerySet{pgtalk.MakeQuerySet(tableInfo, cas, func() interface{} {
+		return new({{.GoType}})
 	})}
 }
 
-type ProductsQuerySet struct {
+type {{.GoType}}sQuerySet struct {
 	pgtalk.QuerySet
 }
 
-func (s ProductsQuerySet) Unwrap() pgtalk.QuerySet { return s.QuerySet }
+func (s {{.GoType}}sQuerySet) Unwrap() pgtalk.QuerySet { return s.QuerySet }
 
 // Where is
-func (s ProductsQuerySet) Where(condition pgtalk.SQLWriter) ProductsQuerySet {
-	return ProductsQuerySet{QuerySet: s.QuerySet.Where(condition)}
+func (s {{.GoType}}sQuerySet) Where(condition pgtalk.SQLWriter) {{.GoType}}sQuerySet {
+	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.Where(condition)}
 }
 
 // Limit is
-func (s ProductsQuerySet) Limit(limit int) ProductsQuerySet {
-	return ProductsQuerySet{QuerySet: s.QuerySet.Limit(limit)}
+func (s {{.GoType}}sQuerySet) Limit(limit int) {{.GoType}}sQuerySet {
+	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.Limit(limit)}
 }
 
 // GroupBy is
-func (s ProductsQuerySet) GroupBy(cas ...pgtalk.ColumnAccessor) ProductsQuerySet {
-	return ProductsQuerySet{QuerySet: s.QuerySet.GroupBy(cas...)}
+func (s {{.GoType}}sQuerySet) GroupBy(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet {
+	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.GroupBy(cas...)}
 }
 
 // GroupBy is
-func (s ProductsQuerySet) OrderBy(cas ...pgtalk.ColumnAccessor) ProductsQuerySet {
-	return ProductsQuerySet{QuerySet: s.QuerySet.OrderBy(cas...)}
+func (s {{.GoType}}sQuerySet) OrderBy(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet {
+	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.OrderBy(cas...)}
 }
 
 // Exec is
-func (s ProductsQuerySet) Exec(conn pgtalk.Connection) (list []*Product, err error) {
+func (s {{.GoType}}sQuerySet) Exec(conn pgtalk.Connection) (list []*{{.GoType}}, err error) {
 	err = s.QuerySet.ExecWithAppender(conn, func(each interface{}) {
-		list = append(list, each.(*Product))
+		list = append(list, each.(*{{.GoType}}))
 	})
 	return
 }
 
-func Insert(as ...pgtalk.ColumnAccessor) pgtalk.MutationSet {
-	return pgtalk.MakeMutationSet(tableInfo, as, pgtalk.MutationInsert)
+func Insert(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet {
+	return pgtalk.MakeMutationSet(tableInfo, cas, pgtalk.MutationInsert)
 }
 
 func Delete() pgtalk.MutationSet {
 	return pgtalk.MakeMutationSet(tableInfo, pgtalk.EmptyColumnAccessor, pgtalk.MutationDelete)
 }
 
-func Update(as ...pgtalk.ColumnAccessor) pgtalk.MutationSet {
-	return pgtalk.MakeMutationSet(tableInfo, as, pgtalk.MutationUpdate)
+func Update(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet {
+	return pgtalk.MakeMutationSet(tableInfo, cas, pgtalk.MutationUpdate)
 }
 `

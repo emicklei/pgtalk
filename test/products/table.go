@@ -17,9 +17,11 @@ var (
 	ID         = pgtalk.NewInt8Access(tableInfo, "id", func(dest interface{}, i *int64) { dest.(*Product).ID = i })
 	Code       = pgtalk.NewTextAccess(tableInfo, "code", func(dest interface{}, i *string) { dest.(*Product).Code = i })
 	CategoryID = pgtalk.NewInt8Access(tableInfo, "category_id", func(dest interface{}, i *int64) { dest.(*Product).CategoryID = i })
-	// or make this func?
-	AllColumns = []pgtalk.ColumnAccessor{ID, Code, CategoryID}
 )
+
+func AllColumns() (all []pgtalk.ColumnAccessor) {
+	return append(all, ID, Code, CategoryID)
+}
 
 func Select(as ...pgtalk.ColumnAccessor) ProductsQuerySet {
 	return ProductsQuerySet{pgtalk.MakeQuerySet(tableInfo, as, func() interface{} {
