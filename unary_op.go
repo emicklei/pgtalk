@@ -1,6 +1,9 @@
 package pgtalk
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
 type UnaryOperator struct {
 	Operator string
@@ -11,8 +14,9 @@ func MakeUnaryOperator(operator string, operand SQLWriter) UnaryOperator {
 	return UnaryOperator{Operator: operator, Operand: operand}
 }
 
-func (u UnaryOperator) SQL() string {
-	return fmt.Sprintf("%s (%s)", u.Operator, u.Operand.SQL())
+func (u UnaryOperator) SQLOn(w io.Writer) {
+	fmt.Fprintf(w, "%s (", u.Operator)
+	u.Operand.SQLOn(w)
 }
 
 func (u UnaryOperator) And(right SQLWriter) BinaryOperator {
@@ -36,9 +40,12 @@ type NullCheck struct {
 	IsNot bool
 }
 
-func (n NullCheck) SQL() string {
+func (n NullCheck) SQLOn(w io.Writer) {
+	fmt.Fprint(w, "(")
+	n.Operand.SQLOn(w)
 	if n.IsNot {
-		return fmt.Sprintf("(%s IS NOT NULL)", n.Operand.SQL())
+		fmt.Fprint(w, " IS NOT NULL)")
+		return
 	}
-	return fmt.Sprintf("(%s IS NULL)", n.Operand.SQL())
+	fmt.Fprint(w, " IS NULL)")
 }

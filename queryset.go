@@ -1,7 +1,6 @@
 package pgtalk
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -31,41 +30,34 @@ func MakeQuerySet(tableInfo TableInfo, selectors []ColumnAccessor, factory NewEn
 		factory:   factory}
 }
 
-func (q QuerySet) FromSection() string {
-	return fmt.Sprintf("%s %s", q.tableInfo.Name, q.tableInfo.Alias)
+func (q QuerySet) fromSectionOn(w io.Writer) {
+	fmt.Fprintf(w, "%s %s", q.tableInfo.Name, q.tableInfo.Alias)
 }
 
-func (q QuerySet) SelectSection() string {
-	buf := new(bytes.Buffer)
+func (q QuerySet) selectSectionOn(w io.Writer) {
 	for i, each := range q.selectors {
 		if i > 0 {
-			io.WriteString(buf, ",")
+			io.WriteString(w, ",")
 		}
-		io.WriteString(buf, each.SQL())
+		each.SQLOn(w)
 	}
-	return buf.String()
 }
 
-func (q QuerySet) WhereSection() string {
-	return q.condition.SQL()
-}
-
-// SQL returns the full SQL query
-func (q QuerySet) SQL() string {
-	// TEMP
-	where := q.WhereSection()
-	if len(where) > 0 {
-		where = fmt.Sprintf(" WHERE %s", where)
-	}
-	limit := ""
-	if q.limit > 0 {
-		limit = fmt.Sprintf(" LIMIT %d", q.limit)
-	}
-	distinct := ""
+func (q QuerySet) SQLOn(w io.Writer) {
+	fmt.Fprint(w, "SELECT ")
 	if q.distinct {
-		distinct = "DISTINCT "
+		fmt.Fprint(w, "DISTINCT ")
 	}
-	return fmt.Sprintf("SELECT %s%s FROM %s%s%s", distinct, q.SelectSection(), q.FromSection(), where, limit)
+	q.selectSectionOn(w)
+	fmt.Fprint(w, " FROM ")
+	q.fromSectionOn(w)
+	if _, ok := q.condition.(NoCondition); !ok {
+		fmt.Fprint(w, " WHERE ")
+		q.condition.SQLOn(w)
+	}
+	if q.limit > 0 {
+		fmt.Fprintf(w, " LIMIT %d", q.limit)
+	}
 }
 
 func (q QuerySet) Distinct() QuerySet                     { q.distinct = true; return q }
@@ -78,7 +70,7 @@ func (q QuerySet) Having(condition SQLWriter) QuerySet    { q.having = condition
 func (q QuerySet) OrderBy(cas ...ColumnAccessor) QuerySet { q.orderBy = cas; return q }
 
 func (d QuerySet) Exec(conn Connection) *ResultIterator {
-	rows, err := conn.Query(context.Background(), d.SQL())
+	rows, err := conn.Query(context.Background(), SQL(d))
 	return &ResultIterator{queryError: err, rows: rows}
 }
 
@@ -112,7 +104,7 @@ func (i *ResultIterator) Next(entity interface{}) error {
 }
 
 func (d QuerySet) ExecWithAppender(conn Connection, appender func(each interface{})) (err error) {
-	rows, err := conn.Query(context.Background(), d.SQL())
+	rows, err := conn.Query(context.Background(), SQL(d))
 	if err != nil {
 		return
 	}
@@ -178,7 +170,11 @@ type Count struct {
 	accessor ColumnAccessor
 }
 
-func (c Count) Name() string               { return c.accessor.Name() }
-func (c Count) SQL() string                { return fmt.Sprintf("COUNT(%s)", c.accessor.SQL()) }
-func (c Count) ValueAsSQL() string         { return "" }
+func (c Count) Name() string { return c.accessor.Name() }
+func (c Count) SQLOn(w io.Writer) {
+	fmt.Fprint(w, "COUNT(")
+	c.accessor.SQLOn(w)
+	fmt.Fprint(w, ")")
+}
+func (c Count) ValueAsSQLOn(w io.Writer)   {}
 func (c Count) WriteInto(e, v interface{}) {}

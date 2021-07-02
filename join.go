@@ -2,6 +2,7 @@ package pgtalk
 
 import (
 	"context"
+	"io"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -23,14 +24,18 @@ type Join struct {
 	Type     JoinType
 }
 
-func (i Join) SQL() string {
-	//TODO InnerJoinType only
-	return "SELECT " + i.LeftSet.SelectSection() + "," + i.RightSet.SelectSection() +
-		" FROM " + i.LeftSet.FromSection() +
-		" INNER JOIN " + i.RightSet.FromSection() +
-		" ON (" + i.OnLeft.SQL() +
-		" = " + i.OnRight.SQL() +
-		") WHERE " + i.LeftSet.WhereSection()
+//func (i Join) SQL() string {
+//TODO InnerJoinType only
+// return "SELECT " + i.LeftSet.SelectSection() + "," + i.RightSet.SelectSection() +
+// 	" FROM " + i.LeftSet.FromSection() +
+// 	" INNER JOIN " + i.RightSet.FromSection() +
+// 	" ON (" + i.OnLeft.SQL() +
+// 	" = " + i.OnRight.SQL() +
+// 	") WHERE " + i.LeftSet.WhereSection()
+//}
+
+func (i Join) SQLOn(w io.Writer) {
+	i.LeftSet.SQLOn(w)
 }
 
 func (i Join) On(onLeft, onRight ColumnAccessor) Join {
@@ -42,8 +47,15 @@ func (i Join) On(onLeft, onRight ColumnAccessor) Join {
 	}
 }
 
+func (i Join) LeftJoin(q Unwrappable) (m MultiJoin) {
+	m.Sets = append(m.Sets, i.LeftSet, i.RightSet, q.Unwrap())
+	m.JoinTypes = append(m.JoinTypes, i.Type, LeftOuterJoinType)
+	m.OnPairs = append(m.OnPairs, i.OnLeft, i.OnRight) // MultiJoin has On to add one pair
+	return
+}
+
 func (i Join) Exec(conn Connection) (it JoinResultIterator, err error) {
-	rows, err := conn.Query(context.Background(), i.SQL())
+	rows, err := conn.Query(context.Background(), SQL(i))
 	if err != nil {
 		return
 	}
@@ -88,4 +100,18 @@ func (i *JoinResultIterator) Next(left interface{}, right interface{}) error {
 		sw = append(sw, rw)
 	}
 	return i.rows.Scan(sw...)
+}
+
+type MultiJoin struct {
+	Sets      []QuerySet
+	JoinTypes []JoinType
+	OnPairs   []ColumnAccessor
+}
+
+func (m MultiJoin) On(onLeft, onRight ColumnAccessor) MultiJoin {
+	m.OnPairs = append(m.OnPairs, onLeft, onRight)
+	return m
+}
+
+func (m MultiJoin) SQLOn(w io.Writer) {
 }

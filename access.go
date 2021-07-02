@@ -17,14 +17,13 @@ type ValuePrinter struct {
 	v interface{}
 }
 
-func (p ValuePrinter) SQL() string { return fmt.Sprintf("%v", p.v) }
+func (p ValuePrinter) SQLOn(b io.Writer) { fmt.Fprintf(b, "%v", p.v) }
 
 type ValuesPrinter struct {
 	vs []interface{}
 }
 
-func (p ValuesPrinter) SQL() string {
-	b := new(bytes.Buffer)
+func (p ValuesPrinter) SQLOn(b io.Writer) {
 	fmt.Fprintf(b, "(")
 	for i, each := range p.vs {
 		if i > 0 {
@@ -35,7 +34,6 @@ func (p ValuesPrinter) SQL() string {
 		}
 	}
 	fmt.Fprintf(b, ")")
-	return b.String()
 }
 
 type ScanToWrite struct {
@@ -50,19 +48,17 @@ func (s ScanToWrite) Scan(fieldValue interface{}) error {
 
 type LiteralString string
 
-func (l LiteralString) SQL() string {
-	b := new(bytes.Buffer)
+func (l LiteralString) SQLOn(b io.Writer) {
 	io.WriteString(b, "'")
 	io.WriteString(b, string(l))
 	io.WriteString(b, "'")
-	return b.String()
 }
 
 type NoCondition struct{}
 
 var EmptyCondition = NoCondition{}
 
-func (n NoCondition) SQL() string { return "" }
+func (n NoCondition) SQLOn(b io.Writer) {}
 
 type columnInfo struct {
 	tableInfo  TableInfo
@@ -71,6 +67,12 @@ type columnInfo struct {
 
 func (c columnInfo) Name() string { return c.columnName }
 
-func (c columnInfo) SQL() string {
-	return fmt.Sprintf("%s.%s", c.tableInfo.Alias, c.columnName)
+func (c columnInfo) SQLOn(w io.Writer) {
+	fmt.Fprintf(w, "%s.%s", c.tableInfo.Alias, c.columnName)
+}
+
+func SQL(w SQLWriter) string {
+	b := new(bytes.Buffer)
+	w.SQLOn(b)
+	return b.String()
 }

@@ -2,6 +2,7 @@ package pgtalk
 
 import (
 	"context"
+	"io"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -20,13 +21,13 @@ type Unwrappable interface {
 
 type ColumnAccessor interface {
 	Name() string
-	SQL() string
+	SQLOn(io.Writer)
 	// temp name
 	WriteInto(entity interface{}, fieldValue interface{})
 	// temp name
-	ValueAsSQL() string
+	ValueAsSQLOn(io.Writer)
 }
 
 type SQLWriter interface {
-	SQL() string
+	SQLOn(io.Writer)
 }

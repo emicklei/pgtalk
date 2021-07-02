@@ -2,6 +2,7 @@ package pgtalk
 
 import (
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -16,8 +17,8 @@ func NewInt8Access(info TableInfo, columnName string, writer func(dest interface
 	return Int8Access{columnInfo: columnInfo{tableInfo: info, columnName: columnName}, fieldWriter: writer}
 }
 
-func (a Int8Access) ValueAsSQL() string {
-	return fmt.Sprintf("%d", a.insertValue)
+func (a Int8Access) ValueAsSQLOn(w io.Writer) {
+	fmt.Fprintf(w, "%d", a.insertValue)
 }
 
 func (a Int8Access) BetweenAnd(begin int64, end int64) BetweenAnd {

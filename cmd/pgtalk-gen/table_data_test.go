@@ -19,6 +19,12 @@ func TestTemplate(t *testing.T) {
 				GoType:        "*int64",
 				FactoryMethod: "NewInt8Access",
 			},
+			{
+				Name:          "currency",
+				GoName:        "Currency",
+				GoType:        "*string",
+				FactoryMethod: "NewTextAccess",
+			},
 		},
 	}
 	tmpl, err := template.New("tt").Parse(tableTemplateSrc)

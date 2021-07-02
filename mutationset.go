@@ -1,7 +1,6 @@
 package pgtalk
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 )
@@ -27,24 +26,27 @@ func MakeMutationSet(tableInfo TableInfo, selectors []ColumnAccessor, operationT
 		operationType: operationType}
 }
 
-func (m MutationSet) WhereSection() string {
-	return m.condition.SQL()
-}
-
 // SQL returns the full SQL mutation query
-func (m MutationSet) SQL() string {
-	// TODO
-
+func (m MutationSet) SQLOn(w io.Writer) {
 	if m.operationType == MutationInsert {
-		return "INSERT INTO " + m.tableInfo.Name + " (" + m.ColumnsSection() + ") values (" + m.ValuesSection() + ")"
+		fmt.Fprint(w, "INSERT INTO ")
+		fmt.Fprint(w, m.tableInfo.Name)
+		fmt.Fprint(w, " (")
+		//m.ColumnsSection() + ") values (" + m.ValuesSection() + ")"
+		return
 	}
 	if m.operationType == MutationDelete {
-		return "DELETE FROM " + m.tableInfo.Name + " WHERE " + m.WhereSection()
+		fmt.Fprint(w, "INSERT INTO ")
+		fmt.Fprint(w, m.tableInfo.Name)
+		//return "DELETE FROM " + m.tableInfo.Name + " WHERE " + m.WhereSection()
+		return
 	}
 	if m.operationType == MutationUpdate {
-		return "UPDATE " + m.tableInfo.Name + " SET " + m.WhereSection() + " WHERE " + m.WhereSection()
+		fmt.Fprint(w, "INSERT INTO ")
+		fmt.Fprint(w, m.tableInfo.Name)
+		//return "UPDATE " + m.tableInfo.Name + " SET " + m.WhereSection() + " WHERE " + m.WhereSection()
+		return
 	}
-	return "-- unknown operation type"
 }
 
 func (m MutationSet) Where(condition SQLWriter) MutationSet {
@@ -66,35 +68,21 @@ func (m MutationSet) columnsSectionOn(buf io.Writer) {
 	}
 }
 
-func (m MutationSet) ColumnsSection() string {
-	buf := new(bytes.Buffer)
-	for i, each := range m.selectors {
-		if i > 0 {
-			io.WriteString(buf, ",")
-		}
-		io.WriteString(buf, each.Name())
-	}
-	return buf.String()
-}
-
-func (m MutationSet) ValuesSection() string {
-	buf := new(bytes.Buffer)
+func (m MutationSet) valuesSectionOn(buf io.Writer) {
 	for i := range m.selectors {
 		if i > 0 {
 			io.WriteString(buf, ",")
 		}
 		fmt.Fprintf(buf, "$%d", i+1)
 	}
-	return buf.String()
 }
 
-func (m MutationSet) SetSection() string {
-	buf := new(bytes.Buffer)
+func (m MutationSet) setSectionOn(w io.Writer) {
 	for i, each := range m.selectors {
 		if i > 0 {
-			io.WriteString(buf, ",")
+			io.WriteString(w, ",")
 		}
-		fmt.Fprintf(buf, "%s = %s", each.Name(), each.ValueAsSQL())
+		fmt.Fprintf(w, "%s = ", each.Name())
+		each.ValueAsSQLOn(w)
 	}
-	return buf.String()
 }

@@ -1,6 +1,9 @@
 package pgtalk
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
 const (
 	validComparisonOperators = "= > < >= <= <>"
@@ -12,8 +15,12 @@ type BinaryOperator struct {
 	Right    SQLWriter
 }
 
-func (o BinaryOperator) SQL() string {
-	return fmt.Sprintf("(%s %s %s)", o.Left.SQL(), o.Operator, o.Right.SQL())
+func (o BinaryOperator) SQLOn(b io.Writer) {
+	fmt.Fprint(b, "(")
+	o.Left.SQLOn(b)
+	fmt.Fprintf(b, " %s ", o.Operator)
+	o.Right.SQLOn(b)
+	fmt.Fprint(b, ")")
 }
 
 func MakeBinaryOperator(left SQLWriter, operator string, right SQLWriter) BinaryOperator {

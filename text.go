@@ -2,6 +2,7 @@ package pgtalk
 
 import (
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -36,8 +37,8 @@ func (a TextAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 	a.fieldWriter(entity, &i)
 }
 
-func (a TextAccess) ValueAsSQL() string {
-	return fmt.Sprintf("'%s'", a.insertValue)
+func (a TextAccess) ValueAsSQLOn(w io.Writer) {
+	fmt.Fprintf(w, "'%s'", a.insertValue)
 }
 
 func (a TextAccess) NotNull() NullCheck {
