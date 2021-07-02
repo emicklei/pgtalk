@@ -21,13 +21,13 @@ type Unwrappable interface {
 
 type ColumnAccessor interface {
 	Name() string
-	SQLOn(io.Writer)
+	SQLOn(w io.Writer)
 	// temp name
 	WriteInto(entity interface{}, fieldValue interface{})
 	// temp name
-	ValueAsSQLOn(io.Writer)
+	ValueAsSQLOn(w io.Writer)
 }
 
 type SQLWriter interface {
-	SQLOn(io.Writer)
+	SQLOn(w io.Writer)
 }

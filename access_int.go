@@ -30,7 +30,7 @@ func (a Int8Access) WriteInto(entity interface{}, fieldValue interface{}) {
 	a.fieldWriter(entity, &i)
 }
 
-func (a Int8Access) Value(v int64) Int8Access {
+func (a Int8Access) Set(v int64) Int8Access {
 	a.insertValue = v
 	return a
 }

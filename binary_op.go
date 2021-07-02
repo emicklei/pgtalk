@@ -54,3 +54,8 @@ func (o BinaryOperator) Like(pattern string) BinaryOperator {
 		Right:    ValuePrinter{pattern},
 	}
 }
+
+type BetweenAnd struct {
+}
+
+func MakeBetweenAnd(reader ColumnAccessor, begin, end SQLWriter) BetweenAnd { return BetweenAnd{} }

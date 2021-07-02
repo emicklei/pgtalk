@@ -16,7 +16,7 @@ func NewTextAccess(info TableInfo, columnName string, writer func(dest interface
 	return TextAccess{columnInfo: columnInfo{tableInfo: info, columnName: columnName}, fieldWriter: writer}
 }
 
-func (a TextAccess) Value(v string) TextAccess {
+func (a TextAccess) Set(v string) TextAccess {
 	a.insertValue = v
 	return a
 }

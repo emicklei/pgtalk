@@ -34,26 +34,25 @@ func (q QuerySet) fromSectionOn(w io.Writer) {
 	fmt.Fprintf(w, "%s %s", q.tableInfo.Name, q.tableInfo.Alias)
 }
 
-func (q QuerySet) selectSectionOn(w io.Writer) {
-	for i, each := range q.selectors {
-		if i > 0 {
-			io.WriteString(w, ",")
-		}
-		each.SQLOn(w)
-	}
-}
-
 func (q QuerySet) SQLOn(w io.Writer) {
 	fmt.Fprint(w, "SELECT ")
 	if q.distinct {
 		fmt.Fprint(w, "DISTINCT ")
 	}
-	q.selectSectionOn(w)
+	writeAccessOn(q.selectors, w)
 	fmt.Fprint(w, " FROM ")
 	q.fromSectionOn(w)
 	if _, ok := q.condition.(NoCondition); !ok {
 		fmt.Fprint(w, " WHERE ")
 		q.condition.SQLOn(w)
+	}
+	if len(q.groupBy) > 0 {
+		fmt.Fprint(w, " GROUP BY ")
+		writeAccessOn(q.groupBy, w)
+	}
+	if len(q.orderBy) > 0 {
+		fmt.Fprint(w, " ORDER BY ")
+		writeAccessOn(q.orderBy, w)
 	}
 	if q.limit > 0 {
 		fmt.Fprintf(w, " LIMIT %d", q.limit)
@@ -113,9 +112,9 @@ func (d QuerySet) ExecWithAppender(conn Connection, appender func(each interface
 		entity := d.factory()
 		sw := []interface{}{}
 		for _, each := range d.selectors {
-			rw := ScanToWrite{
-				RW:     each,
-				Entity: entity,
+			rw := scanToWrite{
+				access: each,
+				entity: entity,
 			}
 			sw = append(sw, rw)
 		}

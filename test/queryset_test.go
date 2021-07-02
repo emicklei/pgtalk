@@ -61,7 +61,7 @@ func TestLeftJoin(t *testing.T) {
 	q := products.Select(products.Code).Where(products.Code.Equals("F42")).
 		LeftJoin(categories.Select(categories.Title)).
 		On(products.ID, categories.ID)
-	if got, want := pgtalk.SQL(q), `SELECT t1.code,t2.title FROM products t1 LEFT JOIN categories t2 ON (t1.id = t2.id) WHERE (t1.code = 'F42')`; got != want {
+	if got, want := pgtalk.SQL(q), `SELECT t1.code,t2.title FROM products t1 LEFT OUTER JOIN categories t2 ON (t1.id = t2.id) WHERE (t1.code = 'F42')`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -72,13 +72,12 @@ func TestMultiLeftJoin(t *testing.T) {
 		On(products.ID, categories.ID).
 		LeftJoin(categories.Select(categories.Title)).
 		On(products.ID, categories.ID)
-	if got, want := pgtalk.SQL(q), `SELECT t1.code,t2.title FROM products t1 LEFT JOIN categories t2 ON (t1.id = t2.id) WHERE (t1.code = 'F42')`; got != want {
+	if got, want := pgtalk.SQL(q), `SELECT t1.code,t2.title,t2.title FROM products t1 LEFT OUTER JOIN categories t2 ON (t1.id = t2.id) LEFT OUTER JOIN categories t2 ON (t1.id = t2.id)`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
 
 func TestFullSelect(t *testing.T) {
-	t.Skip()
 	q := products.
 		Select(products.AllColumns()...).
 		Distinct().
@@ -86,7 +85,7 @@ func TestFullSelect(t *testing.T) {
 		GroupBy(products.CategoryID).
 		OrderBy(products.CategoryID).
 		Ascending()
-	if got, want := pgtalk.SQL(q), ``; got != want {
+	if got, want := pgtalk.SQL(q), `SELECT DISTINCT t1.id,t1.code,t1.category_id FROM products t1 WHERE ((t1.code > 'A') AND (t1.category_id IS NOT NULL)) GROUP BY t1.category_id ORDER BY t1.category_id`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }

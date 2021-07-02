@@ -4,10 +4,12 @@ import (
 	"os"
 	"testing"
 	"text/template"
+	"time"
 )
 
 func TestTemplate(t *testing.T) {
 	tt := TableType{
+		Created:    time.Now(),
 		TableName:  "prices",
 		TableAlias: "p1",
 		GoPackage:  "prices",

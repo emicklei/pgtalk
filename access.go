@@ -36,13 +36,13 @@ func (p ValuesPrinter) SQLOn(b io.Writer) {
 	fmt.Fprintf(b, ")")
 }
 
-type ScanToWrite struct {
-	RW     ColumnAccessor
-	Entity interface{}
+type scanToWrite struct {
+	access ColumnAccessor
+	entity interface{}
 }
 
-func (s ScanToWrite) Scan(fieldValue interface{}) error {
-	s.RW.WriteInto(s.Entity, fieldValue)
+func (s scanToWrite) Scan(fieldValue interface{}) error {
+	s.access.WriteInto(s.entity, fieldValue)
 	return nil
 }
 
@@ -75,4 +75,13 @@ func SQL(w SQLWriter) string {
 	b := new(bytes.Buffer)
 	w.SQLOn(b)
 	return b.String()
+}
+
+func writeAccessOn(list []ColumnAccessor, w io.Writer) {
+	for i, each := range list {
+		if i > 0 {
+			io.WriteString(w, ",")
+		}
+		each.SQLOn(w)
+	}
 }

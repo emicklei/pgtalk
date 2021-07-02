@@ -1,6 +1,9 @@
 package main
 
+import "time"
+
 type TableType struct {
+	Created    time.Time
 	TableName  string
 	TableAlias string
 	GoPackage  string

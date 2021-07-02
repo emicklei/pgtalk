@@ -1,8 +1,33 @@
 # pgtalk
 
-## example
+More type safe SQL query building using Go code generated from PostgreSQL table definitions.
 
-With generated Go code from a table definition (products), you can write and execute
+## examples
+
+### Insert
+
+	m := products.Insert(
+		products.ID.Set(10),
+		products.Code.Set("test"),
+		products.CategoryID.Set(1))
+
+### Update
+
+	m := products.Update(
+		products.ID.Set(10),
+		products.Code.Set("test"),
+		products.CategoryID.Set(1)).
+		Where(products.ID.Equals(10))
+
+### Delete
+
+	m := products.Delete().Where(products.ID.Equals(10))
+
+### Select
+
+	q := products.Select(products.Code).Where(products.Code.Equals("F42"))
+
+### LeftJoin
 
     q :=products.Select(products.Code).Where(products.Code.Equals("F42")).
         LeftJoin(categories.Select(categories.Title)).
@@ -20,3 +45,5 @@ With generated Go code from a table definition (products), you can write and exe
 
 - text
 - bigint
+
+(c) 2021, http://ernestmicklei.com. MIT License.
