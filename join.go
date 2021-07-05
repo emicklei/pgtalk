@@ -70,7 +70,7 @@ func (i Join) On(onLeft, onRight ColumnAccessor) Join {
 	}
 }
 
-func (i Join) LeftJoin(q Unwrappable) (m MultiJoin) {
+func (i Join) LeftOuterJoin(q Unwrappable) (m MultiJoin) {
 	m.Sets = append(m.Sets, i.LeftSet, i.RightSet, q.Unwrap())
 	m.JoinTypes = append(m.JoinTypes, i.Type, LeftOuterJoinType)
 	m.OnPairs = append(m.OnPairs, i.OnLeft, i.OnRight) // MultiJoin has On to add one pair

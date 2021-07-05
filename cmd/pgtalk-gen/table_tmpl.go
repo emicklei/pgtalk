@@ -5,11 +5,11 @@ var tableTemplateSrc = `package {{.GoPackage}}
 
 import (
 	"github.com/emicklei/pgtalk"
-	"github.com/jackc/pgtype"
+	"time"
 )
 
 var (
-	_ = pgtype.Date{}
+	_ = time.Now()
 	tableInfo = pgtalk.TableInfo{Name: "{{.TableName}}", Alias: "{{.TableAlias}}"}
 )
 

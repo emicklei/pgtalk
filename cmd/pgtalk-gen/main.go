@@ -2,17 +2,24 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"html/template"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v4"
 )
 
+var (
+	oTarget = flag.String("o", ".", "target directory")
+)
+
 func main() {
+	flag.Parse()
 	connectionString := os.Getenv("PGTALK_CONN")
 	conn, err := pgx.Connect(context.Background(), connectionString)
 	if err != nil {
@@ -26,9 +33,7 @@ func main() {
 		log.Fatal(err)
 	}
 	for _, each := range all {
-		if each.Name == "things" {
-			generateFromTable(each)
-		}
+		generateFromTable(each)
 	}
 }
 
@@ -54,7 +59,15 @@ func generateFromTable(table PgTable) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = tmpl.Execute(os.Stdout, tt)
+	path := filepath.Join(*oTarget, table.Name, "table.go")
+	os.MkdirAll(path, os.ModeDir)
+	fileOut, err := os.Create(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer fileOut.Close()
+
+	err = tmpl.Execute(fileOut, tt)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,14 +79,21 @@ func alias(s string) string {
 
 func goFieldTypeAndAccess(datatype string) (string, string) {
 	switch datatype {
-	case "date":
-		return "*pgtype.Date", "NewDateAccess"
+	case "date", "timestamp", "timestamp without time zone", "timestamp with time zone":
+		return "*time.Time", "NewTimeAccess"
+	case "text":
+		return "*string", "NewTextAccess"
+	case "bigint":
+		return "*int64", "NewInt64Access"
 	default:
 		return datatype, "New" + datatype
 	}
 }
 
 func fieldName(s string) string {
+	if s == "id" {
+		return "ID"
+	}
 	return strings.Title(s)
 }
 

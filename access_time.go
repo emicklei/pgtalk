@@ -3,29 +3,25 @@ package pgtalk
 import (
 	"fmt"
 	"io"
-
-	"github.com/jackc/pgtype"
+	"time"
 )
 
-type DateAccess struct {
+type TimeAccess struct {
 	columnInfo
-	fieldWriter func(dest interface{}, i *pgtype.Date)
-	insertValue pgtype.Date
+	fieldWriter func(dest interface{}, i *time.Time)
+	insertValue time.Time
 }
 
-func NewDateAccess(info TableInfo, columnName string, writer func(dest interface{}, i *pgtype.Date)) DateAccess {
-	return DateAccess{columnInfo: columnInfo{tableInfo: info, columnName: columnName}, fieldWriter: writer}
+func NewTimeAccess(info TableInfo, columnName string, writer func(dest interface{}, i *time.Time)) TimeAccess {
+	return TimeAccess{columnInfo: columnInfo{tableInfo: info, columnName: columnName}, fieldWriter: writer}
 }
 
-func (a DateAccess) WriteInto(entity interface{}, fieldValue interface{}) {
-	var v pgtype.Date = fieldValue.(pgtype.Date)
+func (a TimeAccess) WriteInto(entity interface{}, fieldValue interface{}) {
+	var v time.Time = fieldValue.(time.Time)
+	// TODO if v.IsZero()
 	a.fieldWriter(entity, &v)
 }
 
-func (a DateAccess) ValueAsSQLOn(w io.Writer) {
+func (a TimeAccess) ValueAsSQLOn(w io.Writer) {
 	fmt.Fprintf(w, "%v", a.insertValue)
-}
-
-func NewTimestampAccess(info TableInfo, columnName string, writer func(dest interface{}, i *pgtype.Date)) DateAccess {
-	return NewDateAccess(info, columnName, writer)
 }

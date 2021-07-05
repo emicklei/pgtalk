@@ -141,7 +141,7 @@ func (d QuerySet) Join(otherQuerySet Unwrappable) Join {
 	}
 }
 
-func (d QuerySet) LeftJoin(otherQuerySet Unwrappable) Join {
+func (d QuerySet) LeftOuterJoin(otherQuerySet Unwrappable) Join {
 	return Join{
 		LeftSet:  d,
 		RightSet: otherQuerySet.Unwrap(),

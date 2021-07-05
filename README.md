@@ -11,6 +11,8 @@ More type safe SQL query building using Go code generated from PostgreSQL table 
 		products.Code.Set("test"),
 		products.CategoryID.Set(1))
 
+	err := m.Exec(aConnection)		
+
 ### Update
 
 	m := products.Update(
@@ -19,15 +21,21 @@ More type safe SQL query building using Go code generated from PostgreSQL table 
 		products.CategoryID.Set(1)).
 		Where(products.ID.Equals(10))
 
+	err := m.Exec(aConnection)		
+
 ### Delete
 
 	m := products.Delete().Where(products.ID.Equals(10))
+
+	err := m.Exec(aConnection)
 
 ### Select
 
 	q := products.Select(products.Code).Where(products.Code.Equals("F42"))
 
-### LeftJoin
+	products, err := q.Exec(aConnection) // products is a []*product.Product
+
+### Left Outer Join
 
     q :=products.Select(products.Code).Where(products.Code.Equals("F42")).
         LeftJoin(categories.Select(categories.Title)).
