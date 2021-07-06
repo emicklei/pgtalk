@@ -46,7 +46,7 @@ func TestIn(t *testing.T) {
 func TestInnerJoin(t *testing.T) {
 	q := products.Select(products.Code).Where(products.Code.Equals("F42")).
 		Join(categories.Select(categories.Title)).
-		On(products.ID, categories.ID)
+		On(products.ID.Equals(categories.ID))
 	if got, want := pgtalk.SQL(q), `SELECT p1.code,c1.title FROM products p1 INNER JOIN categories c1 ON (p1.id = c1.id) WHERE (p1.code = 'F42')`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
@@ -65,7 +65,7 @@ func TestInnerJoin(t *testing.T) {
 func TestLeftJoin(t *testing.T) {
 	q := products.Select(products.Code).Where(products.Code.Equals("F42")).
 		LeftOuterJoin(categories.Select(categories.Title)).
-		On(products.ID, categories.ID)
+		On(products.ID.Equals(categories.ID))
 	if got, want := pgtalk.SQL(q), `SELECT p1.code,c1.title FROM products p1 LEFT OUTER JOIN categories c1 ON (p1.id = c1.id) WHERE (p1.code = 'F42')`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
@@ -74,9 +74,9 @@ func TestLeftJoin(t *testing.T) {
 func TestMultiLeftJoin(t *testing.T) {
 	q := products.Select(products.Code).Where(products.Code.Equals("F42")).
 		LeftOuterJoin(categories.Select(categories.Title)).
-		On(products.ID, categories.ID).
+		On(products.ID.Equals(categories.ID)).
 		LeftOuterJoin(categories.Select(categories.Title)).
-		On(products.ID, categories.ID)
+		On(products.ID.Equals(categories.ID))
 	if got, want := pgtalk.SQL(q), `SELECT p1.code,c1.title,c1.title FROM products p1 LEFT OUTER JOIN categories c1 ON (p1.id = c1.id) LEFT OUTER JOIN categories c1 ON (p1.id = c1.id)`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}

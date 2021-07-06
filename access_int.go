@@ -35,8 +35,14 @@ func (a Int64Access) Set(v int64) Int64Access {
 	return a
 }
 
-func (a Int64Access) Equals(i int) BinaryOperator {
-	return MakeBinaryOperator(a, "=", ValuePrinter{i})
+func (a Int64Access) Equals(intOrInt64Access interface{}) BinaryOperator {
+	if i, ok := intOrInt64Access.(int); ok {
+		return MakeBinaryOperator(a, "=", ValuePrinter{i})
+	}
+	if ia, ok := intOrInt64Access.(Int64Access); ok {
+		return MakeBinaryOperator(a, "=", ia)
+	}
+	panic("int or Int64Access expected")
 }
 
 func (a Int64Access) Compare(op string, i int) BinaryOperator {

@@ -21,15 +21,21 @@ func (a TextAccess) Set(v string) TextAccess {
 	return a
 }
 
-func (a TextAccess) Equals(s string) BinaryOperator {
-	return MakeBinaryOperator(a, "=", LiteralString(s))
+func (a TextAccess) Equals(stringOrTextAccess interface{}) BinaryOperator {
+	return a.Compare("=", stringOrTextAccess)
 }
 
-func (a TextAccess) Compare(op string, s string) BinaryOperator {
+func (a TextAccess) Compare(op string, stringOrTextAccess interface{}) BinaryOperator {
 	if !strings.Contains(validComparisonOperators, op) {
 		panic("invalid comparison operator:" + op)
 	}
-	return MakeBinaryOperator(a, op, LiteralString(s))
+	if s, ok := stringOrTextAccess.(string); ok {
+		return MakeBinaryOperator(a, "=", LiteralString(s))
+	}
+	if ta, ok := stringOrTextAccess.(TextAccess); ok {
+		return MakeBinaryOperator(a, "=", ta)
+	}
+	panic("string or TextAcces expected")
 }
 
 func (a TextAccess) WriteInto(entity interface{}, fieldValue interface{}) {

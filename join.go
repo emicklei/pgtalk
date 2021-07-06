@@ -35,20 +35,11 @@ func (i Join) SQLOn(w io.Writer) {
 	i.LeftSet.fromSectionOn(w)
 	writeJoinType(i.Type, w)
 	i.RightSet.fromSectionOn(w)
-	fmt.Fprint(w, " ON (")
-	// version 2 TODO
-	if _, ok := i.Condition.(NoCondition); !ok {
-		i.Condition.SQLOn(w)
-	} else {
-		i.OnLeft.SQLOn(w)
-		fmt.Fprint(w, " = ")
-		i.OnRight.SQLOn(w)
-	}
+	fmt.Fprint(w, " ON ")
+	i.Condition.SQLOn(w)
 	if _, ok := i.LeftSet.condition.(NoCondition); !ok {
-		fmt.Fprint(w, ") WHERE ")
+		fmt.Fprint(w, " WHERE ")
 		i.LeftSet.condition.SQLOn(w)
-	} else {
-		fmt.Fprint(w, ")")
 	}
 	// TODO RightSet where
 }
@@ -66,18 +57,7 @@ func writeJoinType(t JoinType, w io.Writer) {
 	}
 }
 
-// TODO replace with condition
-func (i Join) On(onLeft, onRight ColumnAccessor) Join {
-	return Join{
-		LeftSet:  i.LeftSet,
-		RightSet: i.RightSet,
-		OnLeft:   onLeft,
-		OnRight:  onRight,
-		Type:     i.Type,
-	}
-}
-
-func (i Join) On2(condition SQLWriter) Join {
+func (i Join) On(condition SQLWriter) Join {
 	return Join{
 		LeftSet:   i.LeftSet,
 		RightSet:  i.RightSet,
@@ -89,7 +69,7 @@ func (i Join) On2(condition SQLWriter) Join {
 func (i Join) LeftOuterJoin(q Unwrappable) (m MultiJoin) {
 	m.Sets = append(m.Sets, i.LeftSet, i.RightSet, q.Unwrap())
 	m.JoinTypes = append(m.JoinTypes, i.Type, LeftOuterJoinType)
-	m.OnPairs = append(m.OnPairs, i.OnLeft, i.OnRight) // MultiJoin has On to add one pair
+	m.Conditions = append(m.Conditions, i.Condition)
 	return
 }
 
@@ -142,14 +122,14 @@ func (i *JoinResultIterator) Next(left interface{}, right interface{}) error {
 }
 
 type MultiJoin struct {
-	Sets      []QuerySet
-	JoinTypes []JoinType
-	OnPairs   []ColumnAccessor
+	Sets       []QuerySet
+	JoinTypes  []JoinType
+	Conditions []SQLWriter
 }
 
 // TODO replace with condition
-func (m MultiJoin) On(onLeft, onRight ColumnAccessor) MultiJoin {
-	m.OnPairs = append(m.OnPairs, onLeft, onRight)
+func (m MultiJoin) On(condition SQLWriter) MultiJoin {
+	//m.OnPairs = append(m.OnPairs, onLeft, onRight)
 	return m
 }
 
@@ -169,10 +149,7 @@ func (m MultiJoin) SQLOn(w io.Writer) {
 		writeJoinType(jt, w)
 		set := m.Sets[j+1]
 		set.fromSectionOn(w)
-		fmt.Fprint(w, " ON (")
-		m.OnPairs[j*2].SQLOn(w) // left
-		fmt.Fprint(w, " = ")
-		m.OnPairs[j*2+1].SQLOn(w) // right
-		fmt.Fprint(w, ")")
+		fmt.Fprint(w, " ON ")
+		m.Conditions[j].SQLOn(w)
 	}
 }
