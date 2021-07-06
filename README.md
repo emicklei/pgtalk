@@ -38,7 +38,7 @@ More type safe SQL query building using Go code generated from PostgreSQL table 
 ### Left Outer Join
 
     q :=products.Select(products.Code).Where(products.Code.Equals("F42")).
-        LeftJoin(categories.Select(categories.Title)).
+        LeftOuterJoin(categories.Select(categories.Title)).
         On(products.ID, categories.ID)
 
 	it, _ := q.Exec(aConnection)
