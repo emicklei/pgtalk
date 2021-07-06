@@ -18,11 +18,12 @@ const (
 )
 
 type Join struct {
-	LeftSet  QuerySet
-	RightSet QuerySet
-	OnLeft   ColumnAccessor
-	OnRight  ColumnAccessor
-	Type     JoinType
+	LeftSet   QuerySet
+	RightSet  QuerySet
+	OnLeft    ColumnAccessor
+	OnRight   ColumnAccessor
+	Condition SQLWriter
+	Type      JoinType
 }
 
 func (i Join) SQLOn(w io.Writer) {
@@ -35,9 +36,14 @@ func (i Join) SQLOn(w io.Writer) {
 	writeJoinType(i.Type, w)
 	i.RightSet.fromSectionOn(w)
 	fmt.Fprint(w, " ON (")
-	i.OnLeft.SQLOn(w)
-	fmt.Fprint(w, " = ")
-	i.OnRight.SQLOn(w)
+	// version 2 TODO
+	if _, ok := i.Condition.(NoCondition); !ok {
+		i.Condition.SQLOn(w)
+	} else {
+		i.OnLeft.SQLOn(w)
+		fmt.Fprint(w, " = ")
+		i.OnRight.SQLOn(w)
+	}
 	if _, ok := i.LeftSet.condition.(NoCondition); !ok {
 		fmt.Fprint(w, ") WHERE ")
 		i.LeftSet.condition.SQLOn(w)
@@ -60,6 +66,7 @@ func writeJoinType(t JoinType, w io.Writer) {
 	}
 }
 
+// TODO replace with condition
 func (i Join) On(onLeft, onRight ColumnAccessor) Join {
 	return Join{
 		LeftSet:  i.LeftSet,
@@ -67,6 +74,15 @@ func (i Join) On(onLeft, onRight ColumnAccessor) Join {
 		OnLeft:   onLeft,
 		OnRight:  onRight,
 		Type:     i.Type,
+	}
+}
+
+func (i Join) On2(condition SQLWriter) Join {
+	return Join{
+		LeftSet:   i.LeftSet,
+		RightSet:  i.RightSet,
+		Condition: condition,
+		Type:      i.Type,
 	}
 }
 
@@ -131,6 +147,7 @@ type MultiJoin struct {
 	OnPairs   []ColumnAccessor
 }
 
+// TODO replace with condition
 func (m MultiJoin) On(onLeft, onRight ColumnAccessor) MultiJoin {
 	m.OnPairs = append(m.OnPairs, onLeft, onRight)
 	return m
