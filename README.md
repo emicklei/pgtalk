@@ -54,4 +54,10 @@ More type safe SQL query building using Go code generated from PostgreSQL table 
 - text
 - bigint
 
+https://www.postgresql.org/docs/9.5/datatype.html
+
+## dev notes
+
+The whole implementation might be better once Go has Type parameters (generics) support.
+
 (c) 2021, http://ernestmicklei.com. MIT License.
