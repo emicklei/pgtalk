@@ -10,12 +10,12 @@ import (
 
 var (
 	_ = time.Now()
-	tableInfo = pgtalk.TableInfo{Name: "{{.TableName}}", Alias: "{{.TableAlias}}"}
+	tableInfo = pgtalk.TableInfo{Schema: "{{.Schema}}" Name: "{{.TableName}}", Alias: "{{.TableAlias}}"}
 )
 
 type {{.GoType}} struct {
 {{- range .Fields}}
-	{{.GoName}}	{{.GoType}}
+	{{.GoName}}	{{.GoType}} // {{.DataType}}
 {{- end}}
 }
 

@@ -7,8 +7,9 @@ import (
 )
 
 type TableInfo struct {
-	Name  string
-	Alias string
+	Name   string
+	Schema string
+	Alias  string
 }
 
 var EmptyColumnAccessor = []ColumnAccessor{}

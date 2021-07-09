@@ -4,6 +4,7 @@ import "time"
 
 type TableType struct {
 	Created    time.Time
+	Schema     string
 	TableName  string
 	TableAlias string
 	GoPackage  string
@@ -13,6 +14,7 @@ type TableType struct {
 
 type ColumnField struct {
 	Name          string
+	DataType      string
 	GoStructType  string
 	GoType        string
 	GoName        string

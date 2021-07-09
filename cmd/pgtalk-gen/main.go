@@ -16,6 +16,7 @@ import (
 
 var (
 	oTarget = flag.String("o", ".", "target directory")
+	oSchema = flag.String("s", "public", "source database schema")
 )
 
 func main() {
@@ -28,7 +29,7 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	all, err := LoadTables(context.Background(), conn, "public")
+	all, err := LoadTables(context.Background(), conn, *oSchema)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,8 +39,10 @@ func main() {
 }
 
 func generateFromTable(table PgTable) {
+	log.Println("generating ", table.Name)
 	tt := TableType{
 		Created:    time.Now(),
+		Schema:     *oSchema,
 		TableName:  table.Name,
 		TableAlias: alias(table.Name),
 		GoPackage:  table.Name,
@@ -51,6 +54,7 @@ func generateFromTable(table PgTable) {
 			Name:          each.Name,
 			GoName:        fieldName(each.Name),
 			GoType:        goType,
+			DataType:      each.DataType,
 			FactoryMethod: method,
 		}
 		tt.Fields = append(tt.Fields, f)
@@ -59,8 +63,9 @@ func generateFromTable(table PgTable) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	path := filepath.Join(*oTarget, table.Name, "table.go")
-	os.MkdirAll(path, os.ModeDir)
+	path := filepath.Join(*oTarget, table.Name)
+	os.MkdirAll(path, os.ModeDir|os.ModePerm)
+	path = filepath.Join(path, "table.go")
 	fileOut, err := os.Create(path)
 	if err != nil {
 		log.Fatal(err)
@@ -83,11 +88,20 @@ func goFieldTypeAndAccess(datatype string) (string, string) {
 		return "*time.Time", "NewTimeAccess"
 	case "text":
 		return "*string", "NewTextAccess"
-	case "bigint":
+	case "bigint", "integer":
 		return "*int64", "NewInt64Access"
-	default:
-		return datatype, "New" + datatype
+	case "jsonb":
+		return "*[]byte", "NewBytesAccess"
+	case "point":
+		return "*Point", "NewPointAccess"
 	}
+	if strings.HasPrefix(datatype, "character") {
+		return "*string", "NewTextAccess"
+	}
+	if strings.HasPrefix(datatype, "numeric") {
+		return "*float64", "NewFloat64Access"
+	}
+	return datatype, "New" + datatype
 }
 
 func fieldName(s string) string {
