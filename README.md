@@ -1,6 +1,6 @@
 # pgtalk
 
-More type safe SQL query building using Go code generated from PostgreSQL table definitions.
+More type safe SQL query building using Go code generated (pgtalk-gen) from PostgreSQL table definitions.
 
 ## examples
 

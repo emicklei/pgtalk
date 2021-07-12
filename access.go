@@ -64,6 +64,7 @@ func (n NoCondition) SQLOn(b io.Writer) {}
 type columnInfo struct {
 	tableInfo  TableInfo
 	columnName string
+	notNull    bool // TODO validate in Go or by Postgres?
 }
 
 func (c columnInfo) Name() string { return c.columnName }

@@ -43,6 +43,15 @@ func TestIn(t *testing.T) {
 	}
 }
 
+func TestExists(t *testing.T) {
+	t.Skip()
+	q := products.
+		Select(products.ID).
+		WhereExists(categories.Select(categories.ID))
+	if got, want := pgtalk.SQL(q), ` `; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
 func TestInnerJoin(t *testing.T) {
 	q := products.Select(products.Code).Where(products.Code.Equals("F42")).
 		Join(categories.Select(categories.Title)).
