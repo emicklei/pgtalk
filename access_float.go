@@ -17,6 +17,9 @@ func NewFloat64Access(info TableInfo, columnName string, writer func(dest interf
 }
 
 func (a Float64Access) WriteInto(entity interface{}, fieldValue interface{}) {
+	if fieldValue == nil {
+		return
+	}
 	var f = fieldValue.(float64)
 	a.fieldWriter(entity, &f)
 }

@@ -39,6 +39,9 @@ func (a TextAccess) Compare(op string, stringOrTextAccess interface{}) BinaryOpe
 }
 
 func (a TextAccess) WriteInto(entity interface{}, fieldValue interface{}) {
+	if fieldValue == nil {
+		return
+	}
 	var i string = fieldValue.(string)
 	a.fieldWriter(entity, &i)
 }

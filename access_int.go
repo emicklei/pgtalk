@@ -10,11 +10,15 @@ import (
 type Int64Access struct {
 	columnInfo
 	fieldWriter func(dest interface{}, i *int64)
+	fieldReader func(src interface{}) *int64 // TODO needed?
 	insertValue int64
 }
 
-func NewInt64Access(info TableInfo, columnName string, writer func(dest interface{}, i *int64)) Int64Access {
-	return Int64Access{columnInfo: columnInfo{tableInfo: info, columnName: columnName}, fieldWriter: writer}
+func NewInt64Access(info TableInfo, columnName string,
+	writer func(dest interface{}, i *int64)) Int64Access {
+	return Int64Access{
+		columnInfo:  columnInfo{tableInfo: info, columnName: columnName},
+		fieldWriter: writer}
 }
 
 func (a Int64Access) ValueAsSQLOn(w io.Writer) {
@@ -26,6 +30,9 @@ func (a Int64Access) BetweenAnd(begin int64, end int64) BetweenAnd {
 }
 
 func (a Int64Access) WriteInto(entity interface{}, fieldValue interface{}) {
+	if fieldValue == nil {
+		return
+	}
 	var i int64 = fieldValue.(int64)
 	a.fieldWriter(entity, &i)
 }

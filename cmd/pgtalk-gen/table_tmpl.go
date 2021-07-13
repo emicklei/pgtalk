@@ -7,6 +7,8 @@ var tableTemplateSrc = `package {{.GoPackage}}
 import (
 	"github.com/emicklei/pgtalk"
 	"time"
+	"fmt"
+	"bytes"
 )
 
 var (
@@ -25,6 +27,18 @@ var (
 	{{.GoName}} = pgtalk.{{.FactoryMethod}}(tableInfo, "{{.Name}}", func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v })
 {{- end}}
 )
+
+func (e *{{.GoType}}) String() string {
+	b := new(bytes.Buffer)
+	fmt.Fprint(b, "{{.TableName}}.{{.GoType}}{")
+{{- range .Fields}}
+	if e.{{.GoName}} != nil {
+		fmt.Fprintf(b, "{{.GoName}}:%v ", *e.{{.GoName}})
+	}
+{{- end}}
+	fmt.Fprint(b, "}")
+	return b.String()
+}
 
 func AllColumns() (all []pgtalk.ColumnAccessor) {
 	return append(all{{range .Fields}},{{.GoName}}{{end}})

@@ -25,10 +25,7 @@ type Product struct {
 var (
 	/**
 		ID = pgtalk.NewInt64Access(tableInfo, "id", func(dest interface{}, v *int64) error {
-		if e, ok := dest.(*Product); ok {
-			e.ID = v
-			return nil
-		}
+		if e, ok := dest.(*Product); ok { e.ID = v; return nil }
 		return pgtalk.EntityTypeError(dest, "products.Product")
 	})
 	**/
