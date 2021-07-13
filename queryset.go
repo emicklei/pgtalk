@@ -59,15 +59,15 @@ func (q QuerySet) SQLOn(w io.Writer) {
 	}
 }
 
-func (q QuerySet) Distinct() QuerySet                          { q.distinct = true; return q }
-func (q QuerySet) Ascending() QuerySet                         { q.sortOrder = "ASC"; return q }
-func (q QuerySet) Descending() QuerySet                        { q.sortOrder = "DESC"; return q }
-func (q QuerySet) Where(condition SQLWriter) QuerySet          { q.condition = condition; return q }
-func (q QuerySet) WhereExists(otherQuerySet QuerySet) QuerySet { return q } // TODO
-func (q QuerySet) Limit(limit int) QuerySet                    { q.limit = limit; return q }
-func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet      { q.groupBy = cas; return q }
-func (q QuerySet) Having(condition SQLWriter) QuerySet         { q.having = condition; return q }
-func (q QuerySet) OrderBy(cas ...ColumnAccessor) QuerySet      { q.orderBy = cas; return q }
+func (q QuerySet) Distinct() QuerySet                             { q.distinct = true; return q }
+func (q QuerySet) Ascending() QuerySet                            { q.sortOrder = "ASC"; return q }
+func (q QuerySet) Descending() QuerySet                           { q.sortOrder = "DESC"; return q }
+func (q QuerySet) Where(condition SQLWriter) QuerySet             { q.condition = condition; return q }
+func (q QuerySet) WhereExists(otherQuerySet Unwrappable) QuerySet { return q } // TODO
+func (q QuerySet) Limit(limit int) QuerySet                       { q.limit = limit; return q }
+func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet         { q.groupBy = cas; return q }
+func (q QuerySet) Having(condition SQLWriter) QuerySet            { q.having = condition; return q }
+func (q QuerySet) OrderBy(cas ...ColumnAccessor) QuerySet         { q.orderBy = cas; return q }
 
 func (d QuerySet) Exec(conn Connection) *ResultIterator {
 	rows, err := conn.Query(context.Background(), SQL(d))
