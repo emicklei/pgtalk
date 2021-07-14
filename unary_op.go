@@ -17,6 +17,7 @@ func MakeUnaryOperator(operator string, operand SQLWriter) UnaryOperator {
 func (u UnaryOperator) SQLOn(w io.Writer) {
 	fmt.Fprintf(w, "%s (", u.Operator)
 	u.Operand.SQLOn(w)
+	fmt.Fprint(w, ")")
 }
 
 func (u UnaryOperator) And(right SQLWriter) BinaryOperator {
