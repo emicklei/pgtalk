@@ -68,6 +68,9 @@ func (q QuerySet) Limit(limit int) QuerySet                       { q.limit = li
 func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet         { q.groupBy = cas; return q }
 func (q QuerySet) Having(condition SQLWriter) QuerySet            { q.having = condition; return q }
 func (q QuerySet) OrderBy(cas ...ColumnAccessor) QuerySet         { q.orderBy = cas; return q }
+func (q QuerySet) Exists() UnaryOperator {
+	return UnaryOperator{Operator: "EXISTS", Operand: q}
+}
 
 func (d QuerySet) Exec(conn Connection) *ResultIterator {
 	rows, err := conn.Query(context.Background(), SQL(d))
