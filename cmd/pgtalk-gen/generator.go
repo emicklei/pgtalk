@@ -11,14 +11,14 @@ import (
 )
 
 func generateFromTable(table PgTable) {
-	log.Println("generating from", table.Schema, table.Name)
+	log.Printf("generating from %s.%s\n", table.Schema, table.Name)
 	tt := TableType{
 		Created:    time.Now(),
 		Schema:     *oSchema,
 		TableName:  table.Name,
 		TableAlias: alias(table.Name),
 		GoPackage:  table.Name,
-		GoType:     withoutTrailingS(strings.Title(table.Name)),
+		GoType:     asSingular(strings.Title(table.Name)),
 	}
 	for _, each := range table.Columns {
 		goType, method := goFieldTypeAndAccess(each.DataType)
@@ -92,7 +92,13 @@ func fieldName(s string) string {
 	return strings.Title(s)
 }
 
-func withoutTrailingS(s string) string {
+func asSingular(s string) string {
+	if strings.HasSuffix(s, "ies") {
+		return s[0 : len(s)-3]+"y"
+	}
+	if strings.HasSuffix(s, "ses") {
+		return s[0 : len(s)-2]
+	}
 	if strings.HasSuffix(s, "s") {
 		return s[0 : len(s)-1]
 	}
