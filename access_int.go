@@ -10,7 +10,6 @@ import (
 type Int64Access struct {
 	columnInfo
 	fieldWriter func(dest interface{}, i *int64)
-	fieldReader func(src interface{}) *int64 // TODO needed?
 	insertValue int64
 }
 
