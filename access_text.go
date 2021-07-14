@@ -13,12 +13,16 @@ type TextAccess struct {
 }
 
 func NewTextAccess(info TableInfo, columnName string, writer func(dest interface{}, i *string)) TextAccess {
-	return TextAccess{columnInfo: columnInfo{tableInfo: info, columnName: columnName}, fieldWriter: writer}
+	return TextAccess{columnInfo: makeColumnInfo(info, columnName), fieldWriter: writer}
 }
 
 func (a TextAccess) Set(v string) TextAccess {
 	a.insertValue = v
 	return a
+}
+
+func (a TextAccess) InsertValue() interface{} {
+	return a.insertValue
 }
 
 func (a TextAccess) Equals(stringOrTextAccess interface{}) BinaryOperator {

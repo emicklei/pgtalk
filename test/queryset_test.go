@@ -65,7 +65,7 @@ func TestInnerJoin(t *testing.T) {
 	it, _ := q.Exec(testConnect)
 	for it.HasNext() {
 		p := new(products.Product)
-		c := new(categories.Categorie)
+		c := new(categories.Category)
 		_ = it.Next(p, c)
 		t.Logf("%#v,%#v", *p.Code, *c.Title)
 	}

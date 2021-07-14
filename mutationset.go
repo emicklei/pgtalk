@@ -1,8 +1,11 @@
 package pgtalk
 
 import (
+	"context"
 	"fmt"
 	"io"
+
+	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -30,10 +33,10 @@ func MakeMutationSet(tableInfo TableInfo, selectors []ColumnAccessor, operationT
 func (m MutationSet) SQLOn(w io.Writer) {
 	if m.operationType == MutationInsert {
 		fmt.Fprint(w, "INSERT INTO ")
-		fmt.Fprint(w, m.tableInfo.Name)
+		fmt.Fprintf(w, "%s.%s", m.tableInfo.Schema, m.tableInfo.Name)
 		fmt.Fprint(w, " (")
 		m.columnsSectionOn(w)
-		fmt.Fprint(w, ") values (")
+		fmt.Fprint(w, ") VALUES (")
 		m.valuesSectionOn(w)
 		fmt.Fprint(w, ")")
 		return
@@ -64,6 +67,16 @@ func (m MutationSet) Where(condition SQLWriter) MutationSet {
 // todo
 func (m MutationSet) On() MutationSet {
 	return m
+}
+
+// Pre: must be run inside transaction
+func (m MutationSet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
+	args := []interface{}{}
+	for _, each := range m.selectors {
+		args = append(args, each.InsertValue())
+	}
+	rows, err := conn.Query(ctx, SQL(m), args...)
+	return &ResultIterator{queryError: err, rows: rows}
 }
 
 func (m MutationSet) columnsSectionOn(buf io.Writer) {

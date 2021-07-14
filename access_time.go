@@ -13,7 +13,7 @@ type TimeAccess struct {
 }
 
 func NewTimeAccess(info TableInfo, columnName string, writer func(dest interface{}, i *time.Time)) TimeAccess {
-	return TimeAccess{columnInfo: columnInfo{tableInfo: info, columnName: columnName}, fieldWriter: writer}
+	return TimeAccess{columnInfo: makeColumnInfo(info, columnName), fieldWriter: writer}
 }
 
 func (a TimeAccess) WriteInto(entity interface{}, fieldValue interface{}) {
@@ -26,4 +26,13 @@ func (a TimeAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 
 func (a TimeAccess) ValueAsSQLOn(w io.Writer) {
 	fmt.Fprintf(w, "%v", a.insertValue)
+}
+
+func (a TimeAccess) InsertValue() interface{} {
+	return a.insertValue
+}
+
+func (a TimeAccess) Set(v time.Time) TimeAccess {
+	a.insertValue = v
+	return a
 }

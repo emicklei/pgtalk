@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"strconv"
+	"strings"
 )
 
 type TableInfo struct {
@@ -62,12 +64,26 @@ var EmptyCondition = NoCondition{}
 func (n NoCondition) SQLOn(b io.Writer) {}
 
 type columnInfo struct {
-	tableInfo  TableInfo
-	columnName string
-	notNull    bool // TODO validate in Go or by Postgres?
+	tableInfo   TableInfo
+	columnName  string
+	notNull     bool // TODO validate in Go or by Postgres?
+	isMixedCase bool
 }
 
-func (c columnInfo) Name() string { return c.columnName }
+func makeColumnInfo(t TableInfo, c string) columnInfo {
+	return columnInfo{
+		tableInfo:   t,
+		columnName:  c,
+		isMixedCase: strings.ToLower(c) != c,
+	}
+}
+
+func (c columnInfo) Name() string {
+	if c.isMixedCase {
+		return strconv.Quote(c.columnName)
+	}
+	return c.columnName
+}
 
 func (c columnInfo) SQLOn(w io.Writer) {
 	fmt.Fprintf(w, "%s.%s", c.tableInfo.Alias, c.columnName)

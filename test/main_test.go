@@ -19,7 +19,7 @@ func TestMain(m *testing.M) {
 		os.Exit(m.Run())
 		return
 	}
-	fmt.Println("db open ...")
+	fmt.Println("db open ...", connectionString)
 	conn, err := pgx.Connect(context.Background(), connectionString)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)

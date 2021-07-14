@@ -16,7 +16,7 @@ type Int64Access struct {
 func NewInt64Access(info TableInfo, columnName string,
 	writer func(dest interface{}, i *int64)) Int64Access {
 	return Int64Access{
-		columnInfo:  columnInfo{tableInfo: info, columnName: columnName},
+		columnInfo:  makeColumnInfo(info, columnName),
 		fieldWriter: writer}
 }
 
@@ -34,6 +34,10 @@ func (a Int64Access) WriteInto(entity interface{}, fieldValue interface{}) {
 	}
 	var i int64 = fieldValue.(int64)
 	a.fieldWriter(entity, &i)
+}
+
+func (a Int64Access) InsertValue() interface{} {
+	return a.insertValue
 }
 
 func (a Int64Access) Set(v int64) Int64Access {

@@ -31,7 +31,7 @@ func MakeQuerySet(tableInfo TableInfo, selectors []ColumnAccessor, factory NewEn
 }
 
 func (q QuerySet) fromSectionOn(w io.Writer) {
-	fmt.Fprintf(w, "%s %s", q.tableInfo.Name, q.tableInfo.Alias)
+	fmt.Fprintf(w, "%s.%s %s", q.tableInfo.Schema, q.tableInfo.Name, q.tableInfo.Alias)
 }
 
 func (q QuerySet) SQLOn(w io.Writer) {
@@ -72,7 +72,7 @@ func (q QuerySet) Exists() UnaryOperator {
 	return UnaryOperator{Operator: "EXISTS", Operand: q}
 }
 
-func (d QuerySet) Exec(conn Connection) *ResultIterator {
+func (d QuerySet) Exec(conn *pgx.Conn) *ResultIterator {
 	rows, err := conn.Query(context.Background(), SQL(d))
 	return &ResultIterator{queryError: err, rows: rows}
 }
@@ -106,7 +106,7 @@ func (i *ResultIterator) Next(entity interface{}) error {
 	return nil
 }
 
-func (d QuerySet) ExecWithAppender(conn Connection, appender func(each interface{})) (err error) {
+func (d QuerySet) ExecWithAppender(conn *pgx.Conn, appender func(each interface{})) (err error) {
 	rows, err := conn.Query(context.Background(), SQL(d))
 	if err != nil {
 		return
@@ -181,3 +181,4 @@ func (c Count) SQLOn(w io.Writer) {
 }
 func (c Count) ValueAsSQLOn(w io.Writer)   {}
 func (c Count) WriteInto(e, v interface{}) {}
+func (c Count) InsertValue() interface{}   { return nil }

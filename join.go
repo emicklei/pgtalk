@@ -73,7 +73,7 @@ func (i Join) LeftOuterJoin(q Unwrappable) (m MultiJoin) {
 	return
 }
 
-func (i Join) Exec(conn Connection) (it JoinResultIterator, err error) {
+func (i Join) Exec(conn *pgx.Conn) (it JoinResultIterator, err error) {
 	rows, err := conn.Query(context.Background(), SQL(i))
 	if err != nil {
 		return

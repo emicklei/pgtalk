@@ -1,2 +1,3 @@
 .vscode
 cmd/pgtalk-gen/pgtalk-gen
+test/gen.sh
