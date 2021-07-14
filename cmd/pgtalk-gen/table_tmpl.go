@@ -28,6 +28,7 @@ var (
 {{- end}}
 )
 
+// String returns the debug string for *{{.GoType}} with all non-nil field values.
 func (e *{{.GoType}}) String() string {
 	b := new(bytes.Buffer)
 	fmt.Fprint(b, "{{.TableName}}.{{.GoType}}{")
@@ -40,43 +41,46 @@ func (e *{{.GoType}}) String() string {
 	return b.String()
 }
 
+// AllColumns returns the list of all column accessors for usage in e.g. Select.
 func AllColumns() (all []pgtalk.ColumnAccessor) {
 	return append(all{{range .Fields}},{{.GoName}}{{end}})
 }
 
+// Select returns a new {{.GoType}}sQuerySet for fetching column data.
 func Select(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet {
 	return {{.GoType}}sQuerySet{pgtalk.MakeQuerySet(tableInfo, cas, func() interface{} {
 		return new({{.GoType}})
 	})}
 }
 
+// {{.GoType}}sQuerySet can query for *{{.GoType}} values.
 type {{.GoType}}sQuerySet struct {
 	pgtalk.QuerySet
 }
 
 func (s {{.GoType}}sQuerySet) Unwrap() pgtalk.QuerySet { return s.QuerySet }
 
-// Where is
+// Where returns a new QuerySet with WHERE clause.
 func (s {{.GoType}}sQuerySet) Where(condition pgtalk.SQLWriter) {{.GoType}}sQuerySet {
 	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.Where(condition)}
 }
 
-// Limit is
+// Limit returns a new QuerySet with the maximum number of results set.
 func (s {{.GoType}}sQuerySet) Limit(limit int) {{.GoType}}sQuerySet {
 	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.Limit(limit)}
 }
 
-// GroupBy is
+// GroupBy returns a new QuerySet with the GROUP BY clause.
 func (s {{.GoType}}sQuerySet) GroupBy(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet {
 	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.GroupBy(cas...)}
 }
 
-// GroupBy is
+// OrderBy returns a new QuerySet with the ORDER BY clause.
 func (s {{.GoType}}sQuerySet) OrderBy(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet {
 	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.OrderBy(cas...)}
 }
 
-// Exec is
+// Exec runs the query and returns the list of *{{.GoType}}.
 func (s {{.GoType}}sQuerySet) Exec(conn pgtalk.Connection) (list []*{{.GoType}}, err error) {
 	err = s.QuerySet.ExecWithAppender(conn, func(each interface{}) {
 		list = append(list, each.(*{{.GoType}}))
@@ -84,14 +88,17 @@ func (s {{.GoType}}sQuerySet) Exec(conn pgtalk.Connection) (list []*{{.GoType}},
 	return
 }
 
+// Insert creates a MutationSet for inserting data with zero or more columns.
 func Insert(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet {
 	return pgtalk.MakeMutationSet(tableInfo, cas, pgtalk.MutationInsert)
 }
 
+// Delete creates a MutationSet for deleting data.
 func Delete() pgtalk.MutationSet {
 	return pgtalk.MakeMutationSet(tableInfo, pgtalk.EmptyColumnAccessor, pgtalk.MutationDelete)
 }
 
+// Update creates a MutationSet to update zero or more columns.
 func Update(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet {
 	return pgtalk.MakeMutationSet(tableInfo, cas, pgtalk.MutationUpdate)
 }
