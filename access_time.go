@@ -7,13 +7,13 @@ import (
 )
 
 type TimeAccess struct {
-	columnInfo
+	ColumnInfo
 	fieldWriter func(dest interface{}, i *time.Time)
 	insertValue time.Time
 }
 
-func NewTimeAccess(info TableInfo, columnName string, writer func(dest interface{}, i *time.Time)) TimeAccess {
-	return TimeAccess{columnInfo: makeColumnInfo(info, columnName), fieldWriter: writer}
+func NewTimeAccess(info ColumnInfo, writer func(dest interface{}, i *time.Time)) TimeAccess {
+	return TimeAccess{ColumnInfo: info, fieldWriter: writer}
 }
 
 func (a TimeAccess) WriteInto(entity interface{}, fieldValue interface{}) {

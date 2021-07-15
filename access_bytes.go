@@ -7,13 +7,13 @@ import (
 
 // BytesAccess can Read a column value (jsonb) and Write a column value and Set a struct field ([]byte).
 type BytesAccess struct {
-	columnInfo
+	ColumnInfo
 	fieldWriter func(dest interface{}, b *[]byte)
 	insertValue []byte
 }
 
-func NewBytesAccess(info TableInfo, columnName string, writer func(dest interface{}, b *[]byte)) BytesAccess {
-	return BytesAccess{columnInfo: makeColumnInfo(info, columnName), fieldWriter: writer}
+func NewBytesAccess(info ColumnInfo, writer func(dest interface{}, b *[]byte)) BytesAccess {
+	return BytesAccess{ColumnInfo: info, fieldWriter: writer}
 }
 
 func (a BytesAccess) WriteInto(entity interface{}, fieldValue interface{}) {

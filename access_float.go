@@ -7,13 +7,13 @@ import (
 
 // Float64Access can Read a column value (float) and Write a column value and Set a struct field (float64).
 type Float64Access struct {
-	columnInfo
+	ColumnInfo
 	fieldWriter func(dest interface{}, f *float64)
 	insertValue float64
 }
 
-func NewFloat64Access(info TableInfo, columnName string, writer func(dest interface{}, f *float64)) Float64Access {
-	return Float64Access{columnInfo: makeColumnInfo(info, columnName), fieldWriter: writer}
+func NewFloat64Access(info ColumnInfo, writer func(dest interface{}, f *float64)) Float64Access {
+	return Float64Access{ColumnInfo: info, fieldWriter: writer}
 }
 
 func (a Float64Access) WriteInto(entity interface{}, fieldValue interface{}) {

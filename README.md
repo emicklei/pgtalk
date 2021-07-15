@@ -4,6 +4,8 @@ More type safe SQL query building using Go code generated (pgtalk-gen) from Post
 
 ## examples
 
+See also [booking demo](https://github.com/emicklei/pgtalk-demo).
+
 ### Insert
 
 	m := products.Insert(

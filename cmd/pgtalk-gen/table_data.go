@@ -19,4 +19,6 @@ type ColumnField struct {
 	GoType        string
 	GoName        string
 	FactoryMethod string
+	IsPrimary     bool
+	IsNotNull     bool
 }

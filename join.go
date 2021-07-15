@@ -127,9 +127,8 @@ type MultiJoin struct {
 	Conditions []SQLWriter
 }
 
-// TODO replace with condition
 func (m MultiJoin) On(condition SQLWriter) MultiJoin {
-	//m.OnPairs = append(m.OnPairs, onLeft, onRight)
+	m.Conditions = append(m.Conditions, condition)
 	return m
 }
 

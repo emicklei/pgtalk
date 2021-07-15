@@ -7,13 +7,13 @@ import (
 )
 
 type TextAccess struct {
-	columnInfo
+	ColumnInfo
 	fieldWriter func(dest interface{}, i *string)
 	insertValue string
 }
 
-func NewTextAccess(info TableInfo, columnName string, writer func(dest interface{}, i *string)) TextAccess {
-	return TextAccess{columnInfo: makeColumnInfo(info, columnName), fieldWriter: writer}
+func NewTextAccess(info ColumnInfo, writer func(dest interface{}, i *string)) TextAccess {
+	return TextAccess{ColumnInfo: info, fieldWriter: writer}
 }
 
 func (a TextAccess) Set(v string) TextAccess {

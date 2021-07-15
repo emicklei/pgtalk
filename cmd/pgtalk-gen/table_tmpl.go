@@ -25,7 +25,8 @@ type {{.GoType}} struct {
 
 var (
 {{- range .Fields}}	
-	{{.GoName}} = pgtalk.{{.FactoryMethod}}(tableInfo, "{{.Name}}", func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v })
+	{{.GoName}} = pgtalk.{{.FactoryMethod}}(pgtalk.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimary}}, {{.IsNotNull}}),
+		func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v })
 {{- end}}
 )
 

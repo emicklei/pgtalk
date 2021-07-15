@@ -8,15 +8,16 @@ import (
 
 // Int64Access can Read a column value (int8) and Write a column value and Set a struct field (int64).
 type Int64Access struct {
-	columnInfo
+	ColumnInfo
 	fieldWriter func(dest interface{}, i *int64)
 	insertValue int64
 }
 
-func NewInt64Access(info TableInfo, columnName string,
+func NewInt64Access(
+	info ColumnInfo,
 	writer func(dest interface{}, i *int64)) Int64Access {
 	return Int64Access{
-		columnInfo:  makeColumnInfo(info, columnName),
+		ColumnInfo:  info,
 		fieldWriter: writer}
 }
 

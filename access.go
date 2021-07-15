@@ -14,6 +14,10 @@ type TableInfo struct {
 	Alias  string
 }
 
+func (t TableInfo) SQLOn(w io.Writer) {
+	fmt.Fprintf(w, "%s.%s", t.Schema, t.Name)
+}
+
 var EmptyColumnAccessor = []ColumnAccessor{}
 
 type ValuePrinter struct {
@@ -63,30 +67,33 @@ var EmptyCondition = NoCondition{}
 
 func (n NoCondition) SQLOn(b io.Writer) {}
 
-type columnInfo struct {
+type ColumnInfo struct {
 	tableInfo   TableInfo
 	columnName  string
-	notNull     bool // TODO validate in Go or by Postgres?
+	isPrimary   bool
+	notNull     bool
 	isMixedCase bool
 }
 
-func makeColumnInfo(t TableInfo, c string) columnInfo {
-	return columnInfo{
+func MakeColumnInfo(t TableInfo, name string, isPrimary bool, isNotNull bool) ColumnInfo {
+	return ColumnInfo{
 		tableInfo:   t,
-		columnName:  c,
-		isMixedCase: strings.ToLower(c) != c,
+		columnName:  name,
+		notNull:     isNotNull,
+		isPrimary:   isPrimary,
+		isMixedCase: strings.ToLower(name) != name,
 	}
 }
 
-func (c columnInfo) Name() string {
+func (c ColumnInfo) Name() string {
 	if c.isMixedCase {
 		return strconv.Quote(c.columnName)
 	}
 	return c.columnName
 }
 
-func (c columnInfo) SQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%s.%s", c.tableInfo.Alias, c.columnName)
+func (c ColumnInfo) SQLOn(w io.Writer) {
+	fmt.Fprintf(w, "%s.%s", c.tableInfo.Alias, c.Name())
 }
 
 func SQL(w SQLWriter) string {

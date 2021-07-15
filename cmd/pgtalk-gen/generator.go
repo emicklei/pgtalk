@@ -28,6 +28,8 @@ func generateFromTable(table PgTable) {
 			GoType:        goType,
 			DataType:      each.DataType,
 			FactoryMethod: method,
+			IsPrimary:     each.IsPrimaryKey,
+			IsNotNull:     each.NotNull,
 		}
 		tt.Fields = append(tt.Fields, f)
 	}
@@ -94,7 +96,7 @@ func fieldName(s string) string {
 
 func asSingular(s string) string {
 	if strings.HasSuffix(s, "ies") {
-		return s[0 : len(s)-3]+"y"
+		return s[0:len(s)-3] + "y"
 	}
 	if strings.HasSuffix(s, "ses") {
 		return s[0 : len(s)-2]

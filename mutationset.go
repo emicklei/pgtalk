@@ -33,7 +33,7 @@ func MakeMutationSet(tableInfo TableInfo, selectors []ColumnAccessor, operationT
 func (m MutationSet) SQLOn(w io.Writer) {
 	if m.operationType == MutationInsert {
 		fmt.Fprint(w, "INSERT INTO ")
-		fmt.Fprintf(w, "%s.%s", m.tableInfo.Schema, m.tableInfo.Name)
+		m.tableInfo.SQLOn(w)
 		fmt.Fprint(w, " (")
 		m.columnsSectionOn(w)
 		fmt.Fprint(w, ") VALUES (")
@@ -43,14 +43,14 @@ func (m MutationSet) SQLOn(w io.Writer) {
 	}
 	if m.operationType == MutationDelete {
 		fmt.Fprint(w, "DELETE FROM ")
-		fmt.Fprint(w, m.tableInfo.Name)
+		m.tableInfo.SQLOn(w)
 		fmt.Fprint(w, " WHERE ")
 		m.condition.SQLOn(w)
 		return
 	}
 	if m.operationType == MutationUpdate {
 		fmt.Fprint(w, "UPDATE ")
-		fmt.Fprint(w, m.tableInfo.Name)
+		m.tableInfo.SQLOn(w)
 		fmt.Fprint(w, " SET ")
 		m.setSectionOn(w)
 		fmt.Fprint(w, " WHERE ")
