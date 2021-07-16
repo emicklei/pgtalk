@@ -19,28 +19,32 @@ const (
 
 type Join struct {
 	preparedName string
-	LeftSet      QuerySet
-	RightSet     QuerySet
-	OnLeft       ColumnAccessor
-	OnRight      ColumnAccessor
-	Condition    SQLWriter
-	Type         JoinType
+	leftSet      QuerySet
+	rightSet     QuerySet
+	onLeft       ColumnAccessor
+	onRight      ColumnAccessor
+	condition    SQLWriter
+	joinType     JoinType
+	limit        int
 }
 
 func (i Join) SQLOn(w io.Writer) {
 	fmt.Fprint(w, "SELECT ")
-	writeAccessOn(i.LeftSet.selectors, w)
+	writeAccessOn(i.leftSet.selectors, w)
 	fmt.Fprint(w, ",")
-	writeAccessOn(i.RightSet.selectors, w)
+	writeAccessOn(i.rightSet.selectors, w)
 	fmt.Fprint(w, " FROM ")
-	i.LeftSet.fromSectionOn(w)
-	writeJoinType(i.Type, w)
-	i.RightSet.fromSectionOn(w)
+	i.leftSet.fromSectionOn(w)
+	writeJoinType(i.joinType, w)
+	i.rightSet.fromSectionOn(w)
 	fmt.Fprint(w, " ON ")
-	i.Condition.SQLOn(w)
-	if _, ok := i.LeftSet.condition.(NoCondition); !ok {
+	i.condition.SQLOn(w)
+	if _, ok := i.leftSet.condition.(NoCondition); !ok {
 		fmt.Fprint(w, " WHERE ")
-		i.LeftSet.condition.SQLOn(w)
+		i.leftSet.condition.SQLOn(w)
+	}
+	if i.limit > 0 {
+		fmt.Fprintf(w, " LIMIT %d", i.limit)
 	}
 	// TODO RightSet where
 }
@@ -59,29 +63,24 @@ func writeJoinType(t JoinType, w io.Writer) {
 }
 
 func (i Join) Named(preparedName string) Join {
-	return Join{
-		preparedName: preparedName,
-		LeftSet:      i.LeftSet,
-		RightSet:     i.RightSet,
-		Condition:    i.Condition,
-		Type:         i.Type,
-	}
+	i.preparedName = preparedName
+	return i
 }
 
 func (i Join) On(condition SQLWriter) Join {
-	return Join{
-		preparedName: i.preparedName,
-		LeftSet:      i.LeftSet,
-		RightSet:     i.RightSet,
-		Condition:    condition,
-		Type:         i.Type,
-	}
+	i.condition = condition
+	return i
+}
+
+func (i Join) Limit(limit int) Join {
+	i.limit = limit
+	return i
 }
 
 func (i Join) LeftOuterJoin(q Unwrappable) (m MultiJoin) {
-	m.Sets = append(m.Sets, i.LeftSet, i.RightSet, q.Unwrap())
-	m.JoinTypes = append(m.JoinTypes, i.Type, LeftOuterJoinType)
-	m.Conditions = append(m.Conditions, i.Condition)
+	m.sets = append(m.sets, i.leftSet, i.rightSet, q.Unwrap())
+	m.joinTypes = append(m.joinTypes, i.joinType, LeftOuterJoinType)
+	m.conditions = append(m.conditions, i.condition)
 	return
 }
 
@@ -97,7 +96,7 @@ func (i Join) Exec(ctx context.Context, conn *pgx.Conn) (it JoinResultIterator, 
 	if err != nil {
 		return
 	}
-	return JoinResultIterator{leftSet: i.LeftSet, rightSet: i.RightSet, rows: rows}, nil
+	return JoinResultIterator{leftSet: i.leftSet, rightSet: i.rightSet, rows: rows}, nil
 }
 
 type JoinResultIterator struct {
@@ -145,33 +144,33 @@ func (i *JoinResultIterator) Next(left interface{}, right interface{}) error {
 }
 
 type MultiJoin struct {
-	Sets       []QuerySet
-	JoinTypes  []JoinType
-	Conditions []SQLWriter
+	sets       []QuerySet
+	joinTypes  []JoinType
+	conditions []SQLWriter
 }
 
 func (m MultiJoin) On(condition SQLWriter) MultiJoin {
-	m.Conditions = append(m.Conditions, condition)
+	m.conditions = append(m.conditions, condition)
 	return m
 }
 
 func (m MultiJoin) SQLOn(w io.Writer) {
 	fmt.Fprint(w, "SELECT ")
-	for i, each := range m.Sets {
+	for i, each := range m.sets {
 		if i > 0 {
 			fmt.Fprint(w, ",")
 		}
 		writeAccessOn(each.selectors, w)
 	}
 	fmt.Fprint(w, " FROM ")
-	first := m.Sets[0]
+	first := m.sets[0]
 	first.fromSectionOn(w)
-	for j := 0; j < len(m.JoinTypes); j++ {
-		jt := m.JoinTypes[j]
+	for j := 0; j < len(m.joinTypes); j++ {
+		jt := m.joinTypes[j]
 		writeJoinType(jt, w)
-		set := m.Sets[j+1]
+		set := m.sets[j+1]
 		set.fromSectionOn(w)
 		fmt.Fprint(w, " ON ")
-		m.Conditions[j].SQLOn(w)
+		m.conditions[j].SQLOn(w)
 	}
 }

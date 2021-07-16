@@ -18,6 +18,7 @@ type MutationSet struct {
 	tableInfo     TableInfo
 	selectors     []ColumnAccessor
 	condition     SQLWriter
+	returning     []ColumnAccessor
 	operationType int
 }
 
@@ -35,7 +36,7 @@ func (m MutationSet) SQLOn(w io.Writer) {
 		fmt.Fprint(w, "INSERT INTO ")
 		fmt.Fprintf(w, "%s.%s", m.tableInfo.Schema, m.tableInfo.Name)
 		fmt.Fprint(w, " (")
-		m.columnsSectionOn(w)
+		m.columnsSectionOn(m.selectors, w)
 		fmt.Fprint(w, ") VALUES (")
 		m.valuesSectionOn(w)
 		fmt.Fprint(w, ")")
@@ -55,12 +56,21 @@ func (m MutationSet) SQLOn(w io.Writer) {
 		m.setSectionOn(w)
 		fmt.Fprint(w, " WHERE ")
 		m.condition.SQLOn(w)
+		if len(m.returning) > 0 {
+			fmt.Fprint(w, " RETURNING ")
+			m.columnsSectionOn(m.returning, w)
+		}
 		return
 	}
 }
 
 func (m MutationSet) Where(condition SQLWriter) MutationSet {
 	m.condition = condition
+	return m
+}
+
+func (m MutationSet) Returning(columns ...ColumnAccessor) MutationSet {
+	m.returning = columns
 	return m
 }
 
@@ -76,11 +86,18 @@ func (m MutationSet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 		args = append(args, each.InsertValue())
 	}
 	rows, err := conn.Query(ctx, SQL(m), args...)
+	if err == nil && !m.canProduceResults() {
+		rows.Close()
+	}
 	return &ResultIterator{queryError: err, rows: rows}
 }
 
-func (m MutationSet) columnsSectionOn(buf io.Writer) {
-	for i, each := range m.selectors {
+func (m MutationSet) canProduceResults() bool {
+	return m.operationType == MutationUpdate && len(m.returning) > 0
+}
+
+func (m MutationSet) columnsSectionOn(which []ColumnAccessor, buf io.Writer) {
+	for i, each := range which {
 		if i > 0 {
 			io.WriteString(buf, ",")
 		}

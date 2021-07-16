@@ -13,23 +13,29 @@ See also [booking demo](https://github.com/emicklei/pgtalk-demo).
 		products.Code.Set("test"),
 		products.CategoryID.Set(1))
 
-	err := m.Exec(aConnection)		
+	it := m.Exec(aConnection)		
 
 ### Update
 
 	m := products.Update(
-		products.ID.Set(10),
-		products.Code.Set("test"),
-		products.CategoryID.Set(1)).
-		Where(products.ID.Equals(10))
+			products.ID.Set(10),
+			products.Code.Set("test"),
+			products.CategoryID.Set(1)).
+		Where(products.ID.Equals(10)).
+		Returning(products.Code)
 
-	err := m.Exec(aConnection)		
+	it := m.Exec(aConnection)	
+	for it.HasNext() {
+		p := new(products.Product)
+		_ = it.Next(p)
+		t.Logf("%s,%s", *p.Code)
+	}		
 
 ### Delete
 
 	m := products.Delete().Where(products.ID.Equals(10))
 
-	err := m.Exec(aConnection)
+	_ = m.Exec(aConnection)
 
 ### Select
 
@@ -55,6 +61,13 @@ See also [booking demo](https://github.com/emicklei/pgtalk-demo).
 
 - text
 - bigint
+- date
+- timestamp
+- jsonb
+- bytes
+- number
+- character
+- integer
 
 https://www.postgresql.org/docs/9.5/datatype.html
 

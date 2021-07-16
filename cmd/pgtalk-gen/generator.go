@@ -74,9 +74,9 @@ func goFieldTypeAndAccess(datatype string) (string, string) {
 	case "bigint", "integer":
 		return "*int64", "NewInt64Access"
 	case "jsonb":
-		return "*[]byte", "NewBytesAccess"
+		return "*string", "NewJSONBAccess"
 	case "point":
-		return "*Point", "NewPointAccess"
+		return "*pgtalk.Point", "NewPointAccess"
 	}
 	if strings.HasPrefix(datatype, "character") {
 		return "*string", "NewTextAccess"

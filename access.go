@@ -24,6 +24,8 @@ type ValuePrinter struct {
 	v interface{}
 }
 
+func MakeValuePrinter(v interface{}) ValuePrinter { return ValuePrinter{v: v} }
+
 func (p ValuePrinter) SQLOn(b io.Writer) { fmt.Fprintf(b, "%v", p.v) }
 
 type ValuesPrinter struct {
@@ -112,10 +114,10 @@ func writeAccessOn(list []ColumnAccessor, w io.Writer) {
 }
 
 // PrettySQL returns a multiline SQL statement with line breaks before each next uppercase token
-func PrettySQL(sql string) string {
+func PrettySQL(sql SQLWriter) string {
 	b := new(bytes.Buffer)
 	wasUpper := false
-	for i, each := range strings.Fields(sql) {
+	for i, each := range strings.Fields(SQL(sql)) {
 		if i > 0 { // skip first
 			if len(each) > 1 { // sql token are multi-char
 				if !strings.HasPrefix(each, "'") {

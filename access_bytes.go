@@ -36,3 +36,30 @@ func (a BytesAccess) Set(v []byte) BytesAccess {
 	a.insertValue = v
 	return a
 }
+
+type JSONBAccess struct {
+	ColumnInfo
+	fieldWriter func(dest interface{}, b *string)
+	insertValue string
+}
+
+func NewJSONBAccess(info ColumnInfo, writer func(dest interface{}, b *string)) JSONBAccess {
+	return JSONBAccess{ColumnInfo: info, fieldWriter: writer}
+}
+
+func (a JSONBAccess) WriteInto(entity interface{}, fieldValue interface{}) {
+	if fieldValue == nil {
+		return
+	}
+	var f = fieldValue.([]byte)
+	var s = string(f)
+	a.fieldWriter(entity, &s)
+}
+
+func (a JSONBAccess) InsertValue() interface{} {
+	return a.insertValue
+}
+
+func (a JSONBAccess) ValueAsSQLOn(w io.Writer) {
+	fmt.Fprintf(w, "%v", a.insertValue) // TODO
+}

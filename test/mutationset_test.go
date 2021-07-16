@@ -21,6 +21,18 @@ func TestUpdate(t *testing.T) {
 	}
 }
 
+func TestUpdateReturning(t *testing.T) {
+	m := products.Update(
+		products.Code.Set("F42"),
+		products.Category_id.Set(1)).
+		Where(products.ID.Equals(10)).
+		Returning(products.Code)
+	if got, want := pgtalk.SQL(m), `UPDATE public.products p1 SET code = 'F42',category_id = 1 WHERE (p1.id = 10) RETURNING code`; got != want {
+		t.Log(diff(got, want))
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
+
 func TestDelete(t *testing.T) {
 	m := products.Delete().Where(products.ID.Equals(10))
 	if got, want := pgtalk.SQL(m), `DELETE FROM public.products p1 WHERE (p1.id = 10)`; got != want {

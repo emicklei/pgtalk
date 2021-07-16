@@ -148,33 +148,33 @@ func (q QuerySet) Count(cas ...ColumnAccessor) QuerySet {
 
 func (d QuerySet) Join(otherQuerySet Unwrappable) Join {
 	return Join{
-		LeftSet:  d,
-		RightSet: otherQuerySet.Unwrap(),
-		Type:     InnerJoinType,
+		leftSet:  d,
+		rightSet: otherQuerySet.Unwrap(),
+		joinType: InnerJoinType,
 	}
 }
 
 func (d QuerySet) LeftOuterJoin(otherQuerySet Unwrappable) Join {
 	return Join{
-		LeftSet:  d,
-		RightSet: otherQuerySet.Unwrap(),
-		Type:     LeftOuterJoinType,
+		leftSet:  d,
+		rightSet: otherQuerySet.Unwrap(),
+		joinType: LeftOuterJoinType,
 	}
 }
 
 func (d QuerySet) RightJoin(otherQuerySet Unwrappable) Join {
 	return Join{
-		LeftSet:  d,
-		RightSet: otherQuerySet.Unwrap(),
-		Type:     RightOuterJoinType,
+		leftSet:  d,
+		rightSet: otherQuerySet.Unwrap(),
+		joinType: RightOuterJoinType,
 	}
 }
 
 func (d QuerySet) FullJoin(otherQuerySet Unwrappable) Join {
 	return Join{
-		LeftSet:  d,
-		RightSet: otherQuerySet.Unwrap(),
-		Type:     FullOuterJoinType,
+		leftSet:  d,
+		rightSet: otherQuerySet.Unwrap(),
+		joinType: FullOuterJoinType,
 	}
 }
 
