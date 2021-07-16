@@ -10,16 +10,17 @@ import (
 )
 
 type QuerySet struct {
-	tableInfo TableInfo
-	selectors []ColumnAccessor
-	distinct  bool
-	condition SQLWriter
-	limit     int
-	factory   NewEntityFunc
-	groupBy   []ColumnAccessor
-	having    SQLWriter
-	orderBy   []ColumnAccessor
-	sortOrder string
+	preparedName string
+	tableInfo    TableInfo
+	selectors    []ColumnAccessor
+	distinct     bool
+	condition    SQLWriter
+	limit        int
+	factory      NewEntityFunc
+	groupBy      []ColumnAccessor
+	having       SQLWriter
+	orderBy      []ColumnAccessor
+	sortOrder    string
 }
 
 func MakeQuerySet(tableInfo TableInfo, selectors []ColumnAccessor, factory NewEntityFunc) QuerySet {
@@ -59,6 +60,7 @@ func (q QuerySet) SQLOn(w io.Writer) {
 	}
 }
 
+func (q QuerySet) Named(preparedName string) QuerySet             { q.preparedName = preparedName; return q }
 func (q QuerySet) Distinct() QuerySet                             { q.distinct = true; return q }
 func (q QuerySet) Ascending() QuerySet                            { q.sortOrder = "ASC"; return q }
 func (q QuerySet) Descending() QuerySet                           { q.sortOrder = "DESC"; return q }
@@ -72,8 +74,15 @@ func (q QuerySet) Exists() UnaryOperator {
 	return UnaryOperator{Operator: "EXISTS", Operand: q}
 }
 
-func (d QuerySet) Exec(conn *pgx.Conn) *ResultIterator {
-	rows, err := conn.Query(context.Background(), SQL(d))
+func (d QuerySet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
+	sql := SQL(d)
+	if d.preparedName != "" {
+		_, err := conn.Prepare(ctx, d.preparedName, sql)
+		if err != nil {
+			return &ResultIterator{queryError: err}
+		}
+	}
+	rows, err := conn.Query(ctx, sql)
 	return &ResultIterator{queryError: err, rows: rows}
 }
 
@@ -106,8 +115,8 @@ func (i *ResultIterator) Next(entity interface{}) error {
 	return nil
 }
 
-func (d QuerySet) ExecWithAppender(conn *pgx.Conn, appender func(each interface{})) (err error) {
-	rows, err := conn.Query(context.Background(), SQL(d))
+func (d QuerySet) ExecWithAppender(ctx context.Context, conn *pgx.Conn, appender func(each interface{})) (err error) {
+	rows, err := conn.Query(ctx, SQL(d))
 	if err != nil {
 		return
 	}

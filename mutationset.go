@@ -33,7 +33,7 @@ func MakeMutationSet(tableInfo TableInfo, selectors []ColumnAccessor, operationT
 func (m MutationSet) SQLOn(w io.Writer) {
 	if m.operationType == MutationInsert {
 		fmt.Fprint(w, "INSERT INTO ")
-		m.tableInfo.SQLOn(w)
+		fmt.Fprintf(w, "%s.%s", m.tableInfo.Schema, m.tableInfo.Name)
 		fmt.Fprint(w, " (")
 		m.columnsSectionOn(w)
 		fmt.Fprint(w, ") VALUES (")

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"bytes"
 	"github.com/jackc/pgx/v4"
+	"context"
 )
 
 var (
@@ -83,8 +84,8 @@ func (s {{.GoType}}sQuerySet) OrderBy(cas ...pgtalk.ColumnAccessor) {{.GoType}}s
 }
 
 // Exec runs the query and returns the list of *{{.GoType}}.
-func (s {{.GoType}}sQuerySet) Exec(conn *pgx.Conn) (list []*{{.GoType}}, err error) {
-	err = s.QuerySet.ExecWithAppender(conn, func(each interface{}) {
+func (s {{.GoType}}sQuerySet) Exec(ctx context.Context,conn *pgx.Conn) (list []*{{.GoType}}, err error) {
+	err = s.QuerySet.ExecWithAppender(ctx, conn, func(each interface{}) {
 		list = append(list, each.(*{{.GoType}}))
 	})
 	return

@@ -34,10 +34,10 @@ func (a TextAccess) Compare(op string, stringOrTextAccess interface{}) BinaryOpe
 		panic("invalid comparison operator:" + op)
 	}
 	if s, ok := stringOrTextAccess.(string); ok {
-		return MakeBinaryOperator(a, "=", LiteralString(s))
+		return MakeBinaryOperator(a, op, LiteralString(s))
 	}
 	if ta, ok := stringOrTextAccess.(TextAccess); ok {
-		return MakeBinaryOperator(a, "=", ta)
+		return MakeBinaryOperator(a, op, ta)
 	}
 	panic("string or TextAcces expected")
 }

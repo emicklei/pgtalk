@@ -11,6 +11,17 @@ import (
 
 func TestJSONB(t *testing.T) {
 	ctx := context.Background()
+
+	// delete any
+	tx, _ := testConnect.Begin(ctx)
+	del := things.Delete().Where(things.ID.Equals(2))
+	it := del.Exec(ctx, testConnect)
+	t.Log(pgtalk.SQL(del))
+	t.Log(it.Err())
+	it.HasNext() // TODO
+	tx.Commit(ctx)
+
+	// insert again
 	m := things.Insert(
 		things.ID.Set(2),
 		things.TDate.Set(time.Now()),

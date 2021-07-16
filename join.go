@@ -18,12 +18,13 @@ const (
 )
 
 type Join struct {
-	LeftSet   QuerySet
-	RightSet  QuerySet
-	OnLeft    ColumnAccessor
-	OnRight   ColumnAccessor
-	Condition SQLWriter
-	Type      JoinType
+	preparedName string
+	LeftSet      QuerySet
+	RightSet     QuerySet
+	OnLeft       ColumnAccessor
+	OnRight      ColumnAccessor
+	Condition    SQLWriter
+	Type         JoinType
 }
 
 func (i Join) SQLOn(w io.Writer) {
@@ -57,12 +58,23 @@ func writeJoinType(t JoinType, w io.Writer) {
 	}
 }
 
+func (i Join) Named(preparedName string) Join {
+	return Join{
+		preparedName: preparedName,
+		LeftSet:      i.LeftSet,
+		RightSet:     i.RightSet,
+		Condition:    i.Condition,
+		Type:         i.Type,
+	}
+}
+
 func (i Join) On(condition SQLWriter) Join {
 	return Join{
-		LeftSet:   i.LeftSet,
-		RightSet:  i.RightSet,
-		Condition: condition,
-		Type:      i.Type,
+		preparedName: i.preparedName,
+		LeftSet:      i.LeftSet,
+		RightSet:     i.RightSet,
+		Condition:    condition,
+		Type:         i.Type,
 	}
 }
 
@@ -73,8 +85,15 @@ func (i Join) LeftOuterJoin(q Unwrappable) (m MultiJoin) {
 	return
 }
 
-func (i Join) Exec(conn *pgx.Conn) (it JoinResultIterator, err error) {
-	rows, err := conn.Query(context.Background(), SQL(i))
+func (i Join) Exec(ctx context.Context, conn *pgx.Conn) (it JoinResultIterator, err error) {
+	sql := SQL(i)
+	if i.preparedName != "" {
+		_, err := conn.Prepare(ctx, i.preparedName, sql)
+		if err != nil {
+			return JoinResultIterator{queryError: err}, nil
+		}
+	}
+	rows, err := conn.Query(ctx, sql)
 	if err != nil {
 		return
 	}
@@ -82,9 +101,10 @@ func (i Join) Exec(conn *pgx.Conn) (it JoinResultIterator, err error) {
 }
 
 type JoinResultIterator struct {
-	leftSet  QuerySet
-	rightSet QuerySet
-	rows     pgx.Rows
+	queryError error
+	leftSet    QuerySet
+	rightSet   QuerySet
+	rows       pgx.Rows
 }
 
 func (i *JoinResultIterator) HasNext() bool {
@@ -97,6 +117,9 @@ func (i *JoinResultIterator) HasNext() bool {
 }
 
 func (i *JoinResultIterator) Err() error {
+	if i.queryError != nil {
+		return i.queryError
+	}
 	return i.rows.Err()
 }
 

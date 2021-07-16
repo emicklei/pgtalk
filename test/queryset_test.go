@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"log"
 	"testing"
 
@@ -22,7 +23,7 @@ func TestSelectProductsWhere(t *testing.T) {
 	if testConnect == nil {
 		return
 	}
-	products, err := q.Exec(testConnect)
+	products, err := q.Exec(context.Background(), testConnect)
 	log.Printf("%v,%v,%v", *products[0].ID, *products[0].Code, err)
 }
 
@@ -63,7 +64,7 @@ func TestInnerJoin(t *testing.T) {
 	if testConnect == nil {
 		return
 	}
-	it, _ := q.Exec(testConnect)
+	it, _ := q.Exec(context.Background(), testConnect)
 	for it.HasNext() {
 		p := new(products.Product)
 		c := new(categories.Category)
@@ -100,7 +101,8 @@ func TestFullSelect(t *testing.T) {
 		GroupBy(products.Category_id).
 		OrderBy(products.Category_id).
 		Ascending()
-	if got, want := pgtalk.SQL(q), `SELECT DISTINCT p1.id,p1.created_at,p1.updated_at,p1.deleted_at,p1.code,p1.price,p1.category_id FROM products p1 WHERE ((p1.code > 'A') AND (p1.category_id IS NOT NULL)) GROUP BY p1.category_id ORDER BY p1.category_id`; got != want {
+	if got, want := pgtalk.SQL(q), `SELECT DISTINCT p1.id,p1.created_at,p1.updated_at,p1.deleted_at,p1.code,p1.price,p1.category_id FROM public.products p1 WHERE ((p1.code > 'A') AND (p1.category_id IS NOT NULL)) GROUP BY p1.category_id ORDER BY p1.category_id`; got != want {
+		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -112,16 +114,21 @@ type ProductWithCount struct {
 
 func TestSelectProductWithCount(t *testing.T) {
 	q := products.Select(products.Code).Count(products.ID)
-	if got, want := pgtalk.SQL(q), `SELECT p1.code,COUNT(p1.id) FROM products p1`; got != want {
+	if got, want := pgtalk.SQL(q), `SELECT p1.code,COUNT(p1.id) FROM public.products p1`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 	if testConnect == nil {
 		return
 	}
-	it := q.Exec(testConnect)
+	it := q.Exec(context.Background(), testConnect)
 	for it.HasNext() {
 		pc := new(ProductWithCount)
 		_ = it.Next(pc)
 		t.Logf("%#v", pc)
 	}
+}
+
+func TestPretty(t *testing.T) {
+	sql := `SELECT DISTINCT p1.id,p1.created_at,p1.updated_at,p1.deleted_at,p1.code,p1.price,p1.category_id FROM products p1 WHERE ((p1.code > 'A') AND (p1.category_id IS NOT NULL)) GROUP BY p1.category_id ORDER BY p1.category_id`
+	t.Log(pgtalk.PrettySQL(sql))
 }

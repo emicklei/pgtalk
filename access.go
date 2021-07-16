@@ -15,7 +15,7 @@ type TableInfo struct {
 }
 
 func (t TableInfo) SQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%s.%s", t.Schema, t.Name)
+	fmt.Fprintf(w, "%s.%s %s", t.Schema, t.Name, t.Alias)
 }
 
 var EmptyColumnAccessor = []ColumnAccessor{}
@@ -109,4 +109,30 @@ func writeAccessOn(list []ColumnAccessor, w io.Writer) {
 		}
 		each.SQLOn(w)
 	}
+}
+
+// PrettySQL returns a multiline SQL statement with line breaks before each next uppercase token
+func PrettySQL(sql string) string {
+	b := new(bytes.Buffer)
+	wasUpper := false
+	for i, each := range strings.Fields(sql) {
+		if i > 0 { // skip first
+			if len(each) > 1 { // sql token are multi-char
+				if !strings.HasPrefix(each, "'") {
+					if strings.ToUpper(each) == each {
+						if !wasUpper {
+							io.WriteString(b, "\n")
+							wasUpper = true
+						}
+					} else {
+						wasUpper = false
+					}
+				}
+			} else {
+				wasUpper = false
+			}
+		}
+		fmt.Fprintf(b, "%s ", each)
+	}
+	return b.String()
 }
