@@ -76,13 +76,17 @@ func (q QuerySet) Exists() UnaryOperator {
 
 func (d QuerySet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 	sql := SQL(d)
+	var rows pgx.Rows
+	var err error
 	if d.preparedName != "" {
 		_, err := conn.Prepare(ctx, d.preparedName, sql)
 		if err != nil {
 			return &ResultIterator{queryError: err}
 		}
+		rows, err = conn.Query(ctx, d.preparedName)
+	} else {
+		rows, err = conn.Query(ctx, sql)
 	}
-	rows, err := conn.Query(ctx, sql)
 	return &ResultIterator{queryError: err, rows: rows}
 }
 
