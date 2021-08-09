@@ -56,6 +56,11 @@ func (a JSONBAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 	a.fieldWriter(entity, &s)
 }
 
+func (a JSONBAccess) Set(s string) JSONBAccess {
+	a.insertValue = s
+	return a
+}
+
 func (a JSONBAccess) InsertValue() interface{} {
 	return a.insertValue
 }

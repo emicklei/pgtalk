@@ -31,6 +31,17 @@ var (
 {{- end}}
 )
 
+// ColumnUpdatesFrom returns the list of changes to a *{{.GoType}} for which updates need to be processed.
+// Cannot be used to set null values for columns.
+func ColumnUpdatesFrom(e *{{.GoType}}) (list []pgtalk.SQLWriter) {
+{{- range .Fields}}
+	if e.{{.GoName}} != nil {
+		list = append(list, {{.GoName}}.Set(*e.{{.GoName}}))
+	}
+{{- end}}	
+	return
+}
+
 // String returns the debug string for *{{.GoType}} with all non-nil field values.
 func (e *{{.GoType}}) String() string {
 	b := new(bytes.Buffer)
