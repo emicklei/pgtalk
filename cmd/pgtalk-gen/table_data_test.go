@@ -16,16 +16,18 @@ func TestTemplate(t *testing.T) {
 		GoType:     "Price",
 		Fields: []ColumnField{
 			{
-				Name:          "id",
-				GoName:        "ID",
-				GoType:        "*int64",
-				FactoryMethod: "NewInt8Access",
+				Name:                 "id",
+				GoName:               "ID",
+				GoType:               "*int64",
+				FactoryMethod:        "NewInt8Access",
+				TableAttributeNumber: 1,
 			},
 			{
-				Name:          "currency",
-				GoName:        "Currency",
-				GoType:        "*string",
-				FactoryMethod: "NewTextAccess",
+				Name:                 "currency",
+				GoName:               "Currency",
+				GoType:               "*string",
+				FactoryMethod:        "NewTextAccess",
+				TableAttributeNumber: 2,
 			},
 		},
 	}

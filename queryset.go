@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -21,14 +20,16 @@ type QuerySet struct {
 	having       SQLWriter
 	orderBy      []ColumnAccessor
 	sortOrder    string
+	fieldSetter  FieldSetter
 }
 
-func MakeQuerySet(tableInfo TableInfo, selectors []ColumnAccessor, factory NewEntityFunc) QuerySet {
+func MakeQuerySet(tableInfo TableInfo, selectors []ColumnAccessor, factory NewEntityFunc, fieldSetter FieldSetter) QuerySet {
 	return QuerySet{
-		tableInfo: tableInfo,
-		selectors: selectors,
-		condition: EmptyCondition,
-		factory:   factory}
+		tableInfo:   tableInfo,
+		selectors:   selectors,
+		condition:   EmptyCondition,
+		factory:     factory,
+		fieldSetter: fieldSetter}
 }
 
 func (q QuerySet) fromSectionOn(w io.Writer) {
@@ -87,12 +88,13 @@ func (d QuerySet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 	} else {
 		rows, err = conn.Query(ctx, sql)
 	}
-	return &ResultIterator{queryError: err, rows: rows}
+	return &ResultIterator{queryError: err, rows: rows, fieldSetter: d.fieldSetter}
 }
 
 type ResultIterator struct {
-	queryError error
-	rows       pgx.Rows
+	queryError  error
+	rows        pgx.Rows
+	fieldSetter FieldSetter
 }
 
 func (i *ResultIterator) Err() error {
@@ -112,9 +114,14 @@ func (i *ResultIterator) HasNext() bool {
 
 func (i *ResultIterator) Next(entity interface{}) error {
 	list := i.rows.FieldDescriptions()
-	for _, each := range list {
-		log.Println(each.Name)
-		log.Println(each.TableAttributeNumber)
+	vals, err := i.rows.Values()
+	if err != nil {
+		return fmt.Errorf("unable to get values:%v", err)
+	}
+	for f, each := range list {
+		if err := i.fieldSetter(entity, each.TableAttributeNumber, vals[f]); err != nil {
+			return err
+		}
 	}
 	return nil
 }

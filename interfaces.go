@@ -24,3 +24,5 @@ type ColumnAccessor interface {
 type SQLWriter interface {
 	SQLOn(w io.Writer)
 }
+
+type FieldSetter func(entityPointer interface{}, tableAttributeNumber uint16, value interface{}) error

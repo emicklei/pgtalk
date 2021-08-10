@@ -23,13 +23,15 @@ func generateFromTable(table PgTable) {
 	for _, each := range table.Columns {
 		goType, method := goFieldTypeAndAccess(each.DataType)
 		f := ColumnField{
-			Name:          each.Name,
-			GoName:        fieldName(each.Name),
-			GoType:        goType,
-			DataType:      each.DataType,
-			FactoryMethod: method,
-			IsPrimary:     each.IsPrimaryKey,
-			IsNotNull:     each.NotNull,
+			Name:                 each.Name,
+			GoName:               fieldName(each.Name),
+			GoType:               goType,
+			NonPointerGoType:     goType[1:],
+			DataType:             each.DataType,
+			FactoryMethod:        method,
+			IsPrimary:            each.IsPrimaryKey,
+			IsNotNull:            each.NotNull,
+			TableAttributeNumber: each.FieldOrdinal,
 		}
 		tt.Fields = append(tt.Fields, f)
 	}

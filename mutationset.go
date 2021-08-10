@@ -20,14 +20,16 @@ type MutationSet struct {
 	condition     SQLWriter
 	returning     []ColumnAccessor
 	operationType int
+	fieldSetter   FieldSetter
 }
 
-func MakeMutationSet(tableInfo TableInfo, selectors []ColumnAccessor, operationType int) MutationSet {
+func MakeMutationSet(tableInfo TableInfo, selectors []ColumnAccessor, operationType int, fieldSetter FieldSetter) MutationSet {
 	return MutationSet{
 		tableInfo:     tableInfo,
 		selectors:     selectors,
 		condition:     EmptyCondition,
-		operationType: operationType}
+		operationType: operationType,
+		fieldSetter:   fieldSetter}
 }
 
 // SQL returns the full SQL mutation query
@@ -40,6 +42,10 @@ func (m MutationSet) SQLOn(w io.Writer) {
 		fmt.Fprint(w, ") VALUES (")
 		m.valuesSectionOn(w)
 		fmt.Fprint(w, ")")
+		if len(m.returning) > 0 {
+			fmt.Fprint(w, " RETURNING ")
+			m.columnsSectionOn(m.returning, w)
+		}
 		return
 	}
 	if m.operationType == MutationDelete {
@@ -47,6 +53,10 @@ func (m MutationSet) SQLOn(w io.Writer) {
 		m.tableInfo.SQLOn(w)
 		fmt.Fprint(w, " WHERE ")
 		m.condition.SQLOn(w)
+		if len(m.returning) > 0 {
+			fmt.Fprint(w, " RETURNING ")
+			m.columnsSectionOn(m.returning, w)
+		}
 		return
 	}
 	if m.operationType == MutationUpdate {
@@ -89,11 +99,11 @@ func (m MutationSet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 	if err == nil && !m.canProduceResults() {
 		rows.Close()
 	}
-	return &ResultIterator{queryError: err, rows: rows}
+	return &ResultIterator{queryError: err, rows: rows, fieldSetter: m.fieldSetter}
 }
 
 func (m MutationSet) canProduceResults() bool {
-	return m.operationType == MutationUpdate && len(m.returning) > 0
+	return len(m.returning) > 0
 }
 
 func (m MutationSet) columnsSectionOn(which []ColumnAccessor, buf io.Writer) {
@@ -119,7 +129,6 @@ func (m MutationSet) setSectionOn(w io.Writer) {
 		if i > 0 {
 			io.WriteString(w, ",")
 		}
-		fmt.Fprintf(w, "%s = ", each.Name())
-		each.ValueAsSQLOn(w)
+		fmt.Fprintf(w, "%s = $%d", each.Name(), i+1)
 	}
 }

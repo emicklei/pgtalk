@@ -31,15 +31,39 @@ var (
 {{- end}}
 )
 
-// ColumnUpdatesFrom returns the list of changes to a *{{.GoType}} for which updates need to be processed.
+// ColumnUpdatesFrom returns the list of changes to a {{.GoType}} for which updates need to be processed.
 // Cannot be used to set null values for columns.
-func ColumnUpdatesFrom(e *{{.GoType}}) (list []pgtalk.SQLWriter) {
+func ColumnUpdatesFrom(e {{.GoType}}) (list []pgtalk.SQLWriter) {
 {{- range .Fields}}
 	if e.{{.GoName}} != nil {
 		list = append(list, {{.GoName}}.Set(*e.{{.GoName}}))
 	}
 {{- end}}	
 	return
+}
+
+// setColumnValueTo sets the field of a *{{.GoType}} to the non-nil value.
+func setColumnValueTo(e *{{.GoType}}, tableAttributeNumber uint16, value interface{}) error {
+	if value == nil {
+		return nil
+	}
+	switch tableAttributeNumber {
+{{- range .Fields}}		
+	case {{.TableAttributeNumber}}:		
+		if tvalue, ok := value.({{.NonPointerGoType}}); !ok {
+			return fmt.Errorf("unable to assert value of type [*%T] to field [{{.GoName}}] of type [%s] in entity with type [%s]", value, "{{.GoType}}", "*{{$.GoPackage}}.{{$.GoType}}")
+		} else {
+			e.{{.GoName}} = &tvalue
+		}
+{{- end}}		
+	default:
+		return fmt.Errorf("unable to set value [%v] to field of [%v] with table attribute number [%d] in entity with type [%s]", value, e, tableAttributeNumber, "*{{$.GoPackage}}.{{$.GoType}}")
+	}
+	return nil
+}
+
+var fieldSetter = func(entityPointer interface{}, tableAttributeNumber uint16, value interface{}) error {
+	return setColumnValueTo(entityPointer.(*{{.GoType}}), tableAttributeNumber, value)
 }
 
 // String returns the debug string for *{{.GoType}} with all non-nil field values.
@@ -64,7 +88,7 @@ func AllColumns() (all []pgtalk.ColumnAccessor) {
 func Select(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet {
 	return {{.GoType}}sQuerySet{pgtalk.MakeQuerySet(tableInfo, cas, func() interface{} {
 		return new({{.GoType}})
-	})}
+	}, fieldSetter)}
 }
 
 // {{.GoType}}sQuerySet can query for *{{.GoType}} values.
@@ -104,16 +128,16 @@ func (s {{.GoType}}sQuerySet) Exec(ctx context.Context,conn *pgx.Conn) (list []*
 
 // Insert creates a MutationSet for inserting data with zero or more columns.
 func Insert(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet {
-	return pgtalk.MakeMutationSet(tableInfo, cas, pgtalk.MutationInsert)
+	return pgtalk.MakeMutationSet(tableInfo, cas, pgtalk.MutationInsert, fieldSetter)
 }
 
 // Delete creates a MutationSet for deleting data.
 func Delete() pgtalk.MutationSet {
-	return pgtalk.MakeMutationSet(tableInfo, pgtalk.EmptyColumnAccessor, pgtalk.MutationDelete)
+	return pgtalk.MakeMutationSet(tableInfo, pgtalk.EmptyColumnAccessor, pgtalk.MutationDelete, fieldSetter)
 }
 
 // Update creates a MutationSet to update zero or more columns.
 func Update(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet {
-	return pgtalk.MakeMutationSet(tableInfo, cas, pgtalk.MutationUpdate)
+	return pgtalk.MakeMutationSet(tableInfo, cas, pgtalk.MutationUpdate, fieldSetter)
 }
 `

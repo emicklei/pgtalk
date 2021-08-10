@@ -13,12 +13,14 @@ type TableType struct {
 }
 
 type ColumnField struct {
-	Name          string
-	DataType      string
-	GoStructType  string
-	GoType        string
-	GoName        string
-	FactoryMethod string
-	IsPrimary     bool
-	IsNotNull     bool
+	Name                 string
+	DataType             string
+	GoStructType         string
+	GoType               string
+	NonPointerGoType     string
+	GoName               string
+	FactoryMethod        string
+	IsPrimary            bool
+	IsNotNull            bool
+	TableAttributeNumber int
 }

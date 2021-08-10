@@ -93,10 +93,7 @@ func (i Join) Exec(ctx context.Context, conn *pgx.Conn) (it JoinResultIterator, 
 		}
 	}
 	rows, err := conn.Query(ctx, sql)
-	if err != nil {
-		return
-	}
-	return JoinResultIterator{leftSet: i.leftSet, rightSet: i.rightSet, rows: rows}, nil
+	return JoinResultIterator{queryError: err, leftSet: i.leftSet, rightSet: i.rightSet, rows: rows}, nil
 }
 
 type JoinResultIterator struct {
@@ -107,6 +104,9 @@ type JoinResultIterator struct {
 }
 
 func (i *JoinResultIterator) HasNext() bool {
+	if i.queryError != nil {
+		return false
+	}
 	if i.rows.Next() {
 		return true
 	} else {

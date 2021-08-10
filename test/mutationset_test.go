@@ -2,6 +2,7 @@ package test
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"testing"
@@ -15,7 +16,7 @@ func TestUpdate(t *testing.T) {
 		products.Code.Set("test"),
 		products.Category_id.Set(1)).
 		Where(products.ID.Equals(10))
-	if got, want := pgtalk.SQL(m), `UPDATE public.products p1 SET code = 'test',category_id = 1 WHERE (p1.id = 10)`; got != want {
+	if got, want := pgtalk.SQL(m), `UPDATE public.products p1 SET code = $1,category_id = $2 WHERE (p1.id = 10)`; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
@@ -25,11 +26,25 @@ func TestUpdateReturning(t *testing.T) {
 	m := products.Update(
 		products.Code.Set("F42"),
 		products.Category_id.Set(1)).
-		Where(products.ID.Equals(10)).
+		Where(products.ID.Equals(1)).
 		Returning(products.Code)
-	if got, want := pgtalk.SQL(m), `UPDATE public.products p1 SET code = 'F42',category_id = 1 WHERE (p1.id = 10) RETURNING code`; got != want {
+	if got, want := pgtalk.SQL(m), `UPDATE public.products p1 SET code = $1,category_id = $2 WHERE (p1.id = 1) RETURNING code`; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+	if testConnect == nil {
+		return
+	}
+	it := m.Exec(context.Background(), testConnect)
+	if it.Err() != nil {
+		t.Fatal(it.Err())
+	}
+	for it.HasNext() {
+		p := new(products.Product)
+		if err := it.Next(p); err != nil {
+			t.Fatal(err)
+		}
+		t.Logf("%s", *p.Code)
 	}
 }
 
