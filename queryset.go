@@ -152,6 +152,7 @@ func (d QuerySet) FullJoin(otherQuerySet Unwrappable) Join {
 	}
 }
 
+// TODO Count is not really a columnaccessor.
 type Count struct {
 	accessor ColumnAccessor
 }

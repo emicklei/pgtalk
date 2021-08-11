@@ -36,13 +36,10 @@ func TestUpdateReturning(t *testing.T) {
 		return
 	}
 	it := m.Exec(context.Background(), testConnect)
-	for {
-		p, ok, err := products.Next(it)
+	for it.HasNext() {
+		p, err := products.Next(it)
 		if err != nil {
 			t.Fatal(it.Err())
-		}
-		if !ok {
-			break
 		}
 		t.Logf("%s", *p.Code)
 	}

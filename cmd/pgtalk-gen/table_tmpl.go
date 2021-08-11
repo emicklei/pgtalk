@@ -43,17 +43,15 @@ func ColumnUpdatesFrom(e {{.GoType}}) (list []pgtalk.SQLWriter) {
 }
 
 // Next returns the next *{{.GoType}} from the iterator data.
-// Use ok to check if there was data available and err to check for failure.
-func Next(it *pgtalk.ResultIterator) (e *{{.GoType}}, ok bool, err error) {
+// Use err to check for failure.
+func Next(it *pgtalk.ResultIterator) (e *{{.GoType}}, err error) {
 	var each = new({{.GoType}})
+	// first check for query error in case caller forgot
 	if err = it.Err(); err != nil {
-		return nil, false, err
-	}
-	if !it.HasNext() {
-		return nil, false, nil
+		return nil, err
 	}
 	err = it.Next(each)
-	return each, true, err
+	return each, err
 }
 
 // String returns the debug string for *{{.GoType}} with all non-nil field values.

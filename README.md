@@ -13,7 +13,11 @@ See also [booking demo](https://github.com/emicklei/pgtalk-demo).
 		products.Code.Set("test"),
 		products.CategoryID.Set(1))
 
-	it := m.Exec(aConnection)		
+	it := m.Exec(aConnection)
+	// no returning so check err only	
+	if err := it.Err(); err != nil {
+		....
+	}
 
 ### Update
 
@@ -26,8 +30,7 @@ See also [booking demo](https://github.com/emicklei/pgtalk-demo).
 
 	it := m.Exec(aConnection)	
 	for it.HasNext() {
-		p := new(products.Product)
-		_ = it.Next(p)
+		p, err := products.Next(p) // p is a *product.Product
 		t.Logf("%s,%s", *p.Code)
 	}		
 
