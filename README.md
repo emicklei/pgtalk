@@ -1,6 +1,6 @@
 # pgtalk
 
-More type safe SQL query building using Go code generated (pgtalk-gen) from PostgreSQL table definitions.
+More type safe SQL query building and execution using Go code generated (pgtalk-gen) from PostgreSQL table definitions.
 
 ## examples
 
@@ -14,7 +14,6 @@ See also [booking demo](https://github.com/emicklei/pgtalk-demo).
 		products.CategoryID.Set(1))
 
 	it := m.Exec(aConnection)
-	// no returning so check err only	
 	if err := it.Err(); err != nil {
 		....
 	}
