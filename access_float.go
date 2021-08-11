@@ -31,3 +31,5 @@ func (a Float64Access) InsertValue() interface{} {
 func (a Float64Access) ValueAsSQLOn(w io.Writer) {
 	fmt.Fprintf(w, "%v", a.insertValue)
 }
+
+func (a Float64Access) Column() ColumnInfo { return a.ColumnInfo }

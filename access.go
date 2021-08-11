@@ -70,20 +70,22 @@ var EmptyCondition = NoCondition{}
 func (n NoCondition) SQLOn(b io.Writer) {}
 
 type ColumnInfo struct {
-	tableInfo   TableInfo
-	columnName  string
-	isPrimary   bool
-	notNull     bool
-	isMixedCase bool
+	tableInfo            TableInfo
+	columnName           string
+	isPrimary            bool
+	notNull              bool
+	isMixedCase          bool
+	tableAttributeNumber uint16
 }
 
-func MakeColumnInfo(t TableInfo, name string, isPrimary bool, isNotNull bool) ColumnInfo {
+func MakeColumnInfo(t TableInfo, name string, isPrimary bool, isNotNull bool, tableAttributeNumber uint16) ColumnInfo {
 	return ColumnInfo{
-		tableInfo:   t,
-		columnName:  name,
-		notNull:     isNotNull,
-		isPrimary:   isPrimary,
-		isMixedCase: strings.ToLower(name) != name,
+		tableInfo:            t,
+		columnName:           name,
+		notNull:              isNotNull,
+		isPrimary:            isPrimary,
+		isMixedCase:          strings.ToLower(name) != name,
+		tableAttributeNumber: tableAttributeNumber,
 	}
 }
 

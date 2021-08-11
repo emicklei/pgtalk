@@ -19,6 +19,7 @@ type ColumnAccessor interface {
 	ValueAsSQLOn(w io.Writer)
 	// temp name
 	InsertValue() interface{}
+	Column() ColumnInfo
 }
 
 type SQLWriter interface {

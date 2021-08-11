@@ -66,3 +66,5 @@ func (a Int64Access) Compare(op string, i int) BinaryOperator {
 func (a Int64Access) NotNull() NullCheck {
 	return NullCheck{Operand: a, IsNot: true}
 }
+
+func (a Int64Access) Column() ColumnInfo { return a.ColumnInfo }

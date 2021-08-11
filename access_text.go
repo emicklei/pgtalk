@@ -69,3 +69,5 @@ func (a TextAccess) In(values ...string) BinaryOperator {
 	}
 	return MakeBinaryOperator(a, "IN", ValuesPrinter{vs})
 }
+
+func (a TextAccess) Column() ColumnInfo { return a.ColumnInfo }

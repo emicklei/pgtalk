@@ -36,3 +36,5 @@ func (a TimeAccess) Set(v time.Time) TimeAccess {
 	a.insertValue = v
 	return a
 }
+
+func (a TimeAccess) Column() ColumnInfo { return a.ColumnInfo }

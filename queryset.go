@@ -20,16 +20,14 @@ type QuerySet struct {
 	having       SQLWriter
 	orderBy      []ColumnAccessor
 	sortOrder    string
-	fieldSetter  FieldSetter
 }
 
-func MakeQuerySet(tableInfo TableInfo, selectors []ColumnAccessor, factory NewEntityFunc, fieldSetter FieldSetter) QuerySet {
+func MakeQuerySet(tableInfo TableInfo, selectors []ColumnAccessor, factory NewEntityFunc) QuerySet {
 	return QuerySet{
-		tableInfo:   tableInfo,
-		selectors:   selectors,
-		condition:   EmptyCondition,
-		factory:     factory,
-		fieldSetter: fieldSetter}
+		tableInfo: tableInfo,
+		selectors: selectors,
+		condition: EmptyCondition,
+		factory:   factory}
 }
 
 func (q QuerySet) fromSectionOn(w io.Writer) {
@@ -88,42 +86,7 @@ func (d QuerySet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 	} else {
 		rows, err = conn.Query(ctx, sql)
 	}
-	return &ResultIterator{queryError: err, rows: rows, fieldSetter: d.fieldSetter}
-}
-
-type ResultIterator struct {
-	queryError  error
-	rows        pgx.Rows
-	fieldSetter FieldSetter
-}
-
-func (i *ResultIterator) Err() error {
-	return i.queryError
-}
-
-func (i *ResultIterator) HasNext() bool {
-	if i.queryError != nil {
-		return false
-	}
-	if i.rows.Next() {
-		return true
-	}
-	i.rows.Close()
-	return false
-}
-
-func (i *ResultIterator) Next(entity interface{}) error {
-	list := i.rows.FieldDescriptions()
-	vals, err := i.rows.Values()
-	if err != nil {
-		return fmt.Errorf("unable to get values:%v", err)
-	}
-	for f, each := range list {
-		if err := i.fieldSetter(entity, each.TableAttributeNumber, vals[f]); err != nil {
-			return err
-		}
-	}
-	return nil
+	return &ResultIterator{queryError: err, rows: rows}
 }
 
 func (d QuerySet) ExecWithAppender(ctx context.Context, conn *pgx.Conn, appender func(each interface{})) (err error) {
@@ -202,3 +165,4 @@ func (c Count) SQLOn(w io.Writer) {
 func (c Count) ValueAsSQLOn(w io.Writer)   {}
 func (c Count) WriteInto(e, v interface{}) {}
 func (c Count) InsertValue() interface{}   { return nil }
+func (a Count) Column() ColumnInfo         { return ColumnInfo{} }

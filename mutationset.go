@@ -20,16 +20,14 @@ type MutationSet struct {
 	condition     SQLWriter
 	returning     []ColumnAccessor
 	operationType int
-	fieldSetter   FieldSetter
 }
 
-func MakeMutationSet(tableInfo TableInfo, selectors []ColumnAccessor, operationType int, fieldSetter FieldSetter) MutationSet {
+func MakeMutationSet(tableInfo TableInfo, selectors []ColumnAccessor, operationType int) MutationSet {
 	return MutationSet{
 		tableInfo:     tableInfo,
 		selectors:     selectors,
 		condition:     EmptyCondition,
-		operationType: operationType,
-		fieldSetter:   fieldSetter}
+		operationType: operationType}
 }
 
 // SQL returns the full SQL mutation query
@@ -99,7 +97,7 @@ func (m MutationSet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 	if err == nil && !m.canProduceResults() {
 		rows.Close()
 	}
-	return &ResultIterator{queryError: err, rows: rows, fieldSetter: m.fieldSetter}
+	return &ResultIterator{queryError: err, rows: rows, selectors: m.returning}
 }
 
 func (m MutationSet) canProduceResults() bool {

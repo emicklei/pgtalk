@@ -68,3 +68,5 @@ func (a JSONBAccess) InsertValue() interface{} {
 func (a JSONBAccess) ValueAsSQLOn(w io.Writer) {
 	fmt.Fprintf(w, "%v", a.insertValue) // TODO
 }
+
+func (a JSONBAccess) Column() ColumnInfo { return a.ColumnInfo }
