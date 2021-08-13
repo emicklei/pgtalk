@@ -91,7 +91,7 @@ func (m MutationSet) On() MutationSet {
 func (m MutationSet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 	args := []interface{}{}
 	for _, each := range m.selectors {
-		args = append(args, each.InsertValue())
+		args = append(args, each.ValueToInsert())
 	}
 	rows, err := conn.Query(ctx, SQL(m), args...)
 	if err == nil && !m.canProduceResults() {

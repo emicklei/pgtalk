@@ -38,7 +38,7 @@ func (i *ResultIterator) Next(entity interface{}) error {
 		for _, other := range i.selectors {
 			if other.Column().tableAttributeNumber == each.TableAttributeNumber {
 				// TODO error handling
-				other.WriteInto(entity, vals[f])
+				other.SetFieldValue(entity, vals[f])
 			}
 		}
 	}

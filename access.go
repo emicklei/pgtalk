@@ -51,7 +51,7 @@ type scanToWrite struct {
 }
 
 func (s scanToWrite) Scan(fieldValue interface{}) error {
-	s.access.WriteInto(s.entity, fieldValue)
+	s.access.SetFieldValue(s.entity, fieldValue)
 	return nil
 }
 

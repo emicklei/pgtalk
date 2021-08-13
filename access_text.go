@@ -8,8 +8,8 @@ import (
 
 type TextAccess struct {
 	ColumnInfo
-	fieldWriter func(dest interface{}, i *string)
-	insertValue string
+	fieldWriter   func(dest interface{}, i *string)
+	valueToInsert string
 }
 
 func NewTextAccess(info ColumnInfo, writer func(dest interface{}, i *string)) TextAccess {
@@ -17,12 +17,12 @@ func NewTextAccess(info ColumnInfo, writer func(dest interface{}, i *string)) Te
 }
 
 func (a TextAccess) Set(v string) TextAccess {
-	a.insertValue = v
+	a.valueToInsert = v
 	return a
 }
 
-func (a TextAccess) InsertValue() interface{} {
-	return a.insertValue
+func (a TextAccess) ValueToInsert() interface{} {
+	return a.valueToInsert
 }
 
 func (a TextAccess) Equals(stringOrTextAccess interface{}) BinaryOperator {
@@ -42,7 +42,7 @@ func (a TextAccess) Compare(op string, stringOrTextAccess interface{}) BinaryOpe
 	panic("string or TextAcces expected")
 }
 
-func (a TextAccess) WriteInto(entity interface{}, fieldValue interface{}) {
+func (a TextAccess) SetFieldValue(entity interface{}, fieldValue interface{}) {
 	if fieldValue == nil {
 		return
 	}
@@ -51,7 +51,7 @@ func (a TextAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 }
 
 func (a TextAccess) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "'%s'", a.insertValue)
+	fmt.Fprintf(w, "'%s'", a.ValueToInsert)
 }
 
 func (a TextAccess) NotNull() NullCheck {

@@ -8,8 +8,8 @@ import (
 // BytesAccess can Read a column value (jsonb) and Write a column value and Set a struct field ([]byte).
 type BytesAccess struct {
 	ColumnInfo
-	fieldWriter func(dest interface{}, b *[]byte)
-	insertValue []byte
+	fieldWriter   func(dest interface{}, b *[]byte)
+	valueToInsert []byte
 }
 
 func NewBytesAccess(info ColumnInfo, writer func(dest interface{}, b *[]byte)) BytesAccess {
@@ -25,29 +25,29 @@ func (a BytesAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 }
 
 func (a BytesAccess) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%v", a.insertValue) // TODO
+	fmt.Fprintf(w, "%v", a.ValueToInsert) // TODO
 }
 
-func (a BytesAccess) InsertValue() interface{} {
-	return a.insertValue
+func (a BytesAccess) ValueToInsert() interface{} {
+	return a.valueToInsert
 }
 
 func (a BytesAccess) Set(v []byte) BytesAccess {
-	a.insertValue = v
+	a.valueToInsert = v
 	return a
 }
 
 type JSONBAccess struct {
 	ColumnInfo
-	fieldWriter func(dest interface{}, b *string)
-	insertValue string
+	fieldWriter   func(dest interface{}, b *string)
+	valueToInsert string
 }
 
 func NewJSONBAccess(info ColumnInfo, writer func(dest interface{}, b *string)) JSONBAccess {
 	return JSONBAccess{ColumnInfo: info, fieldWriter: writer}
 }
 
-func (a JSONBAccess) WriteInto(entity interface{}, fieldValue interface{}) {
+func (a JSONBAccess) SetFieldValue(entity interface{}, fieldValue interface{}) {
 	if fieldValue == nil {
 		return
 	}
@@ -57,16 +57,16 @@ func (a JSONBAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 }
 
 func (a JSONBAccess) Set(s string) JSONBAccess {
-	a.insertValue = s
+	a.valueToInsert = s
 	return a
 }
 
-func (a JSONBAccess) InsertValue() interface{} {
-	return a.insertValue
+func (a JSONBAccess) ValueToInsert() interface{} {
+	return a.valueToInsert
 }
 
 func (a JSONBAccess) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%v", a.insertValue) // TODO
+	fmt.Fprintf(w, "%v", a.valueToInsert) // TODO
 }
 
 func (a JSONBAccess) Column() ColumnInfo { return a.ColumnInfo }

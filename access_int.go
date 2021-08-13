@@ -9,8 +9,8 @@ import (
 // Int64Access can Read a column value (int8) and Write a column value and Set a struct field (int64).
 type Int64Access struct {
 	ColumnInfo
-	fieldWriter func(dest interface{}, i *int64)
-	insertValue int64
+	fieldWriter   func(dest interface{}, i *int64)
+	valueToInsert int64
 }
 
 func NewInt64Access(
@@ -22,14 +22,14 @@ func NewInt64Access(
 }
 
 func (a Int64Access) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%d", a.insertValue)
+	fmt.Fprintf(w, "%d", a.ValueToInsert)
 }
 
 func (a Int64Access) BetweenAnd(begin int64, end int64) BetweenAnd {
 	return MakeBetweenAnd(a, ValuePrinter{begin}, ValuePrinter{end})
 }
 
-func (a Int64Access) WriteInto(entity interface{}, fieldValue interface{}) {
+func (a Int64Access) SetFieldValue(entity interface{}, fieldValue interface{}) {
 	if fieldValue == nil {
 		return
 	}
@@ -37,12 +37,12 @@ func (a Int64Access) WriteInto(entity interface{}, fieldValue interface{}) {
 	a.fieldWriter(entity, &i)
 }
 
-func (a Int64Access) InsertValue() interface{} {
-	return a.insertValue
+func (a Int64Access) ValueToInsert() interface{} {
+	return a.valueToInsert
 }
 
 func (a Int64Access) Set(v int64) Int64Access {
-	a.insertValue = v
+	a.valueToInsert = v
 	return a
 }
 

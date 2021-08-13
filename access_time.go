@@ -8,15 +8,15 @@ import (
 
 type TimeAccess struct {
 	ColumnInfo
-	fieldWriter func(dest interface{}, i *time.Time)
-	insertValue time.Time
+	fieldWriter   func(dest interface{}, i *time.Time)
+	valueToInsert time.Time
 }
 
 func NewTimeAccess(info ColumnInfo, writer func(dest interface{}, i *time.Time)) TimeAccess {
 	return TimeAccess{ColumnInfo: info, fieldWriter: writer}
 }
 
-func (a TimeAccess) WriteInto(entity interface{}, fieldValue interface{}) {
+func (a TimeAccess) SetFieldValue(entity interface{}, fieldValue interface{}) {
 	if fieldValue == nil {
 		return
 	}
@@ -25,15 +25,15 @@ func (a TimeAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 }
 
 func (a TimeAccess) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%v", a.insertValue)
+	fmt.Fprintf(w, "%v", a.ValueToInsert)
 }
 
-func (a TimeAccess) InsertValue() interface{} {
-	return a.insertValue
+func (a TimeAccess) ValueToInsert() interface{} {
+	return a.valueToInsert
 }
 
 func (a TimeAccess) Set(v time.Time) TimeAccess {
-	a.insertValue = v
+	a.valueToInsert = v
 	return a
 }
 

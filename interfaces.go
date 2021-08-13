@@ -13,17 +13,12 @@ type Unwrappable interface {
 type ColumnAccessor interface {
 	Name() string
 	SQLOn(w io.Writer)
-	// temp name
-	WriteInto(entity interface{}, fieldValue interface{})
-	// temp name
+	SetFieldValue(entity interface{}, fieldValue interface{})
 	ValueAsSQLOn(w io.Writer)
-	// temp name
-	InsertValue() interface{}
+	ValueToInsert() interface{}
 	Column() ColumnInfo
 }
 
 type SQLWriter interface {
 	SQLOn(w io.Writer)
 }
-
-type FieldSetter func(entityPointer interface{}, tableAttributeNumber uint16, value interface{}) error

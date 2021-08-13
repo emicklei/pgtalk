@@ -59,16 +59,15 @@ func (q QuerySet) SQLOn(w io.Writer) {
 	}
 }
 
-func (q QuerySet) Named(preparedName string) QuerySet             { q.preparedName = preparedName; return q }
-func (q QuerySet) Distinct() QuerySet                             { q.distinct = true; return q }
-func (q QuerySet) Ascending() QuerySet                            { q.sortOrder = "ASC"; return q }
-func (q QuerySet) Descending() QuerySet                           { q.sortOrder = "DESC"; return q }
-func (q QuerySet) Where(condition SQLWriter) QuerySet             { q.condition = condition; return q }
-func (q QuerySet) WhereExists(otherQuerySet Unwrappable) QuerySet { return q } // TODO
-func (q QuerySet) Limit(limit int) QuerySet                       { q.limit = limit; return q }
-func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet         { q.groupBy = cas; return q }
-func (q QuerySet) Having(condition SQLWriter) QuerySet            { q.having = condition; return q }
-func (q QuerySet) OrderBy(cas ...ColumnAccessor) QuerySet         { q.orderBy = cas; return q }
+func (q QuerySet) Named(preparedName string) QuerySet     { q.preparedName = preparedName; return q }
+func (q QuerySet) Distinct() QuerySet                     { q.distinct = true; return q }
+func (q QuerySet) Ascending() QuerySet                    { q.sortOrder = "ASC"; return q }
+func (q QuerySet) Descending() QuerySet                   { q.sortOrder = "DESC"; return q }
+func (q QuerySet) Where(condition SQLWriter) QuerySet     { q.condition = condition; return q }
+func (q QuerySet) Limit(limit int) QuerySet               { q.limit = limit; return q }
+func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet { q.groupBy = cas; return q }
+func (q QuerySet) Having(condition SQLWriter) QuerySet    { q.having = condition; return q }
+func (q QuerySet) OrderBy(cas ...ColumnAccessor) QuerySet { q.orderBy = cas; return q }
 func (q QuerySet) Exists() UnaryOperator {
 	return UnaryOperator{Operator: "EXISTS", Operand: q}
 }
@@ -113,13 +112,6 @@ func (d QuerySet) ExecWithAppender(ctx context.Context, conn *pgx.Conn, appender
 	return
 }
 
-func (q QuerySet) Count(cas ...ColumnAccessor) QuerySet {
-	for _, each := range cas {
-		q.selectors = append(q.selectors, Count{accessor: each})
-	}
-	return q
-}
-
 func (d QuerySet) Join(otherQuerySet Unwrappable) Join {
 	return Join{
 		leftSet:  d,
@@ -151,19 +143,3 @@ func (d QuerySet) FullJoin(otherQuerySet Unwrappable) Join {
 		joinType: FullOuterJoinType,
 	}
 }
-
-// TODO Count is not really a columnaccessor.
-type Count struct {
-	accessor ColumnAccessor
-}
-
-func (c Count) Name() string { return c.accessor.Name() }
-func (c Count) SQLOn(w io.Writer) {
-	fmt.Fprint(w, "COUNT(")
-	c.accessor.SQLOn(w)
-	fmt.Fprint(w, ")")
-}
-func (c Count) ValueAsSQLOn(w io.Writer)   {}
-func (c Count) WriteInto(e, v interface{}) {}
-func (c Count) InsertValue() interface{}   { return nil }
-func (a Count) Column() ColumnInfo         { return ColumnInfo{} }
