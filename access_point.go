@@ -30,5 +30,5 @@ func (a PointAccess) ValueToInsert() interface{} {
 }
 
 func (a PointAccess) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%v", a.ValueToInsert) // TODO
+	fmt.Fprintf(w, "%v", a.valueToInsert) // TODO
 }

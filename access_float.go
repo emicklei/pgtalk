@@ -16,12 +16,17 @@ func NewFloat64Access(info ColumnInfo, writer func(dest interface{}, f *float64)
 	return Float64Access{ColumnInfo: info, fieldWriter: writer}
 }
 
-func (a Float64Access) SetFieldValue(entity interface{}, fieldValue interface{}) {
+func (a Float64Access) SetFieldValue(entity interface{}, fieldValue interface{}) error {
 	if fieldValue == nil {
-		return
+		return nil
 	}
-	var f = fieldValue.(float64)
+	f, ok := fieldValue.(float64)
+	if !ok {
+		// TODO try string?
+		return NewValueConversionError(fieldValue, "float64")
+	}
 	a.fieldWriter(entity, &f)
+	return nil
 }
 
 func (a Float64Access) ValueToInsert() interface{} {

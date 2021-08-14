@@ -23,6 +23,9 @@ type MutationSet struct {
 }
 
 func MakeMutationSet(tableInfo TableInfo, selectors []ColumnAccessor, operationType int) MutationSet {
+	if AssertEnabled {
+		assertEachAccessorHasTableInfo(selectors, tableInfo)
+	}
 	return MutationSet{
 		tableInfo:     tableInfo,
 		selectors:     selectors,

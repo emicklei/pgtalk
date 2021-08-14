@@ -16,16 +16,20 @@ func NewTimeAccess(info ColumnInfo, writer func(dest interface{}, i *time.Time))
 	return TimeAccess{ColumnInfo: info, fieldWriter: writer}
 }
 
-func (a TimeAccess) SetFieldValue(entity interface{}, fieldValue interface{}) {
+func (a TimeAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error {
 	if fieldValue == nil {
-		return
+		return nil
 	}
-	var v time.Time = fieldValue.(time.Time)
+	v, ok := fieldValue.(time.Time)
+	if !ok {
+		return NewValueConversionError(fieldValue, "time.Time")
+	}
 	a.fieldWriter(entity, &v)
+	return nil
 }
 
 func (a TimeAccess) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%v", a.ValueToInsert)
+	fmt.Fprintf(w, "%v", a.valueToInsert)
 }
 
 func (a TimeAccess) ValueToInsert() interface{} {

@@ -25,7 +25,7 @@ func (a BytesAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 }
 
 func (a BytesAccess) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%v", a.ValueToInsert) // TODO
+	fmt.Fprintf(w, "%v", a.valueToInsert) // TODO
 }
 
 func (a BytesAccess) ValueToInsert() interface{} {
@@ -47,13 +47,18 @@ func NewJSONBAccess(info ColumnInfo, writer func(dest interface{}, b *string)) J
 	return JSONBAccess{ColumnInfo: info, fieldWriter: writer}
 }
 
-func (a JSONBAccess) SetFieldValue(entity interface{}, fieldValue interface{}) {
+func (a JSONBAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error {
 	if fieldValue == nil {
-		return
+		return nil
 	}
-	var f = fieldValue.([]byte)
+	f, ok := fieldValue.([]byte)
+	if !ok {
+		// TODO try string?
+		return NewValueConversionError(fieldValue, "[]byte")
+	}
 	var s = string(f)
 	a.fieldWriter(entity, &s)
+	return nil
 }
 
 func (a JSONBAccess) Set(s string) JSONBAccess {

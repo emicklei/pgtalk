@@ -18,6 +18,14 @@ func (t TableInfo) SQLOn(w io.Writer) {
 	fmt.Fprintf(w, "%s.%s %s", t.Schema, t.Name, t.Alias)
 }
 
+func (t TableInfo) Equals(o TableInfo) bool {
+	return t.Name == o.Name && t.Schema == o.Schema && t.Alias == o.Alias
+}
+
+func (t TableInfo) String() string {
+	return fmt.Sprintf("table(%s.%s %s)", t.Schema, t.Name, t.Alias)
+}
+
 var EmptyColumnAccessor = []ColumnAccessor{}
 
 type ValuePrinter struct {
@@ -89,6 +97,10 @@ func MakeColumnInfo(t TableInfo, name string, isPrimary bool, isNotNull bool, ta
 	}
 }
 
+func (c ColumnInfo) String() string {
+	return fmt.Sprintf("column(%s.%s:%s)", c.tableInfo.Schema, c.tableInfo.Name, c.columnName)
+}
+
 func (c ColumnInfo) Name() string {
 	if c.isMixedCase {
 		return strconv.Quote(c.columnName)
@@ -123,7 +135,8 @@ func PrettySQL(sql SQLWriter) string {
 		if i > 0 { // skip first
 			if len(each) > 1 { // sql token are multi-char
 				if !strings.HasPrefix(each, "'") {
-					if strings.ToUpper(each) == each {
+					// no break after IS,NOT,NULL
+					if strings.ToUpper(each) == each && strings.Index("IS NOT NULL", each) == -1 {
 						if !wasUpper {
 							io.WriteString(b, "\n")
 							wasUpper = true

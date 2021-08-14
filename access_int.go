@@ -22,19 +22,23 @@ func NewInt64Access(
 }
 
 func (a Int64Access) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%d", a.ValueToInsert)
+	fmt.Fprintf(w, "%d", a.valueToInsert)
 }
 
 func (a Int64Access) BetweenAnd(begin int64, end int64) BetweenAnd {
 	return MakeBetweenAnd(a, ValuePrinter{begin}, ValuePrinter{end})
 }
 
-func (a Int64Access) SetFieldValue(entity interface{}, fieldValue interface{}) {
+func (a Int64Access) SetFieldValue(entity interface{}, fieldValue interface{}) error {
 	if fieldValue == nil {
-		return
+		return nil
 	}
-	var i int64 = fieldValue.(int64)
+	i, ok := fieldValue.(int64)
+	if !ok {
+		return NewValueConversionError(fieldValue, "int64")
+	}
 	a.fieldWriter(entity, &i)
+	return nil
 }
 
 func (a Int64Access) ValueToInsert() interface{} {

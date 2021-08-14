@@ -42,16 +42,20 @@ func (a TextAccess) Compare(op string, stringOrTextAccess interface{}) BinaryOpe
 	panic("string or TextAcces expected")
 }
 
-func (a TextAccess) SetFieldValue(entity interface{}, fieldValue interface{}) {
+func (a TextAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error {
 	if fieldValue == nil {
-		return
+		return nil
 	}
-	var i string = fieldValue.(string)
-	a.fieldWriter(entity, &i)
+	s, ok := fieldValue.(string)
+	if !ok {
+		return NewValueConversionError(fieldValue, "string")
+	}
+	a.fieldWriter(entity, &s)
+	return nil
 }
 
 func (a TextAccess) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "'%s'", a.ValueToInsert)
+	fmt.Fprintf(w, "'%s'", a.valueToInsert)
 }
 
 func (a TextAccess) NotNull() NullCheck {
@@ -71,3 +75,7 @@ func (a TextAccess) In(values ...string) BinaryOperator {
 }
 
 func (a TextAccess) Column() ColumnInfo { return a.ColumnInfo }
+
+func (a TextAccess) String() string {
+	return fmt.Sprintf("text(%v)", a.ColumnInfo)
+}
