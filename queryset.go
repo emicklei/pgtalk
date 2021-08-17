@@ -53,6 +53,10 @@ func (q QuerySet) SQLOn(w io.Writer) {
 		fmt.Fprint(w, " GROUP BY ")
 		writeAccessOn(q.groupBy, w)
 	}
+	if q.having != nil {
+		fmt.Fprint(w, " HAVING ")
+		q.having.SQLOn(w)
+	}
 	if len(q.orderBy) > 0 {
 		fmt.Fprint(w, " ORDER BY ")
 		writeAccessOn(q.orderBy, w)

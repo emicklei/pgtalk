@@ -38,3 +38,7 @@ func NewValueConversionError(got interface{}, want string) error {
 func (e ValueConversionError) Error() string {
 	return fmt.Sprintf("field value conversion error, got %s expected %s", e.got, e.want)
 }
+
+type HasColumn interface {
+	Column() ColumnInfo
+}

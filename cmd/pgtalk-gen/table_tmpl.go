@@ -104,6 +104,11 @@ func (s {{.GoType}}sQuerySet) GroupBy(cas ...pgtalk.ColumnAccessor) {{.GoType}}s
 	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.GroupBy(cas...)}
 }
 
+// Having returns a new QuerySet with the HAVING clause.
+func (s {{.GoType}}sQuerySet) Having(expr pgtalk.SQLWriter) {{.GoType}}sQuerySet {
+	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.Having(expr)}
+}
+
 // OrderBy returns a new QuerySet with the ORDER BY clause.
 func (s {{.GoType}}sQuerySet) OrderBy(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet {
 	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.OrderBy(cas...)}
