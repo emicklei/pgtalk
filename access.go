@@ -26,6 +26,11 @@ func (t TableInfo) String() string {
 	return fmt.Sprintf("table(%s.%s %s)", t.Schema, t.Name, t.Alias)
 }
 
+type TableAccessor struct {
+	TableInfo
+	AllColumns []ColumnAccessor
+}
+
 var EmptyColumnAccessor = []ColumnAccessor{}
 
 type ValuePrinter struct {

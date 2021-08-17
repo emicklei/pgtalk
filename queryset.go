@@ -22,12 +22,12 @@ type QuerySet struct {
 	sortOrder    string
 }
 
-func MakeQuerySet(tableInfo TableInfo, selectors []ColumnAccessor, factory NewEntityFunc) QuerySet {
+func MakeQuerySet(tableAccess TableAccessor, selectors []ColumnAccessor, factory NewEntityFunc) QuerySet {
 	if AssertEnabled {
-		assertEachAccessorHasTableInfo(selectors, tableInfo)
+		assertEachAccessorHasTableInfo(selectors, tableAccess.TableInfo)
 	}
 	return QuerySet{
-		tableInfo: tableInfo,
+		tableInfo: tableAccess.TableInfo,
 		selectors: selectors,
 		condition: EmptyCondition,
 		factory:   factory}
