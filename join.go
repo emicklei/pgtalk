@@ -154,6 +154,12 @@ func (m MultiJoin) On(condition SQLWriter) MultiJoin {
 	return m
 }
 
+func (m MultiJoin) LeftOuterJoin(q Unwrappable) MultiJoin {
+	m.sets = append(m.sets, q.Unwrap())
+	m.joinTypes = append(m.joinTypes, LeftOuterJoinType)
+	return m
+}
+
 func (m MultiJoin) SQLOn(w io.Writer) {
 	fmt.Fprint(w, "SELECT ")
 	for i, each := range m.sets {
@@ -165,6 +171,22 @@ func (m MultiJoin) SQLOn(w io.Writer) {
 	fmt.Fprint(w, " FROM ")
 	first := m.sets[0]
 	first.fromSectionOn(w)
+	// collect all conditions from all sets
+	wheres := []SQLExpression{}
+	for _, each := range m.sets {
+		if each.condition != EmptyCondition {
+			wheres = append(wheres, each.condition)
+		}
+	}
+	if len(wheres) > 0 {
+		fmt.Fprint(w, " WHERE ")
+		for i, each := range wheres {
+			if i > 0 {
+				fmt.Fprint(w, " AND ")
+			}
+			each.SQLOn(w)
+		}
+	}
 	for j := 0; j < len(m.joinTypes); j++ {
 		jt := m.joinTypes[j]
 		writeJoinType(jt, w)

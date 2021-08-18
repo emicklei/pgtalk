@@ -90,7 +90,7 @@ type {{.GoType}}sQuerySet struct {
 func (s {{.GoType}}sQuerySet) Unwrap() pgtalk.QuerySet { return s.QuerySet }
 
 // Where returns a new QuerySet with WHERE clause.
-func (s {{.GoType}}sQuerySet) Where(condition pgtalk.SQLWriter) {{.GoType}}sQuerySet {
+func (s {{.GoType}}sQuerySet) Where(condition pgtalk.SQLExpression) {{.GoType}}sQuerySet {
 	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.Where(condition)}
 }
 

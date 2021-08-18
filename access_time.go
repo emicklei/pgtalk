@@ -86,3 +86,7 @@ func (a BooleanAccess) ValueToInsert() interface{} {
 func (a BooleanAccess) ValueAsSQLOn(w io.Writer) {
 	fmt.Fprintf(w, "%v", a.valueToInsert)
 }
+
+func (a BooleanAccess) Equals(b bool) SQLExpression {
+	return MakeBinaryOperator(a, "=", ValuePrinter{b})
+}

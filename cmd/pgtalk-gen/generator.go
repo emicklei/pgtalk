@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"log"
@@ -59,14 +60,30 @@ func generateFromTable(table PgTable) {
 var knownAliases = map[string]int{}
 
 func alias(s string) string {
-	first := strings.ToLower(s[0:1])
+	abb := abbreviate(s)
 	index := 1
-	if known, ok := knownAliases[first]; ok {
+	if known, ok := knownAliases[abb]; ok {
 		index = known + 1
 	}
-	a := fmt.Sprintf("%s%d", first, index)
-	knownAliases[first] = index
+	a := fmt.Sprintf("%s%d", abb, index)
+	knownAliases[abb] = index
 	return a
+}
+
+// happy_world => hw
+func abbreviate(s string) string {
+	b := new(bytes.Buffer)
+	start := true
+	for _, each := range []rune(s) {
+		if start {
+			b.WriteRune(each)
+			start = false
+		}
+		if each == '_' || each == '.' {
+			start = true
+		}
+	}
+	return b.String()
 }
 
 func goFieldTypeAndAccess(datatype string) (string, string) {

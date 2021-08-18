@@ -109,4 +109,9 @@ func (a Float64Access) ValueAsSQLOn(w io.Writer) {
 	fmt.Fprintf(w, "%v", a.valueToInsert)
 }
 
+func (a Float64Access) Set(v float64) Float64Access {
+	a.valueToInsert = v
+	return a
+}
+
 func (a Float64Access) Column() ColumnInfo { return a.ColumnInfo }

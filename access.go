@@ -90,7 +90,8 @@ type NoCondition struct{}
 
 var EmptyCondition = NoCondition{}
 
-func (n NoCondition) SQLOn(b io.Writer) {}
+func (n NoCondition) SQLOn(b io.Writer)                              {}
+func (n NoCondition) Collect(list []ColumnAccessor) []ColumnAccessor { return list }
 
 type ColumnInfo struct {
 	tableInfo            TableInfo

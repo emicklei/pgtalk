@@ -13,7 +13,7 @@ type QuerySet struct {
 	tableInfo    TableInfo
 	selectors    []ColumnAccessor
 	distinct     bool
-	condition    SQLWriter
+	condition    SQLExpression
 	limit        int
 	factory      NewEntityFunc
 	groupBy      []ColumnAccessor
@@ -66,12 +66,12 @@ func (q QuerySet) SQLOn(w io.Writer) {
 	}
 }
 
-func (q QuerySet) Named(preparedName string) QuerySet { q.preparedName = preparedName; return q }
-func (q QuerySet) Distinct() QuerySet                 { q.distinct = true; return q }
-func (q QuerySet) Ascending() QuerySet                { q.sortOrder = "ASC"; return q }
-func (q QuerySet) Descending() QuerySet               { q.sortOrder = "DESC"; return q }
-func (q QuerySet) Where(condition SQLWriter) QuerySet { q.condition = condition; return q }
-func (q QuerySet) Limit(limit int) QuerySet           { q.limit = limit; return q }
+func (q QuerySet) Named(preparedName string) QuerySet     { q.preparedName = preparedName; return q }
+func (q QuerySet) Distinct() QuerySet                     { q.distinct = true; return q }
+func (q QuerySet) Ascending() QuerySet                    { q.sortOrder = "ASC"; return q }
+func (q QuerySet) Descending() QuerySet                   { q.sortOrder = "DESC"; return q }
+func (q QuerySet) Where(condition SQLExpression) QuerySet { q.condition = condition; return q }
+func (q QuerySet) Limit(limit int) QuerySet               { q.limit = limit; return q }
 func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet {
 	q.groupBy = cas
 	if assertEnabled {
