@@ -16,6 +16,14 @@ func NewBytesAccess(info ColumnInfo, writer func(dest interface{}, b *[]byte)) B
 	return BytesAccess{ColumnInfo: info, fieldWriter: writer}
 }
 
+func (a BytesAccess) Column() ColumnInfo { return a.ColumnInfo }
+
+func (a BytesAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error { return nil }
+
+func (a BytesAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
+	return append(list, a)
+}
+
 func (a BytesAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 	if fieldValue == nil {
 		return

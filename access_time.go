@@ -16,6 +16,10 @@ func NewTimeAccess(info ColumnInfo, writer func(dest interface{}, i *time.Time))
 	return TimeAccess{ColumnInfo: info, fieldWriter: writer}
 }
 
+func (a TimeAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
+	return append(list, a)
+}
+
 func (a TimeAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error {
 	if fieldValue == nil {
 		return nil

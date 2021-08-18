@@ -6,6 +6,8 @@ More type safe SQL query building and execution using Go code generated (pgtalk-
 
 See also [booking demo](https://github.com/emicklei/pgtalk-demo).
 
+These examples are from the test package in which a few database tables files (categories,products,things) are generated.
+
 ### Insert
 
 	m := products.Insert(

@@ -23,7 +23,7 @@ type MutationSet struct {
 }
 
 func MakeMutationSet(tableAccess TableAccessor, selectors []ColumnAccessor, operationType int) MutationSet {
-	if AssertEnabled {
+	if assertEnabled {
 		assertEachAccessorHasTableInfo(selectors, tableAccess.TableInfo)
 	}
 	return MutationSet{
@@ -75,14 +75,17 @@ func (m MutationSet) SQLOn(w io.Writer) {
 	}
 }
 
-func (m MutationSet) Where(condition SQLWriter) MutationSet {
-	// TODO how to check the condition only uses columns from the table
+func (m MutationSet) Where(condition SQLExpression) MutationSet {
+	if assertEnabled {
+		access := condition.Collect([]ColumnAccessor{})
+		assertEachAccessorIn(access, m.tableAccess.AllColumns)
+	}
 	m.condition = condition
 	return m
 }
 
 func (m MutationSet) Returning(columns ...ColumnAccessor) MutationSet {
-	if AssertEnabled {
+	if assertEnabled {
 		assertEachAccessorIn(columns, m.tableAccess.AllColumns)
 	}
 	m.returning = columns

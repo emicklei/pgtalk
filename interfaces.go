@@ -1,12 +1,15 @@
 package pgtalk
 
 import (
-	"fmt"
 	"io"
 )
 
-// AssertEnabled, if true then perform extra runtime assertion that may panic
-var AssertEnabled = true
+// assertEnabled, if true then perform extra runtime assertion that may panic
+var assertEnabled = false
+
+// EnableAssert will enable running extra, potentially more expensive, assertion checks.
+// Use this for running your test code.
+func EnableAssert() { assertEnabled = true }
 
 type NewEntityFunc func() interface{}
 
@@ -24,21 +27,12 @@ type ColumnAccessor interface {
 }
 
 type SQLWriter interface {
+	// SQLOn writes a valid SQL on a Writer
 	SQLOn(w io.Writer)
 }
 
-type ValueConversionError struct {
-	got, want string
-}
-
-func NewValueConversionError(got interface{}, want string) error {
-	return ValueConversionError{fmt.Sprintf("%T", got), want}
-}
-
-func (e ValueConversionError) Error() string {
-	return fmt.Sprintf("field value conversion error, got %s expected %s", e.got, e.want)
-}
-
-type HasColumn interface {
-	Column() ColumnInfo
+type SQLExpression interface {
+	SQLWriter
+	// Collect returns all ColumnAccessor that are used in the expression. It exists for assertion.
+	Collect(list []ColumnAccessor) []ColumnAccessor
 }

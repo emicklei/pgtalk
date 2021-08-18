@@ -17,12 +17,19 @@ func NewPointAccess(info ColumnInfo, writer func(dest interface{}, b *Point)) Po
 	return PointAccess{ColumnInfo: info, fieldWriter: writer}
 }
 
-func (a PointAccess) SetFieldValue(entity interface{}, fieldValue interface{}) {
+func (a PointAccess) Column() ColumnInfo { return a.ColumnInfo }
+
+func (a PointAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
+	return append(list, a)
+}
+
+func (a PointAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error {
 	if fieldValue == nil {
-		return
+		return nil
 	}
 	// TODO
 	// a.fieldWriter(entity, &Point)
+	return nil
 }
 
 func (a PointAccess) ValueToInsert() interface{} {

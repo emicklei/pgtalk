@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/emicklei/pgtalk"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -26,6 +27,7 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 	testConnect = conn
+	pgtalk.EnableAssert()
 	code := m.Run()
 	fmt.Println("... db close")
 	conn.Close(context.Background())

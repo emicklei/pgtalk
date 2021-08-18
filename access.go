@@ -41,6 +41,10 @@ func MakeValuePrinter(v interface{}) ValuePrinter { return ValuePrinter{v: v} }
 
 func (p ValuePrinter) SQLOn(b io.Writer) { fmt.Fprintf(b, "%v", p.v) }
 
+func (p ValuePrinter) Collect(list []ColumnAccessor) []ColumnAccessor {
+	return list
+}
+
 type ValuesPrinter struct {
 	vs []interface{}
 }
@@ -56,6 +60,10 @@ func (p ValuesPrinter) SQLOn(b io.Writer) {
 		}
 	}
 	fmt.Fprintf(b, ")")
+}
+
+func (p ValuesPrinter) Collect(list []ColumnAccessor) []ColumnAccessor {
+	return list
 }
 
 type scanToWrite struct {
@@ -75,6 +83,8 @@ func (l LiteralString) SQLOn(b io.Writer) {
 	io.WriteString(b, string(l))
 	io.WriteString(b, "'")
 }
+
+func (l LiteralString) Collect(list []ColumnAccessor) []ColumnAccessor { return list }
 
 type NoCondition struct{}
 

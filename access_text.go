@@ -42,6 +42,10 @@ func (a TextAccess) Compare(op string, stringOrTextAccess interface{}) BinaryOpe
 	panic("string or TextAcces expected")
 }
 
+func (a TextAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
+	return append(list, a)
+}
+
 func (a TextAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error {
 	if fieldValue == nil {
 		return nil

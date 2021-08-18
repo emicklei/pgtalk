@@ -23,7 +23,7 @@ type QuerySet struct {
 }
 
 func MakeQuerySet(tableAccess TableAccessor, selectors []ColumnAccessor, factory NewEntityFunc) QuerySet {
-	if AssertEnabled {
+	if assertEnabled {
 		assertEachAccessorHasTableInfo(selectors, tableAccess.TableInfo)
 	}
 	return QuerySet{
@@ -74,7 +74,7 @@ func (q QuerySet) Where(condition SQLWriter) QuerySet { q.condition = condition;
 func (q QuerySet) Limit(limit int) QuerySet           { q.limit = limit; return q }
 func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet {
 	q.groupBy = cas
-	if AssertEnabled {
+	if assertEnabled {
 		assertEachAccessorIn(cas, q.selectors)
 	}
 	return q
@@ -82,13 +82,17 @@ func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet {
 func (q QuerySet) Having(condition SQLWriter) QuerySet { q.having = condition; return q }
 func (q QuerySet) OrderBy(cas ...ColumnAccessor) QuerySet {
 	q.orderBy = cas
-	if AssertEnabled {
+	if assertEnabled {
 		assertEachAccessorHasTableInfo(cas, q.tableInfo)
 	}
 	return q
 }
 func (q QuerySet) Exists() UnaryOperator {
 	return UnaryOperator{Operator: "EXISTS", Operand: q}
+}
+
+func (d QuerySet) Collect(list []ColumnAccessor) []ColumnAccessor {
+	return list // ?
 }
 
 func (d QuerySet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
