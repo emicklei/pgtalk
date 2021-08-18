@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/iancoleman/strcase"
 )
 
 func generateFromTable(table PgTable) {
@@ -79,6 +81,8 @@ func goFieldTypeAndAccess(datatype string) (string, string) {
 		return "*string", "NewJSONBAccess"
 	case "point":
 		return "*pgtalk.Point", "NewPointAccess"
+	case "boolean":
+		return "*bool", "NewBooleanAccess"
 	}
 	if strings.HasPrefix(datatype, "character") {
 		return "*string", "NewTextAccess"
@@ -93,7 +97,7 @@ func fieldName(s string) string {
 	if s == "id" {
 		return "ID"
 	}
-	return strings.Title(s)
+	return strcase.ToCamel(s)
 }
 
 func asSingular(s string) string {

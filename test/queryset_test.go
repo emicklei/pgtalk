@@ -88,9 +88,9 @@ func TestLeftJoin(t *testing.T) {
 func TestMultiLeftJoin(t *testing.T) {
 	q := products.Select(products.Code).Where(products.Code.Equals("F42")).
 		LeftOuterJoin(categories.Select(categories.Title)).
-		On(products.Category_id.Equals(categories.ID)).
+		On(products.CategoryId.Equals(categories.ID)).
 		LeftOuterJoin(categories.Select(categories.Title)).
-		On(products.Category_id.Equals(categories.ID))
+		On(products.CategoryId.Equals(categories.ID))
 	if got, want := pgtalk.SQL(q), `SELECT p1.code,c1.title,c1.title FROM public.products p1 LEFT OUTER JOIN public.categories c1 ON (p1.category_id = c1.id) LEFT OUTER JOIN public.categories c1 ON (p1.category_id = c1.id)`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
@@ -100,9 +100,9 @@ func TestFullSelect(t *testing.T) {
 	q := products.
 		Select(products.AllColumns()...).
 		Distinct().
-		Where(products.Code.Compare(">", "A").And(products.Category_id.NotNull())).
-		GroupBy(products.Category_id).
-		OrderBy(products.Category_id).
+		Where(products.Code.Compare(">", "A").And(products.CategoryId.NotNull())).
+		GroupBy(products.CategoryId).
+		OrderBy(products.CategoryId).
 		Ascending().
 		Limit(3)
 	if got, want := pgtalk.SQL(q), `SELECT DISTINCT p1.id,p1.created_at,p1.updated_at,p1.deleted_at,p1.code,p1.price,p1.category_id FROM public.products p1 WHERE ((p1.code > 'A') AND (p1.category_id IS NOT NULL)) GROUP BY p1.category_id ORDER BY p1.category_id LIMIT 3`; got != want {
