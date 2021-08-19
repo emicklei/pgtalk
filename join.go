@@ -89,7 +89,7 @@ func (i Join) Exec(ctx context.Context, conn *pgx.Conn) (it JoinResultIterator, 
 	if i.preparedName != "" {
 		_, err := conn.Prepare(ctx, i.preparedName, sql)
 		if err != nil {
-			return JoinResultIterator{queryError: err}, nil
+			return JoinResultIterator{queryError: err}, err
 		}
 	}
 	rows, err := conn.Query(ctx, sql)
@@ -123,6 +123,9 @@ func (i *JoinResultIterator) Err() error {
 }
 
 func (i *JoinResultIterator) Next(left interface{}, right interface{}) error {
+	if i.queryError != nil {
+		return i.queryError
+	}
 	sw := []interface{}{}
 	// left
 	for _, each := range i.leftSet.selectors {
@@ -144,9 +147,10 @@ func (i *JoinResultIterator) Next(left interface{}, right interface{}) error {
 }
 
 type MultiJoin struct {
-	sets       []QuerySet
-	joinTypes  []JoinType
-	conditions []SQLExpression
+	preparedName string
+	sets         []QuerySet
+	joinTypes    []JoinType
+	conditions   []SQLExpression
 }
 
 func (m MultiJoin) On(condition SQLExpression) MultiJoin {
@@ -158,6 +162,18 @@ func (m MultiJoin) LeftOuterJoin(q Unwrappable) MultiJoin {
 	m.sets = append(m.sets, q.Unwrap())
 	m.joinTypes = append(m.joinTypes, LeftOuterJoinType)
 	return m
+}
+
+func (m MultiJoin) Exec(ctx context.Context, conn *pgx.Conn) (*MultiJoinResultIterator, error) {
+	sql := SQL(m)
+	if m.preparedName != "" {
+		_, err := conn.Prepare(ctx, m.preparedName, sql)
+		if err != nil {
+			return &MultiJoinResultIterator{queryError: err}, nil
+		}
+	}
+	rows, err := conn.Query(ctx, sql)
+	return &MultiJoinResultIterator{queryError: err, querySets: m.sets, rows: rows}, nil
 }
 
 func (m MultiJoin) SQLOn(w io.Writer) {
@@ -195,4 +211,59 @@ func (m MultiJoin) SQLOn(w io.Writer) {
 			each.SQLOn(w)
 		}
 	}
+}
+
+type MultiJoinResultIterator struct {
+	queryError error
+	querySets  []QuerySet
+	rows       pgx.Rows
+}
+
+func (i *MultiJoinResultIterator) Err() error {
+	if i.queryError != nil {
+		return i.queryError
+	}
+	return i.rows.Err()
+}
+
+func (i *MultiJoinResultIterator) HasNext() bool {
+	if i.queryError != nil {
+		return false
+	}
+	if i.rows.Next() {
+		return true
+	} else {
+		i.rows.Close()
+	}
+	return false
+}
+
+func (i *MultiJoinResultIterator) Next(models ...interface{}) error {
+	if i.queryError != nil {
+		return i.queryError
+	}
+	// count non-empty querysets
+	countNonEmpty := 0
+	for _, each := range i.querySets {
+		if len(each.selectors) != 0 {
+			countNonEmpty++
+		}
+	}
+	// check models count matches
+	if mc, qc := len(models), countNonEmpty; mc != qc {
+		return fmt.Errorf("number of models [%d] does not match select count [%d]", mc, qc)
+	}
+	// TODO how to check model types?
+	sw := []interface{}{}
+	// all sets
+	for m, eachSet := range i.querySets {
+		for _, each := range eachSet.selectors {
+			rw := scanToWrite{
+				access: each,
+				entity: models[m],
+			}
+			sw = append(sw, rw)
+		}
+	}
+	return i.rows.Scan(sw...)
 }

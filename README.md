@@ -61,6 +61,37 @@ These examples are from the test package in which a few database tables files (c
 		t.Logf("%s,%s", *p.Code, *c.Title)
 	}
 
+### Multi Join
+
+	q := offer.Select(offer.AllColumns()...).
+		Where(offer.ID.In("01F674G8MDRAPBWA6SB1HWE2VC").And(offer.IsActive.Equals(true))).
+		LeftOuterJoin(offer_buyer_permission_rel.Select(offer_buyer_permission_rel.BuyerPermission)).
+		On(offer_buyer_permission_rel.OfferId.Equals(offer.ID)).
+		LeftOuterJoin(offer_market_rel.Select(offer_market_rel.MarketId)).
+		On(offer_market_rel.OfferId.Equals(offer.ID)).
+		LeftOuterJoin(buyer_market_rel.Select().Where(buyer_market_rel.BuyerId.Equals("X1010_0100002"))).
+		On(offer_market_rel.MarketId.Equals(offer_market_rel.MarketId))
+
+	t.Log(pgtalk.PrettySQL(q))
+
+	it, err := q.Exec(context.Background(), testConnect)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for it.HasNext() {
+		offer := new(offer.Offer)
+		permission := new(offer_buyer_permission_rel.OfferBuyerPermissionRel)
+		market := new(offer_market_rel.OfferMarketRel)
+		// The order and types of the entities must match the order of the non-empty Select functions used in the query
+		err := it.Next(offer, permission, market)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log(offer)
+		t.Log(permission)
+		t.Log(market)
+	}
+
 ## supported Column Types
 
 - text
@@ -74,9 +105,5 @@ These examples are from the test package in which a few database tables files (c
 - integer
 
 https://www.postgresql.org/docs/9.5/datatype.html
-
-## dev notes
-
-The whole implementation might be better once Go has Type parameters (generics) support.
 
 (c) 2021, http://ernestmicklei.com. MIT License.

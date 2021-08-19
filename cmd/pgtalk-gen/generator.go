@@ -21,7 +21,7 @@ func generateFromTable(table PgTable) {
 		TableName:  table.Name,
 		TableAlias: alias(table.Name),
 		GoPackage:  table.Name,
-		GoType:     asSingular(strings.Title(table.Name)),
+		GoType:     asSingular(strcase.ToCamel(table.Name)),
 	}
 	for _, each := range table.Columns {
 		goType, method := goFieldTypeAndAccess(each.DataType)
