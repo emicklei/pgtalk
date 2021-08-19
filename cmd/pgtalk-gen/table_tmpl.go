@@ -36,7 +36,7 @@ var (
 
 // ColumnUpdatesFrom returns the list of changes to a {{.GoType}} for which updates need to be processed.
 // Cannot be used to set null values for columns.
-func ColumnUpdatesFrom(e {{.GoType}}) (list []pgtalk.SQLWriter) {
+func ColumnUpdatesFrom(e {{.GoType}}) (list []pgtalk.SQLExpression) {
 {{- range .Fields}}
 	if e.{{.GoName}} != nil {
 		list = append(list, {{.GoName}}.Set(*e.{{.GoName}}))
@@ -105,7 +105,7 @@ func (s {{.GoType}}sQuerySet) GroupBy(cas ...pgtalk.ColumnAccessor) {{.GoType}}s
 }
 
 // Having returns a new QuerySet with the HAVING clause.
-func (s {{.GoType}}sQuerySet) Having(expr pgtalk.SQLWriter) {{.GoType}}sQuerySet {
+func (s {{.GoType}}sQuerySet) Having(expr pgtalk.SQLExpression) {{.GoType}}sQuerySet {
 	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.Having(expr)}
 }
 

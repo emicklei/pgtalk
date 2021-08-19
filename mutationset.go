@@ -17,7 +17,7 @@ const (
 type MutationSet struct {
 	tableAccess   TableAccessor
 	selectors     []ColumnAccessor
-	condition     SQLWriter
+	condition     SQLExpression
 	returning     []ColumnAccessor
 	operationType int
 }

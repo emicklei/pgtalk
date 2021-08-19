@@ -83,3 +83,7 @@ func (a JSONBAccess) ValueAsSQLOn(w io.Writer) {
 }
 
 func (a JSONBAccess) Column() ColumnInfo { return a.ColumnInfo }
+
+func (a JSONBAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
+	return append(list, a)
+}

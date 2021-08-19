@@ -17,7 +17,7 @@ type QuerySet struct {
 	limit        int
 	factory      NewEntityFunc
 	groupBy      []ColumnAccessor
-	having       SQLWriter
+	having       SQLExpression
 	orderBy      []ColumnAccessor
 	sortOrder    string
 }
@@ -79,7 +79,7 @@ func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet {
 	}
 	return q
 }
-func (q QuerySet) Having(condition SQLWriter) QuerySet { q.having = condition; return q }
+func (q QuerySet) Having(condition SQLExpression) QuerySet { q.having = condition; return q }
 func (q QuerySet) OrderBy(cas ...ColumnAccessor) QuerySet {
 	q.orderBy = cas
 	if assertEnabled {

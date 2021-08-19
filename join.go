@@ -23,7 +23,7 @@ type Join struct {
 	rightSet     QuerySet
 	onLeft       ColumnAccessor
 	onRight      ColumnAccessor
-	condition    SQLWriter
+	condition    SQLExpression
 	joinType     JoinType
 	limit        int
 }
@@ -67,7 +67,7 @@ func (i Join) Named(preparedName string) Join {
 	return i
 }
 
-func (i Join) On(condition SQLWriter) Join {
+func (i Join) On(condition SQLExpression) Join {
 	i.condition = condition
 	return i
 }
@@ -146,10 +146,10 @@ func (i *JoinResultIterator) Next(left interface{}, right interface{}) error {
 type MultiJoin struct {
 	sets       []QuerySet
 	joinTypes  []JoinType
-	conditions []SQLWriter
+	conditions []SQLExpression
 }
 
-func (m MultiJoin) On(condition SQLWriter) MultiJoin {
+func (m MultiJoin) On(condition SQLExpression) MultiJoin {
 	m.conditions = append(m.conditions, condition)
 	return m
 }
