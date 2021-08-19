@@ -115,3 +115,7 @@ func (a Float64Access) Set(v float64) Float64Access {
 }
 
 func (a Float64Access) Column() ColumnInfo { return a.ColumnInfo }
+
+func (a Float64Access) Collect(list []ColumnAccessor) []ColumnAccessor {
+	return append(list, a)
+}
