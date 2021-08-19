@@ -163,7 +163,7 @@ func (m MultiJoin) LeftOuterJoin(q Unwrappable) MultiJoin {
 func (m MultiJoin) SQLOn(w io.Writer) {
 	fmt.Fprint(w, "SELECT ")
 	for i, each := range m.sets {
-		if i > 0 {
+		if i > 0 && len(each.selectors) > 0 {
 			fmt.Fprint(w, ",")
 		}
 		writeAccessOn(each.selectors, w)
@@ -178,6 +178,14 @@ func (m MultiJoin) SQLOn(w io.Writer) {
 			wheres = append(wheres, each.condition)
 		}
 	}
+	for j := 0; j < len(m.joinTypes); j++ {
+		jt := m.joinTypes[j]
+		writeJoinType(jt, w)
+		set := m.sets[j+1]
+		set.fromSectionOn(w)
+		fmt.Fprint(w, " ON ")
+		m.conditions[j].SQLOn(w)
+	}
 	if len(wheres) > 0 {
 		fmt.Fprint(w, " WHERE ")
 		for i, each := range wheres {
@@ -186,13 +194,5 @@ func (m MultiJoin) SQLOn(w io.Writer) {
 			}
 			each.SQLOn(w)
 		}
-	}
-	for j := 0; j < len(m.joinTypes); j++ {
-		jt := m.joinTypes[j]
-		writeJoinType(jt, w)
-		set := m.sets[j+1]
-		set.fromSectionOn(w)
-		fmt.Fprint(w, " ON ")
-		m.conditions[j].SQLOn(w)
 	}
 }
