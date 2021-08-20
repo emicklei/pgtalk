@@ -29,7 +29,8 @@ var (
 	{{.GoName}} = pgtalk.{{.FactoryMethod}}(pgtalk.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimary}}, {{.IsNotNull}}, {{.TableAttributeNumber}}),
 		func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v })
 {{- end}}
-	tableAccess = pgtalk.TableAccessor{TableInfo: tableInfo, AllColumns: []pgtalk.ColumnAccessor{
+	tableAccess = pgtalk.TableAccessor{TableInfo: tableInfo, 
+		Factory: func() interface{}{return new({{.GoType}})}, AllColumns: []pgtalk.ColumnAccessor{
 {{- range .Fields}}{{.GoName}},{{- end}}
 }}
 )
@@ -77,9 +78,7 @@ func AllColumns() []pgtalk.ColumnAccessor {
 
 // Select returns a new {{.GoType}}sQuerySet for fetching column data.
 func Select(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet {
-	return {{.GoType}}sQuerySet{pgtalk.MakeQuerySet(tableAccess, cas, func() interface{} {
-		return new({{.GoType}})
-	})}
+	return {{.GoType}}sQuerySet{pgtalk.MakeQuerySet(tableAccess, cas)}
 }
 
 // {{.GoType}}sQuerySet can query for *{{.GoType}} values.

@@ -28,6 +28,7 @@ func (t TableInfo) String() string {
 
 type TableAccessor struct {
 	TableInfo
+	Factory    NewEntityFunc
 	AllColumns []ColumnAccessor
 }
 

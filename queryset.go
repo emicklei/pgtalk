@@ -10,31 +10,29 @@ import (
 
 type QuerySet struct {
 	preparedName string
-	tableInfo    TableInfo
+	tableAccess  TableAccessor
 	selectors    []ColumnAccessor
 	distinct     bool
 	condition    SQLExpression
 	limit        int
-	factory      NewEntityFunc
 	groupBy      []ColumnAccessor
 	having       SQLExpression
 	orderBy      []ColumnAccessor
 	sortOrder    string
 }
 
-func MakeQuerySet(tableAccess TableAccessor, selectors []ColumnAccessor, factory NewEntityFunc) QuerySet {
+func MakeQuerySet(tableAccess TableAccessor, selectors []ColumnAccessor) QuerySet {
 	if assertEnabled {
 		assertEachAccessorHasTableInfo(selectors, tableAccess.TableInfo)
 	}
 	return QuerySet{
-		tableInfo: tableAccess.TableInfo,
-		selectors: selectors,
-		condition: EmptyCondition,
-		factory:   factory}
+		tableAccess: tableAccess,
+		selectors:   selectors,
+		condition:   EmptyCondition}
 }
 
 func (q QuerySet) fromSectionOn(w io.Writer) {
-	fmt.Fprintf(w, "%s.%s %s", q.tableInfo.Schema, q.tableInfo.Name, q.tableInfo.Alias)
+	fmt.Fprintf(w, "%s.%s %s", q.tableAccess.TableInfo.Schema, q.tableAccess.TableInfo.Name, q.tableAccess.TableInfo.Alias)
 }
 
 func (q QuerySet) SQLOn(w io.Writer) {
@@ -83,7 +81,7 @@ func (q QuerySet) Having(condition SQLExpression) QuerySet { q.having = conditio
 func (q QuerySet) OrderBy(cas ...ColumnAccessor) QuerySet {
 	q.orderBy = cas
 	if assertEnabled {
-		assertEachAccessorHasTableInfo(cas, q.tableInfo)
+		assertEachAccessorHasTableInfo(cas, q.tableAccess.TableInfo)
 	}
 	return q
 }
@@ -118,7 +116,7 @@ func (d QuerySet) ExecWithAppender(ctx context.Context, conn *pgx.Conn, appender
 	}
 	defer rows.Close()
 	for rows.Next() {
-		entity := d.factory()
+		entity := d.tableAccess.Factory()
 		sw := []interface{}{}
 		for _, each := range d.selectors {
 			rw := scanToWrite{
