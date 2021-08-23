@@ -2,6 +2,7 @@ package pgtalk
 
 import "testing"
 
+// gotip test -v -gcflags=-G=3
 func TestFloat64Access_WriteInto(t *testing.T) {
 	type price struct {
 		amount *float64

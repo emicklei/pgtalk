@@ -96,6 +96,7 @@ func (d QuerySet[T]) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return list // ?
 }
 
+/**
 func (d QuerySet[T]) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 	sql := SQL(d)
 	var rows pgx.Rows
@@ -111,8 +112,9 @@ func (d QuerySet[T]) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 	}
 	return &ResultIterator{queryError: err, rows: rows}
 }
+**/
 
-func (d QuerySet[T]) ExecWithAppender(ctx context.Context, conn *pgx.Conn, appender func(each interface{})) (err error) {
+func (d QuerySet[T]) Exec(ctx context.Context, conn *pgx.Conn) (list []*T, err error) {
 	rows, err := conn.Query(ctx, SQL(d))
 	if err != nil {
 		return
@@ -129,9 +131,9 @@ func (d QuerySet[T]) ExecWithAppender(ctx context.Context, conn *pgx.Conn, appen
 			sw = append(sw, rw)
 		}
 		if err := rows.Scan(sw...); err != nil {
-			return err
+			return list, err
 		}
-		appender(entity)
+		list = append(list, entity)
 	}
 	return
 }
