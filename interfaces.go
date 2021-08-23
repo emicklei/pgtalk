@@ -13,10 +13,6 @@ func EnableAssert() { assertEnabled = true }
 
 type NewEntityFunc func() interface{}
 
-type Unwrappable interface {
-	Unwrap() QuerySet
-}
-
 type ColumnAccessor interface {
 	Name() string
 	SQLOn(w io.Writer)
@@ -35,4 +31,10 @@ type SQLExpression interface {
 	SQLWriter
 	// Collect returns all ColumnAccessor that are used in the expression. It exists for assertion.
 	Collect(list []ColumnAccessor) []ColumnAccessor
+}
+
+type querySet interface {
+	fromSectionOn(io.Writer)
+	selectAccessors() []ColumnAccessor
+	whereCondition() SQLExpression
 }

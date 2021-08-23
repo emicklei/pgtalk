@@ -14,7 +14,7 @@ const (
 	MutationUpdate
 )
 
-type MutationSet struct {
+type MutationSet[T any] struct {
 	tableAccess   TableAccessor
 	selectors     []ColumnAccessor
 	condition     SQLExpression
@@ -22,11 +22,11 @@ type MutationSet struct {
 	operationType int
 }
 
-func MakeMutationSet(tableAccess TableAccessor, selectors []ColumnAccessor, operationType int) MutationSet {
+func MakeMutationSet[T any](tableAccess TableAccessor, selectors []ColumnAccessor, operationType int) MutationSet[T] {
 	if assertEnabled {
 		assertEachAccessorHasTableInfo(selectors, tableAccess.TableInfo)
 	}
-	return MutationSet{
+	return MutationSet[T]{
 		tableAccess:   tableAccess,
 		selectors:     selectors,
 		condition:     EmptyCondition,
@@ -34,7 +34,7 @@ func MakeMutationSet(tableAccess TableAccessor, selectors []ColumnAccessor, oper
 }
 
 // SQL returns the full SQL mutation query
-func (m MutationSet) SQLOn(w io.Writer) {
+func (m MutationSet[T]) SQLOn(w io.Writer) {
 	if m.operationType == MutationInsert {
 		fmt.Fprint(w, "INSERT INTO ")
 		fmt.Fprintf(w, "%s.%s", m.tableAccess.Schema, m.tableAccess.Name)
@@ -75,7 +75,7 @@ func (m MutationSet) SQLOn(w io.Writer) {
 	}
 }
 
-func (m MutationSet) Where(condition SQLExpression) MutationSet {
+func (m MutationSet[T]) Where(condition SQLExpression) MutationSet[T] {
 	if assertEnabled {
 		access := condition.Collect([]ColumnAccessor{})
 		assertEachAccessorIn(access, m.tableAccess.AllColumns)
@@ -84,7 +84,7 @@ func (m MutationSet) Where(condition SQLExpression) MutationSet {
 	return m
 }
 
-func (m MutationSet) Returning(columns ...ColumnAccessor) MutationSet {
+func (m MutationSet[T]) Returning(columns ...ColumnAccessor) MutationSet[T] {
 	if assertEnabled {
 		assertEachAccessorIn(columns, m.tableAccess.AllColumns)
 	}
@@ -93,12 +93,12 @@ func (m MutationSet) Returning(columns ...ColumnAccessor) MutationSet {
 }
 
 // todo
-func (m MutationSet) On() MutationSet {
+func (m MutationSet[T]) On() MutationSet[T] {
 	return m
 }
 
 // Pre: must be run inside transaction
-func (m MutationSet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
+func (m MutationSet[T]) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 	args := []interface{}{}
 	for _, each := range m.selectors {
 		args = append(args, each.ValueToInsert())
@@ -110,11 +110,11 @@ func (m MutationSet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 	return &ResultIterator{queryError: err, rows: rows, selectors: m.returning}
 }
 
-func (m MutationSet) canProduceResults() bool {
+func (m MutationSet[T]) canProduceResults() bool {
 	return len(m.returning) > 0
 }
 
-func (m MutationSet) columnsSectionOn(which []ColumnAccessor, buf io.Writer) {
+func (m MutationSet[T]) columnsSectionOn(which []ColumnAccessor, buf io.Writer) {
 	for i, each := range which {
 		if i > 0 {
 			io.WriteString(buf, ",")
@@ -123,7 +123,7 @@ func (m MutationSet) columnsSectionOn(which []ColumnAccessor, buf io.Writer) {
 	}
 }
 
-func (m MutationSet) valuesSectionOn(buf io.Writer) {
+func (m MutationSet[T]) valuesSectionOn(buf io.Writer) {
 	for i := range m.selectors {
 		if i > 0 {
 			io.WriteString(buf, ",")
@@ -132,7 +132,7 @@ func (m MutationSet) valuesSectionOn(buf io.Writer) {
 	}
 }
 
-func (m MutationSet) setSectionOn(w io.Writer) {
+func (m MutationSet[T]) setSectionOn(w io.Writer) {
 	for i, each := range m.selectors {
 		if i > 0 {
 			io.WriteString(w, ",")

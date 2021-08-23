@@ -77,40 +77,8 @@ func AllColumns() []pgtalk.ColumnAccessor {
 }
 
 // Select returns a new {{.GoType}}sQuerySet for fetching column data.
-func Select(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet {
-	return {{.GoType}}sQuerySet{pgtalk.MakeQuerySet(tableAccess, cas)}
-}
-
-// {{.GoType}}sQuerySet can query for *{{.GoType}} values.
-type {{.GoType}}sQuerySet struct {
-	pgtalk.QuerySet
-}
-
-func (s {{.GoType}}sQuerySet) Unwrap() pgtalk.QuerySet { return s.QuerySet }
-
-// Where returns a new QuerySet with WHERE clause.
-func (s {{.GoType}}sQuerySet) Where(condition pgtalk.SQLExpression) {{.GoType}}sQuerySet {
-	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.Where(condition)}
-}
-
-// Limit returns a new QuerySet with the maximum number of results set.
-func (s {{.GoType}}sQuerySet) Limit(limit int) {{.GoType}}sQuerySet {
-	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.Limit(limit)}
-}
-
-// GroupBy returns a new QuerySet with the GROUP BY clause.
-func (s {{.GoType}}sQuerySet) GroupBy(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet {
-	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.GroupBy(cas...)}
-}
-
-// Having returns a new QuerySet with the HAVING clause.
-func (s {{.GoType}}sQuerySet) Having(expr pgtalk.SQLExpression) {{.GoType}}sQuerySet {
-	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.Having(expr)}
-}
-
-// OrderBy returns a new QuerySet with the ORDER BY clause.
-func (s {{.GoType}}sQuerySet) OrderBy(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet {
-	return {{.GoType}}sQuerySet{QuerySet: s.QuerySet.OrderBy(cas...)}
+func Select(cas ...pgtalk.ColumnAccessor) {{.GoType}}sQuerySet[*{{.GoType}}] {
+	return pgtalk.MakeQuerySet[*{{.GoType}}](tableAccess, cas)}
 }
 
 // Exec runs the query and returns the list of *{{.GoType}}.
@@ -122,17 +90,17 @@ func (s {{.GoType}}sQuerySet) Exec(ctx context.Context,conn *pgx.Conn) (list []*
 }
 
 // Insert creates a MutationSet for inserting data with zero or more columns.
-func Insert(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet {
-	return pgtalk.MakeMutationSet(tableAccess, cas, pgtalk.MutationInsert)
+func Insert(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet[*{{.GoType}}] {
+	return pgtalk.MakeMutationSet[*{{.GoType}}](tableAccess, cas, pgtalk.MutationInsert)
 }
 
 // Delete creates a MutationSet for deleting data.
-func Delete() pgtalk.MutationSet {
-	return pgtalk.MakeMutationSet(tableAccess, pgtalk.EmptyColumnAccessor, pgtalk.MutationDelete)
+func Delete() pgtalk.MutationSet[*{{.GoType}}] {
+	return pgtalk.MakeMutationSet[*{{.GoType}}](tableAccess, pgtalk.EmptyColumnAccessor, pgtalk.MutationDelete)
 }
 
 // Update creates a MutationSet to update zero or more columns.
-func Update(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet {
-	return pgtalk.MakeMutationSet(tableAccess, cas, pgtalk.MutationUpdate)
+func Update(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet[*{{.GoType}}] {
+	return pgtalk.MakeMutationSet[*{{.GoType}}](tableAccess, cas, pgtalk.MutationUpdate)
 }
 `

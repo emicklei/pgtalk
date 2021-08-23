@@ -93,8 +93,8 @@ func AllColumns() []pgtalk.ColumnAccessor {
 }
 
 // Select returns a new ThingsQuerySet for fetching column data.
-func Select(cas ...pgtalk.ColumnAccessor) ThingsQuerySet {
-	return ThingsQuerySet{pgtalk.MakeQuerySet(tableAccess, cas)}
+func Select(cas ...pgtalk.ColumnAccessor) pgtalk.QuerySet[Thing] {
+	return pgtalk.MakeQuerySet[Thing](tableAccess, cas)
 }
 
 // ThingsQuerySet can query for *Thing values.
@@ -148,6 +148,6 @@ func Delete() pgtalk.MutationSet {
 }
 
 // Update creates a MutationSet to update zero or more columns.
-func Update(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet {
-	return pgtalk.MakeMutationSet(tableAccess, cas, pgtalk.MutationUpdate)
+func Update(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet[Thing] {
+	return pgtalk.MakeMutationSet[Thing](tableAccess, cas, pgtalk.MutationUpdate)
 }

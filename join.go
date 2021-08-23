@@ -19,8 +19,8 @@ const (
 
 type Join struct {
 	preparedName string
-	leftSet      QuerySet
-	rightSet     QuerySet
+	leftSet      querySet
+	rightSet     querySet
 	onLeft       ColumnAccessor
 	onRight      ColumnAccessor
 	condition    SQLExpression
@@ -30,18 +30,18 @@ type Join struct {
 
 func (i Join) SQLOn(w io.Writer) {
 	fmt.Fprint(w, "SELECT ")
-	writeAccessOn(i.leftSet.selectors, w)
+	writeAccessOn(i.leftSet.selectAccessors(), w)
 	fmt.Fprint(w, ",")
-	writeAccessOn(i.rightSet.selectors, w)
+	writeAccessOn(i.rightSet.selectAccessors(), w)
 	fmt.Fprint(w, " FROM ")
 	i.leftSet.fromSectionOn(w)
 	writeJoinType(i.joinType, w)
 	i.rightSet.fromSectionOn(w)
 	fmt.Fprint(w, " ON ")
 	i.condition.SQLOn(w)
-	if _, ok := i.leftSet.condition.(NoCondition); !ok {
+	if _, ok := i.leftSet.whereCondition().(NoCondition); !ok {
 		fmt.Fprint(w, " WHERE ")
-		i.leftSet.condition.SQLOn(w)
+		i.leftSet.whereCondition().SQLOn(w)
 	}
 	if i.limit > 0 {
 		fmt.Fprintf(w, " LIMIT %d", i.limit)
@@ -77,8 +77,8 @@ func (i Join) Limit(limit int) Join {
 	return i
 }
 
-func (i Join) LeftOuterJoin(q Unwrappable) (m MultiJoin) {
-	m.sets = append(m.sets, i.leftSet, i.rightSet, q.Unwrap())
+func (i Join) LeftOuterJoin(q querySet) (m MultiJoin) {
+	m.sets = append(m.sets, i.leftSet, i.rightSet, q)
 	m.joinTypes = append(m.joinTypes, i.joinType, LeftOuterJoinType)
 	m.conditions = append(m.conditions, i.condition)
 	return
@@ -98,8 +98,8 @@ func (i Join) Exec(ctx context.Context, conn *pgx.Conn) (it JoinResultIterator, 
 
 type JoinResultIterator struct {
 	queryError error
-	leftSet    QuerySet
-	rightSet   QuerySet
+	leftSet    querySet
+	rightSet   querySet
 	rows       pgx.Rows
 }
 
@@ -128,7 +128,7 @@ func (i *JoinResultIterator) Next(left interface{}, right interface{}) error {
 	}
 	sw := []interface{}{}
 	// left
-	for _, each := range i.leftSet.selectors {
+	for _, each := range i.leftSet.selectAccessors() {
 		rw := scanToWrite{
 			access: each,
 			entity: left,
@@ -136,7 +136,7 @@ func (i *JoinResultIterator) Next(left interface{}, right interface{}) error {
 		sw = append(sw, rw)
 	}
 	// right
-	for _, each := range i.rightSet.selectors {
+	for _, each := range i.rightSet.selectAccessors() {
 		rw := scanToWrite{
 			access: each,
 			entity: right,
@@ -148,7 +148,7 @@ func (i *JoinResultIterator) Next(left interface{}, right interface{}) error {
 
 type MultiJoin struct {
 	preparedName string
-	sets         []QuerySet
+	sets         []querySet
 	joinTypes    []JoinType
 	conditions   []SQLExpression
 }
@@ -158,8 +158,8 @@ func (m MultiJoin) On(condition SQLExpression) MultiJoin {
 	return m
 }
 
-func (m MultiJoin) LeftOuterJoin(q Unwrappable) MultiJoin {
-	m.sets = append(m.sets, q.Unwrap())
+func (m MultiJoin) LeftOuterJoin(q querySet) MultiJoin {
+	m.sets = append(m.sets, q)
 	m.joinTypes = append(m.joinTypes, LeftOuterJoinType)
 	return m
 }
@@ -179,10 +179,10 @@ func (m MultiJoin) Exec(ctx context.Context, conn *pgx.Conn) (*MultiJoinResultIt
 func (m MultiJoin) SQLOn(w io.Writer) {
 	fmt.Fprint(w, "SELECT ")
 	for i, each := range m.sets {
-		if i > 0 && len(each.selectors) > 0 {
+		if i > 0 && len(each.selectAccessors()) > 0 {
 			fmt.Fprint(w, ",")
 		}
-		writeAccessOn(each.selectors, w)
+		writeAccessOn(each.selectAccessors(), w)
 	}
 	fmt.Fprint(w, " FROM ")
 	first := m.sets[0]
@@ -190,8 +190,8 @@ func (m MultiJoin) SQLOn(w io.Writer) {
 	// collect all conditions from all sets
 	wheres := []SQLExpression{}
 	for _, each := range m.sets {
-		if each.condition != EmptyCondition {
-			wheres = append(wheres, each.condition)
+		if each.whereCondition() != EmptyCondition {
+			wheres = append(wheres, each.whereCondition())
 		}
 	}
 	for j := 0; j < len(m.joinTypes); j++ {
@@ -215,7 +215,7 @@ func (m MultiJoin) SQLOn(w io.Writer) {
 
 type MultiJoinResultIterator struct {
 	queryError error
-	querySets  []QuerySet
+	querySets  []querySet
 	rows       pgx.Rows
 }
 
@@ -245,7 +245,7 @@ func (i *MultiJoinResultIterator) Next(models ...interface{}) error {
 	// count non-empty querysets
 	countNonEmpty := 0
 	for _, each := range i.querySets {
-		if len(each.selectors) != 0 {
+		if len(each.selectAccessors()) != 0 {
 			countNonEmpty++
 		}
 	}
@@ -257,7 +257,7 @@ func (i *MultiJoinResultIterator) Next(models ...interface{}) error {
 	sw := []interface{}{}
 	// all sets
 	for m, eachSet := range i.querySets {
-		for _, each := range eachSet.selectors {
+		for _, each := range eachSet.selectAccessors() {
 			rw := scanToWrite{
 				access: each,
 				entity: models[m],

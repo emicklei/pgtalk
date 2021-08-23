@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-type QuerySet struct {
+type QuerySet[T any] struct {
 	preparedName string
 	tableAccess  TableAccessor
 	selectors    []ColumnAccessor
@@ -21,21 +21,24 @@ type QuerySet struct {
 	sortOrder    string
 }
 
-func MakeQuerySet(tableAccess TableAccessor, selectors []ColumnAccessor) QuerySet {
+func MakeQuerySet[T any](tableAccess TableAccessor, selectors []ColumnAccessor) QuerySet[T] {
 	if assertEnabled {
 		assertEachAccessorHasTableInfo(selectors, tableAccess.TableInfo)
 	}
-	return QuerySet{
+	return QuerySet[T]{
 		tableAccess: tableAccess,
 		selectors:   selectors,
 		condition:   EmptyCondition}
 }
 
-func (q QuerySet) fromSectionOn(w io.Writer) {
+// querySet
+func (q QuerySet[T]) selectAccessors() []ColumnAccessor { return q.selectors }
+func (q QuerySet[T]) whereCondition() SQLExpression     { return q.condition }
+func (q QuerySet[T]) fromSectionOn(w io.Writer) {
 	fmt.Fprintf(w, "%s.%s %s", q.tableAccess.TableInfo.Schema, q.tableAccess.TableInfo.Name, q.tableAccess.TableInfo.Alias)
 }
 
-func (q QuerySet) SQLOn(w io.Writer) {
+func (q QuerySet[T]) SQLOn(w io.Writer) {
 	fmt.Fprint(w, "SELECT ")
 	if q.distinct {
 		fmt.Fprint(w, "DISTINCT ")
@@ -64,36 +67,36 @@ func (q QuerySet) SQLOn(w io.Writer) {
 	}
 }
 
-func (q QuerySet) Named(preparedName string) QuerySet     { q.preparedName = preparedName; return q }
-func (q QuerySet) Distinct() QuerySet                     { q.distinct = true; return q }
-func (q QuerySet) Ascending() QuerySet                    { q.sortOrder = "ASC"; return q }
-func (q QuerySet) Descending() QuerySet                   { q.sortOrder = "DESC"; return q }
-func (q QuerySet) Where(condition SQLExpression) QuerySet { q.condition = condition; return q }
-func (q QuerySet) Limit(limit int) QuerySet               { q.limit = limit; return q }
-func (q QuerySet) GroupBy(cas ...ColumnAccessor) QuerySet {
+func (q QuerySet[T]) Named(preparedName string) QuerySet[T]     { q.preparedName = preparedName; return q }
+func (q QuerySet[T]) Distinct() QuerySet[T]                     { q.distinct = true; return q }
+func (q QuerySet[T]) Ascending() QuerySet[T]                    { q.sortOrder = "ASC"; return q }
+func (q QuerySet[T]) Descending() QuerySet[T]                   { q.sortOrder = "DESC"; return q }
+func (q QuerySet[T]) Where(condition SQLExpression) QuerySet[T] { q.condition = condition; return q }
+func (q QuerySet[T]) Limit(limit int) QuerySet[T]               { q.limit = limit; return q }
+func (q QuerySet[T]) GroupBy(cas ...ColumnAccessor) QuerySet[T] {
 	q.groupBy = cas
 	if assertEnabled {
 		assertEachAccessorIn(cas, q.selectors)
 	}
 	return q
 }
-func (q QuerySet) Having(condition SQLExpression) QuerySet { q.having = condition; return q }
-func (q QuerySet) OrderBy(cas ...ColumnAccessor) QuerySet {
+func (q QuerySet[T]) Having(condition SQLExpression) QuerySet[T] { q.having = condition; return q }
+func (q QuerySet[T]) OrderBy(cas ...ColumnAccessor) QuerySet[T] {
 	q.orderBy = cas
 	if assertEnabled {
 		assertEachAccessorHasTableInfo(cas, q.tableAccess.TableInfo)
 	}
 	return q
 }
-func (q QuerySet) Exists() UnaryOperator {
+func (q QuerySet[T]) Exists() UnaryOperator {
 	return UnaryOperator{Operator: "EXISTS", Operand: q}
 }
 
-func (d QuerySet) Collect(list []ColumnAccessor) []ColumnAccessor {
+func (d QuerySet[T]) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return list // ?
 }
 
-func (d QuerySet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
+func (d QuerySet[T]) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 	sql := SQL(d)
 	var rows pgx.Rows
 	var err error
@@ -109,14 +112,14 @@ func (d QuerySet) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
 	return &ResultIterator{queryError: err, rows: rows}
 }
 
-func (d QuerySet) ExecWithAppender(ctx context.Context, conn *pgx.Conn, appender func(each interface{})) (err error) {
+func (d QuerySet[T]) ExecWithAppender(ctx context.Context, conn *pgx.Conn, appender func(each interface{})) (err error) {
 	rows, err := conn.Query(ctx, SQL(d))
 	if err != nil {
 		return
 	}
 	defer rows.Close()
 	for rows.Next() {
-		entity := d.tableAccess.Factory()
+		entity := new(T)
 		sw := []interface{}{}
 		for _, each := range d.selectors {
 			rw := scanToWrite{
@@ -133,34 +136,34 @@ func (d QuerySet) ExecWithAppender(ctx context.Context, conn *pgx.Conn, appender
 	return
 }
 
-func (d QuerySet) Join(otherQuerySet Unwrappable) Join {
+func (d QuerySet[T]) Join(otherQuerySet querySet) Join {
 	return Join{
 		leftSet:  d,
-		rightSet: otherQuerySet.Unwrap(),
+		rightSet: otherQuerySet,
 		joinType: InnerJoinType,
 	}
 }
 
-func (d QuerySet) LeftOuterJoin(otherQuerySet Unwrappable) Join {
+func (d QuerySet[T]) LeftOuterJoin(otherQuerySet querySet) Join {
 	return Join{
 		leftSet:  d,
-		rightSet: otherQuerySet.Unwrap(),
+		rightSet: otherQuerySet,
 		joinType: LeftOuterJoinType,
 	}
 }
 
-func (d QuerySet) RightJoin(otherQuerySet Unwrappable) Join {
+func (d QuerySet[T]) RightJoin(otherQuerySet querySet) Join {
 	return Join{
 		leftSet:  d,
-		rightSet: otherQuerySet.Unwrap(),
+		rightSet: otherQuerySet,
 		joinType: RightOuterJoinType,
 	}
 }
 
-func (d QuerySet) FullJoin(otherQuerySet Unwrappable) Join {
+func (d QuerySet[T]) FullJoin(otherQuerySet querySet) Join {
 	return Join{
 		leftSet:  d,
-		rightSet: otherQuerySet.Unwrap(),
+		rightSet: otherQuerySet,
 		joinType: FullOuterJoinType,
 	}
 }
