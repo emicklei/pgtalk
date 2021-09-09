@@ -65,8 +65,8 @@ func TestJSONB_3(t *testing.T) {
 	t.Log(pgtalk.SQL(del))
 	t.Log(it.Err())
 	for it.HasNext() {
-		var th things.Thing
-		err := it.Next(&th)
+		var th *things.Thing
+		th, err := it.Next()
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -98,7 +98,7 @@ func (m MutationSet[T]) On() MutationSet[T] {
 }
 
 // Pre: must be run inside transaction
-func (m MutationSet[T]) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
+func (m MutationSet[T]) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator[T] {
 	args := []interface{}{}
 	for _, each := range m.selectors {
 		args = append(args, each.ValueToInsert())
@@ -107,7 +107,7 @@ func (m MutationSet[T]) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterato
 	if err == nil && !m.canProduceResults() {
 		rows.Close()
 	}
-	return &ResultIterator{queryError: err, rows: rows, selectors: m.returning}
+	return &ResultIterator[T]{queryError: err, rows: rows, selectors: m.returning}
 }
 
 func (m MutationSet[T]) canProduceResults() bool {

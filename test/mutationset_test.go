@@ -37,7 +37,7 @@ func TestUpdateReturning(t *testing.T) {
 	}
 	it := m.Exec(context.Background(), testConnect)
 	for it.HasNext() {
-		p, err := products.Next(it)
+		p, err := it.Next()
 		if err != nil {
 			t.Fatal(it.Err())
 		}

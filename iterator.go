@@ -6,17 +6,17 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-type ResultIterator struct {
+type ResultIterator[T any] struct {
 	queryError error
 	rows       pgx.Rows
 	selectors  []ColumnAccessor
 }
 
-func (i *ResultIterator) Err() error {
+func (i *ResultIterator[T]) Err() error {
 	return i.queryError
 }
 
-func (i *ResultIterator) HasNext() bool {
+func (i *ResultIterator[T]) HasNext() bool {
 	if i.queryError != nil {
 		return false
 	}
@@ -27,11 +27,12 @@ func (i *ResultIterator) HasNext() bool {
 	return false
 }
 
-func (i *ResultIterator) Next(entity interface{}) error {
+func (i *ResultIterator[T]) Next() (*T, error) {
+	entity := new(T)
 	list := i.rows.FieldDescriptions()
 	vals, err := i.rows.Values()
 	if err != nil {
-		return fmt.Errorf("unable to get values:%v", err)
+		return entity, fmt.Errorf("unable to get values:%v", err)
 	}
 	// order of list is not the same as selectors?
 	for f, each := range list {
@@ -42,5 +43,5 @@ func (i *ResultIterator) Next(entity interface{}) error {
 			}
 		}
 	}
-	return nil
+	return entity, nil
 }
