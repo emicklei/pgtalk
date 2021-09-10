@@ -11,11 +11,6 @@ import (
 	"bytes"
 )
 
-var (
-	_ = time.Now()
-	tableInfo = pgtalk.TableInfo{Schema: "{{.Schema}}", Name: "{{.TableName}}", Alias: "{{.TableAlias}}"}
-)
-
 type {{.GoType}} struct {
 {{- range .Fields}}
 	{{.GoName}}	{{.GoType}} // {{.DataType}}
@@ -27,6 +22,9 @@ var (
 	{{.GoName}} = pgtalk.{{.FactoryMethod}}(pgtalk.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimary}}, {{.IsNotNull}}, {{.TableAttributeNumber}}),
 		func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v })
 {{- end}}
+	// package private
+	_ = time.Now()
+	tableInfo = pgtalk.TableInfo{Schema: "{{.Schema}}", Name: "{{.TableName}}", Alias: "{{.TableAlias}}"}
 	tableAccess = pgtalk.TableAccessor{TableInfo: tableInfo, 
 		Factory: func() interface{}{return new({{.GoType}})}, AllColumns: []pgtalk.ColumnAccessor{
 {{- range .Fields}}{{.GoName}},{{- end}}
