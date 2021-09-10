@@ -2,6 +2,10 @@
 
 More type safe SQL query building and execution using Go code generated (pgtalk-gen) from PostgreSQL table definitions.
 
+## generics
+
+This package requires Go SDK version 1.18+ because it uses type parameterization.
+
 ## examples
 
 See also [booking demo](https://github.com/emicklei/pgtalk-demo).
