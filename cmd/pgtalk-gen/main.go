@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	oTarget = flag.String("o", ".", "target directory")
-	oSchema = flag.String("s", "public", "source database schema")
+	oTarget  = flag.String("o", ".", "target directory")
+	oSchema  = flag.String("s", "public", "source database schema")
+	oVerbose = flag.Bool("v", true, "use verbose logging")
 )
 
 func main() {

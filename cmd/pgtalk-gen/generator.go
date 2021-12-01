@@ -14,7 +14,9 @@ import (
 )
 
 func generateFromTable(table PgTable) {
-	log.Printf("generating from %s.%s\n", table.Schema, table.Name)
+	if *oVerbose {
+		log.Printf("generating from %s.%s\n", table.Schema, table.Name)
+	}
 	tt := TableType{
 		Created:    time.Now(),
 		Schema:     *oSchema,
@@ -74,7 +76,7 @@ func alias(s string) string {
 func abbreviate(s string) string {
 	b := new(bytes.Buffer)
 	start := true
-	for _, each := range []rune(s) {
+	for _, each := range s {
 		if start {
 			b.WriteRune(each)
 			start = false

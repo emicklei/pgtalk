@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/emicklei/tre"
 	"github.com/jackc/pgconn"
@@ -98,10 +99,16 @@ func LoadTables(ctx context.Context, conn *pgx.Conn, schema string) (list []PgTa
 	if err != nil {
 		return list, tre.New(err, "LoadTables", "schema", schema)
 	}
+	if *oVerbose {
+		log.Println("found tables:", len(classes))
+	}
 	for _, each := range classes {
 		columns, err := loadTableColumns(ctx, conn, schema, each.Name)
 		if err != nil {
 			return list, tre.New(err, "LoadTables", "schema", schema)
+		}
+		if *oVerbose {
+			log.Println("found columns in table", each, len(columns))
 		}
 		primColums, isAutoGen := selectPrimaryKeys(columns)
 		table := PgTable{
@@ -120,7 +127,7 @@ func LoadTables(ctx context.Context, conn *pgx.Conn, schema string) (list []PgTa
 func loadTables(ctx context.Context, conn *pgx.Conn, schema string) (list []PgClass, err error) {
 	rows, err := conn.Query(ctx, pgLoadTableDef, schema)
 	if err != nil {
-		return
+		return list, tre.New(err, "loadTables", "schema", schema)
 	}
 	defer rows.Close()
 
