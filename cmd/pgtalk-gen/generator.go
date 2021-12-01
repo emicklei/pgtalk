@@ -92,7 +92,7 @@ func goFieldTypeAndAccess(datatype string) (string, string) {
 	switch datatype {
 	case "date", "timestamp", "timestamp without time zone", "timestamp with time zone":
 		return "*time.Time", "NewTimeAccess"
-	case "text":
+	case "text", "uuid":
 		return "*string", "NewTextAccess"
 	case "bigint", "integer":
 		return "*int64", "NewInt64Access"
@@ -102,12 +102,17 @@ func goFieldTypeAndAccess(datatype string) (string, string) {
 		return "*pgtalk.Point", "NewPointAccess"
 	case "boolean":
 		return "*bool", "NewBooleanAccess"
+	case "daterange":
+		return "*pgtype.Daterange", "NewFieldAccess[pgtype.Daterange]"
 	}
 	if strings.HasPrefix(datatype, "character") {
 		return "*string", "NewTextAccess"
 	}
 	if strings.HasPrefix(datatype, "numeric") {
 		return "*float64", "NewFloat64Access"
+	}
+	if *oVerbose {
+		log.Println("[WARN] unknown datatype, using fallback for:", datatype)
 	}
 	return datatype, "New" + datatype
 }
