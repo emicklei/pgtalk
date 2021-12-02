@@ -26,12 +26,18 @@ func (a FieldAccess[T]) SetFieldValue(entity interface{}, fieldValue interface{}
 	if fieldValue == nil {
 		return nil
 	}
-	v, ok := fieldValue.(*T)
+	// try both value of T and pointer to T
+	v, ok := fieldValue.(T)
+	if ok {
+		a.fieldWriter(entity, &v)
+		return nil
+	}
+	pv, ok := fieldValue.(*T)
 	if !ok {
 		var t *T
 		return NewValueConversionError(fieldValue, fmt.Sprintf("%T",t))
 	}
-	a.fieldWriter(entity, v)
+	a.fieldWriter(entity, pv)
 	return nil
 }
 

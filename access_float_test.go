@@ -16,3 +16,29 @@ func TestFloat64Access_WriteInto(t *testing.T) {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
+
+func TestGenericFloat64Access_WriteInto(t *testing.T) {
+	type price struct {
+		amount *float64
+	}
+	p := new(price)
+	a := NewFieldAccess[float64](
+		MakeColumnInfo(TableInfo{}, "TestGenericFloat64Access_WriteInto", false, false, 1),
+		func(dest interface{}, f *float64) { dest.(*price).amount = f })
+	if err := a.SetFieldValue(p, 42.0); err != nil {
+		t.Fatal(err)
+	}
+	if p.amount == nil {
+		t.Fatal("amount not set")
+	}
+	if got, want := *p.amount, 42.0; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+	forty2 := 42.0
+	if err := a.SetFieldValue(p, &forty2); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := *p.amount, 42.0; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}

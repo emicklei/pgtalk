@@ -99,7 +99,7 @@ func goFieldTypeAndAccess(datatype string) (string, string) {
 	case "jsonb":
 		return "*string", "NewJSONBAccess"
 	case "point":
-		return "*pgtalk.Point", "NewPointAccess"
+		return "*pgtype.Point", "NewFieldAccess[pgtype.Point]"
 	case "boolean":
 		return "*bool", "NewBooleanAccess"
 	case "daterange":
@@ -109,7 +109,7 @@ func goFieldTypeAndAccess(datatype string) (string, string) {
 		return "*string", "NewTextAccess"
 	}
 	if strings.HasPrefix(datatype, "numeric") {
-		return "*float64", "NewFloat64Access"
+		return "*float64", "NewFieldAccess[float64]"
 	}
 	if *oVerbose {
 		log.Println("[WARN] unknown datatype, using fallback for:", datatype)

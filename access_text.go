@@ -67,7 +67,7 @@ func (a TextAccess) NotNull() NullCheck {
 }
 
 func (a TextAccess) Like(pattern string) BinaryOperator {
-	return MakeBinaryOperator(a, "LIKE", ValuePrinter{pattern})
+	return MakeBinaryOperator(a, "LIKE", LiteralString(pattern))
 }
 
 func (a TextAccess) In(values ...string) BinaryOperator {
