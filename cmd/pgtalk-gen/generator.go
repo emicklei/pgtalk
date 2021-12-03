@@ -34,8 +34,8 @@ func generateFromTable(table PgTable) {
 			NonPointerGoType:     goType[1:],
 			DataType:             each.DataType,
 			FactoryMethod:        method,
-			IsPrimary:            each.IsPrimaryKey,
-			IsNotNull:            each.NotNull,
+			IsPrimary:            isPrimarySource(each.IsPrimaryKey),
+			IsNotNull:            isNotNullSource(each.NotNull),
 			TableAttributeNumber: each.FieldOrdinal,
 		}
 		tt.Fields = append(tt.Fields, f)
@@ -135,4 +135,20 @@ func asSingular(s string) string {
 		return s[0 : len(s)-1]
 	}
 	return s
+}
+
+func isPrimarySource(isPrimary bool) string {
+	// import package is aliased to "p"
+	if isPrimary {
+		return "p.IsPrimary"
+	}
+	return "p.NotPrimary"
+}
+
+func isNotNullSource(isNotNull bool) string {
+	// import package is aliased to "p"
+	if isNotNull {
+		return "p.NotNull"
+	}
+	return "p.Nullable"
 }

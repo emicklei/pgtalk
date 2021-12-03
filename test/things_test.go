@@ -10,6 +10,7 @@ import (
 )
 
 func TestJSONB(t *testing.T) {
+	t.Skip()
 	ctx := context.Background()
 
 	// delete 2
@@ -25,9 +26,9 @@ func TestJSONB(t *testing.T) {
 	// insert 2
 	m := things.Insert(
 		things.ID.Set(2),
-		things.TDate.Set(time.Now()),
-		things.TTimestamp.Set(time.Now()),
-		things.TJSON.Set(`{"key":"value"}`))
+		things.Tdate.Set(time.Now()),
+		things.Ttimestamp.Set(time.Now()),
+		things.Tjson.Set(`{"key":"value"}`))
 
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {
@@ -77,9 +78,9 @@ func TestJSONB_3(t *testing.T) {
 	// insert 3
 	m := things.Insert(
 		things.ID.Set(3),
-		things.TDate.Set(time.Now()),
-		things.TTimestamp.Set(time.Now()),
-		things.TJSON.Set(`{"key":"value"}`))
+		things.Tdate.Set(time.Now()),
+		things.Ttimestamp.Set(time.Now()),
+		things.Tjson.Set(`{"key":"value"}`))
 
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {

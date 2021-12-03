@@ -20,7 +20,7 @@ type ColumnField struct {
 	NonPointerGoType     string
 	GoName               string
 	FactoryMethod        string
-	IsPrimary            bool
-	IsNotNull            bool
+	IsPrimary            string
+	IsNotNull            string
 	TableAttributeNumber int
 }

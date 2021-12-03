@@ -94,6 +94,13 @@ var EmptyCondition = NoCondition{}
 func (n NoCondition) SQLOn(b io.Writer)                              {}
 func (n NoCondition) Collect(list []ColumnAccessor) []ColumnAccessor { return list }
 
+const (
+	IsPrimary  = true
+	NotPrimary = false
+	NotNull    = true
+	Nullable   = false
+)
+
 type ColumnInfo struct {
 	tableInfo            TableInfo
 	columnName           string

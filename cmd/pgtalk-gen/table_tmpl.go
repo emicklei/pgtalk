@@ -5,7 +5,7 @@ var tableTemplateSrc = `package {{.GoPackage}}
 // DO NOT EDIT
 
 import (
-	"github.com/emicklei/pgtalk"
+	p "github.com/emicklei/pgtalk"
 	"time"
 	"fmt"
 	"bytes"
@@ -13,27 +13,27 @@ import (
 
 type {{.GoType}} struct {
 {{- range .Fields}}
-	{{.GoName}}	{{.GoType}} // {{.DataType}}
+	{{.GoName}}	{{.GoType}} // {{.Name}} : {{.DataType}}
 {{- end}}
 }
 
 var (
 {{- range .Fields}}	
-	{{.GoName}} = pgtalk.{{.FactoryMethod}}(pgtalk.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimary}}, {{.IsNotNull}}, {{.TableAttributeNumber}}),
+	{{.GoName}} = p.{{.FactoryMethod}}(p.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimary}}, {{.IsNotNull}}, {{.TableAttributeNumber}}),
 		func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v })
 {{- end}}
 	// package private
 	_ = time.Now()
-	tableInfo = pgtalk.TableInfo{Schema: "{{.Schema}}", Name: "{{.TableName}}", Alias: "{{.TableAlias}}"}
-	tableAccess = pgtalk.TableAccessor{TableInfo: tableInfo, 
-		Factory: func() interface{}{return new({{.GoType}})}, AllColumns: []pgtalk.ColumnAccessor{
+	tableInfo = p.TableInfo{Schema: "{{.Schema}}", Name: "{{.TableName}}", Alias: "{{.TableAlias}}"}
+	tableAccess = p.TableAccessor{TableInfo: tableInfo, 
+		Factory: func() interface{}{return new({{.GoType}})}, AllColumns: []p.ColumnAccessor{
 {{- range .Fields}}{{.GoName}},{{- end}}
 }}
 )
 
 // ColumnUpdatesFrom returns the list of changes to a {{.GoType}} for which updates need to be processed.
 // Cannot be used to set null values for columns.
-func ColumnUpdatesFrom(e *{{.GoType}}) (list []pgtalk.SQLExpression) {
+func ColumnUpdatesFrom(e *{{.GoType}}) (list []p.SQLExpression) {
 {{- range .Fields}}
 	if e.{{.GoName}} != nil {
 		list = append(list, {{.GoName}}.Set(*e.{{.GoName}}))
@@ -56,27 +56,27 @@ func (e *{{.GoType}}) String() string {
 }
 
 // AllColumns returns the list of all column accessors for usage in e.g. Select.
-func AllColumns() []pgtalk.ColumnAccessor {
+func AllColumns() []p.ColumnAccessor {
 	return tableAccess.AllColumns
 }
 
 // Select returns a new QuerySet[{{.GoType}}] for fetching column data.
-func Select(cas ...pgtalk.ColumnAccessor) pgtalk.QuerySet[{{.GoType}}] {
-	return pgtalk.MakeQuerySet[{{.GoType}}](tableAccess, cas)
+func Select(cas ...p.ColumnAccessor) p.QuerySet[{{.GoType}}] {
+	return p.MakeQuerySet[{{.GoType}}](tableAccess, cas)
 }
 
 // Insert creates a MutationSet for inserting data with zero or more columns.
-func Insert(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet[{{.GoType}}] {
-	return pgtalk.MakeMutationSet[{{.GoType}}](tableAccess, cas, pgtalk.MutationInsert)
+func Insert(cas ...p.ColumnAccessor) p.MutationSet[{{.GoType}}] {
+	return p.MakeMutationSet[{{.GoType}}](tableAccess, cas, p.MutationInsert)
 }
 
 // Delete creates a MutationSet for deleting data.
-func Delete() pgtalk.MutationSet[{{.GoType}}] {
-	return pgtalk.MakeMutationSet[{{.GoType}}](tableAccess, pgtalk.EmptyColumnAccessor, pgtalk.MutationDelete)
+func Delete() p.MutationSet[{{.GoType}}] {
+	return p.MakeMutationSet[{{.GoType}}](tableAccess, p.EmptyColumnAccessor, p.MutationDelete)
 }
 
 // Update creates a MutationSet to update zero or more columns.
-func Update(cas ...pgtalk.ColumnAccessor) pgtalk.MutationSet[{{.GoType}}] {
-	return pgtalk.MakeMutationSet[{{.GoType}}](tableAccess, cas, pgtalk.MutationUpdate)
+func Update(cas ...p.ColumnAccessor) p.MutationSet[{{.GoType}}] {
+	return p.MakeMutationSet[{{.GoType}}](tableAccess, cas, p.MutationUpdate)
 }
 `
