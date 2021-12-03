@@ -108,7 +108,7 @@ func LoadTables(ctx context.Context, conn *pgx.Conn, schema string) (list []PgTa
 			return list, tre.New(err, "LoadTables", "schema", schema)
 		}
 		if *oVerbose {
-			log.Println("found columns in table", each, len(columns))
+			log.Println("found columns in table", each.Name, len(columns))
 		}
 		primColums, isAutoGen := selectPrimaryKeys(columns)
 		table := PgTable{

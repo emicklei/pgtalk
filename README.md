@@ -104,6 +104,7 @@ These examples are from the test package in which a few database tables files (c
 - jsonb, bytes
 - daterange
 - point
+- bytea, text[], interval
 
 ## how to run the generator
 

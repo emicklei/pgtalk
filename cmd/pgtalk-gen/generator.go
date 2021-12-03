@@ -104,6 +104,12 @@ func goFieldTypeAndAccess(datatype string) (string, string) {
 		return "*bool", "NewBooleanAccess"
 	case "daterange":
 		return "*pgtype.Daterange", "NewFieldAccess[pgtype.Daterange]"
+	case "interval":
+		return "*pgtype.Interval", "NewFieldAccess[pgtype.Interval]"
+	case "bytea":
+		return "*pgtype.Bytea", "NewFieldAccess[pgtype.Bytea]"
+	case "text[]":
+		return "*pgtype.TextArray", "NewFieldAccess[pgtype.TextArray]"
 	}
 	if strings.HasPrefix(datatype, "character") {
 		return "*string", "NewTextAccess"
