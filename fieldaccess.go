@@ -22,6 +22,13 @@ func (a FieldAccess[T]) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return append(list, a)
 }
 
+
+// Set returns a new FieldAccess[T] with a value to set on a T.
+func (a FieldAccess[T]) Set(v T) FieldAccess[T] {
+	a.valueToInsert = v
+	return a
+}
+
 func (a FieldAccess[T]) SetFieldValue(entity interface{}, fieldValue interface{}) error {
 	if fieldValue == nil {
 		return nil
