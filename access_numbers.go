@@ -1,8 +1,6 @@
 package pgtalk
 
 import (
-	"fmt"
-	"io"
 	"strings"
 )
 
@@ -19,10 +17,6 @@ func NewInt64Access(
 	return Int64Access{
 		ColumnInfo:  info,
 		fieldWriter: writer}
-}
-
-func (a Int64Access) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%d", a.valueToInsert)
 }
 
 func (a Int64Access) Collect(list []ColumnAccessor) []ColumnAccessor {
@@ -103,10 +97,6 @@ func (a Float64Access) SetFieldValue(entity interface{}, fieldValue interface{})
 
 func (a Float64Access) ValueToInsert() interface{} {
 	return a.ValueToInsert
-}
-
-func (a Float64Access) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%v", a.valueToInsert)
 }
 
 func (a Float64Access) Set(v float64) Float64Access {

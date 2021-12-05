@@ -10,8 +10,10 @@ import (
 )
 
 func TestJSONB(t *testing.T) {
-	t.Skip()
 	ctx := context.Background()
+	if testConnect == nil {
+		return
+	}
 
 	// delete 2
 	tx, _ := testConnect.Begin(ctx)
@@ -100,4 +102,9 @@ func TestJSONB_3(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestExtraJSONBField(t *testing.T) {
+	a := things.Tjson.Extract("title")
+	t.Log(pgtalk.PrettySQL(a))
 }

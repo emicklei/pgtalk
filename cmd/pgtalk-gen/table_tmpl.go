@@ -12,6 +12,7 @@ import (
 	"github.com/jackc/pgtype"
 )
 
+// {{.GoType}} is generated from the {{.Schema}}.{{.TableName}} table.
 type {{.GoType}} struct {
 {{- range .Fields}}
 	{{.GoName}}	{{.GoType}} // {{.Name}} : {{.DataType}}

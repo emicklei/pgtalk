@@ -1,8 +1,6 @@
 package pgtalk
 
 import (
-	"fmt"
-	"io"
 	"time"
 )
 
@@ -30,10 +28,6 @@ func (a TimeAccess) SetFieldValue(entity interface{}, fieldValue interface{}) er
 	}
 	a.fieldWriter(entity, &v)
 	return nil
-}
-
-func (a TimeAccess) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%v", a.valueToInsert)
 }
 
 func (a TimeAccess) ValueToInsert() interface{} {
@@ -81,10 +75,6 @@ func (a BooleanAccess) Set(v bool) BooleanAccess {
 }
 func (a BooleanAccess) ValueToInsert() interface{} {
 	return a.valueToInsert
-}
-
-func (a BooleanAccess) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%v", a.valueToInsert)
 }
 
 func (a BooleanAccess) Equals(b bool) SQLExpression {

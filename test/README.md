@@ -6,12 +6,10 @@
 
 ## create database
 
-Use your tool to create the databse "pgtalk"
-
-## create tables in public schema
-
-
+Use your tool to create the databse "pgtalk" in the public schema.
 
 ## running the db tests
+
+The test will create the tables if missing.
 
     make test

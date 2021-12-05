@@ -1,10 +1,5 @@
 package pgtalk
 
-import (
-	"fmt"
-	"io"
-)
-
 // BytesAccess can Read a column value (jsonb) and Write a column value and Set a struct field ([]byte).
 type BytesAccess struct {
 	ColumnInfo
@@ -30,10 +25,6 @@ func (a BytesAccess) WriteInto(entity interface{}, fieldValue interface{}) {
 	}
 	var f = fieldValue.([]byte)
 	a.fieldWriter(entity, &f)
-}
-
-func (a BytesAccess) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%v", a.valueToInsert) // TODO
 }
 
 func (a BytesAccess) ValueToInsert() interface{} {
@@ -76,10 +67,6 @@ func (a JSONBAccess) Set(s string) JSONBAccess {
 
 func (a JSONBAccess) ValueToInsert() interface{} {
 	return a.valueToInsert
-}
-
-func (a JSONBAccess) ValueAsSQLOn(w io.Writer) {
-	fmt.Fprintf(w, "%v", a.valueToInsert) // TODO
 }
 
 func (a JSONBAccess) Column() ColumnInfo { return a.ColumnInfo }

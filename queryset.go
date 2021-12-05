@@ -96,24 +96,6 @@ func (d QuerySet[T]) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return list // ?
 }
 
-/**
-func (d QuerySet[T]) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator {
-	sql := SQL(d)
-	var rows pgx.Rows
-	var err error
-	if d.preparedName != "" {
-		_, err := conn.Prepare(ctx, d.preparedName, sql)
-		if err != nil {
-			return &ResultIterator{queryError: err}
-		}
-		rows, err = conn.Query(ctx, d.preparedName)
-	} else {
-		rows, err = conn.Query(ctx, sql)
-	}
-	return &ResultIterator{queryError: err, rows: rows}
-}
-**/
-
 func (d QuerySet[T]) Exec(ctx context.Context, conn *pgx.Conn) (list []*T, err error) {
 	rows, err := conn.Query(ctx, SQL(d))
 	if err != nil {

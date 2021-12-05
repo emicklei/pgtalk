@@ -17,7 +17,6 @@ type ColumnAccessor interface {
 	Name() string
 	SQLOn(w io.Writer)
 	SetFieldValue(entity interface{}, fieldValue interface{}) error
-	ValueAsSQLOn(w io.Writer)
 	ValueToInsert() interface{}
 	Column() ColumnInfo
 }
