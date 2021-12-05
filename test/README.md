@@ -1,5 +1,17 @@
 # pgtalk/test
 
+## start local postgres db
+
+    make db
+
+## create database
+
+Use your tool to create the databse "pgtalk"
+
+## create tables in public schema
+
+
+
 ## running the db tests
 
-    docker run --name pgtalk-db -e POSTGRES_PASSWORD=pgtalk  -p 5432:5432 -d postgres
+    make test

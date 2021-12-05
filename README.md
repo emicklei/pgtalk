@@ -98,15 +98,18 @@ These examples are from the test package in which a few database tables files (c
 
 ## supported Column Types
 
-- text
-- bigint
-- date
-- timestamp
-- jsonb
-- bytes
-- number
-- character
-- integer
+- text, character, uuid
+- bigint, integer, number
+- date, timestamp
+- jsonb, bytes
+- daterange
+- point
+- bytea, text[], interval
+
+## how to run the generator
+
+	PGTALK_CONN=postgresql://usr:pwd@host:5432/grimlockclone pgtalk-gen -o yourpackage
+	gotip fmt ./...
 
 https://www.postgresql.org/docs/9.5/datatype.html
 
