@@ -34,8 +34,10 @@ func generateFromTable(table PgTable) {
 			NonPointerGoType:     goType[1:],
 			DataType:             each.DataType,
 			FactoryMethod:        method,
-			IsPrimary:            isPrimarySource(each.IsPrimaryKey),
-			IsNotNull:            isNotNullSource(each.NotNull),
+			IsPrimarySrc:         isPrimarySource(each.IsPrimaryKey),
+			IsNotNullSrc:         isNotNullSource(each.NotNull),
+			IsPrimary:            each.IsPrimaryKey,
+			IsNotNull:            each.NotNull,
 			TableAttributeNumber: each.FieldOrdinal,
 		}
 		tt.Fields = append(tt.Fields, f)

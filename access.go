@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -176,5 +177,40 @@ func PrettySQL(sql SQLWriter) string {
 		}
 		fmt.Fprintf(b, "%s ", each)
 	}
+	return b.String()
+}
+
+const HideNilValues = true
+
+func StringWithFields(v interface{}, includeNils bool) string {
+	vt := reflect.TypeOf(v)
+	if vt.Kind() == reflect.Ptr {
+		vt = vt.Elem()
+	}
+	rv := reflect.ValueOf(v)
+	if rv.Kind() == reflect.Ptr {
+		rv = rv.Elem()
+	}
+	b := new(bytes.Buffer)
+	fmt.Fprint(b, vt.PkgPath())
+	fmt.Fprint(b, ".")
+	fmt.Fprint(b, vt.Name())
+	fmt.Fprint(b, "{")
+	for i := 0; i < vt.NumField(); i++ {
+		f := vt.Field(i)
+		fv := rv.Field(i)
+		if fv.IsNil() && !includeNils {
+			continue
+		}
+		var fi interface{}
+		// check fields that have pointer type
+		if fv.Kind() == reflect.Pointer {
+			fi = fv.Elem().Interface()
+		} else {
+			fi = fv.Interface()
+		}
+		fmt.Fprintf(b, "%s:%v ", f.Name, fi)
+	}
+	fmt.Fprint(b, "}")
 	return b.String()
 }

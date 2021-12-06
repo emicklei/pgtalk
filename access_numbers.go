@@ -105,3 +105,20 @@ func (a Float64Access) Column() ColumnInfo { return a.ColumnInfo }
 func (a Float64Access) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return append(list, a)
 }
+
+func (a Float64Access) Equals(float64OrFloat64Access interface{}) BinaryOperator {
+	return a.Compare("=", float64OrFloat64Access)
+}
+
+func (a Float64Access) Compare(op string, float64OrFloat64Access interface{}) BinaryOperator {
+	if !strings.Contains(validComparisonOperators, op) {
+		panic("invalid comparison operator:" + op)
+	}
+	if f, ok := float64OrFloat64Access.(float64); ok {
+		return MakeBinaryOperator(a, op, ValuePrinter{f})
+	}
+	if ta, ok := float64OrFloat64Access.(Float64Access); ok {
+		return MakeBinaryOperator(a, op, ta)
+	}
+	panic("float64 or Float64Access expected")
+}

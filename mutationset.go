@@ -52,8 +52,10 @@ func (m MutationSet[T]) SQLOn(w io.Writer) {
 	if m.operationType == MutationDelete {
 		fmt.Fprint(w, "DELETE FROM ")
 		m.tableAccess.SQLOn(w)
-		fmt.Fprint(w, " WHERE ")
-		m.condition.SQLOn(w)
+		if m.condition != EmptyCondition {
+			fmt.Fprint(w, " WHERE ")
+			m.condition.SQLOn(w)
+		}
 		if len(m.returning) > 0 {
 			fmt.Fprint(w, " RETURNING ")
 			m.columnsSectionOn(m.returning, w)
@@ -65,7 +67,9 @@ func (m MutationSet[T]) SQLOn(w io.Writer) {
 		m.tableAccess.SQLOn(w)
 		fmt.Fprint(w, " SET ")
 		m.setSectionOn(w)
-		fmt.Fprint(w, " WHERE ")
+		if m.condition != EmptyCondition {
+			fmt.Fprint(w, " WHERE ")
+		}
 		m.condition.SQLOn(w)
 		if len(m.returning) > 0 {
 			fmt.Fprint(w, " RETURNING ")

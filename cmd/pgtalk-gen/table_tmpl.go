@@ -7,8 +7,6 @@ var tableTemplateSrc = `package {{.GoPackage}}
 import (
 	p "github.com/emicklei/pgtalk"
 	"time"
-	"fmt"
-	"bytes"
 	"github.com/jackc/pgtype"
 )
 
@@ -21,7 +19,8 @@ type {{.GoType}} struct {
 
 var (
 {{- range .Fields}}	
-	{{.GoName}} = p.{{.FactoryMethod}}(p.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimary}}, {{.IsNotNull}}, {{.TableAttributeNumber}}),
+	// {{.GoName}} represents the column "{{.Name}}" of with type "{{.DataType}}", nullable:{{.IsNotNull}}, primary:{{.IsPrimary}}
+	{{.GoName}} = p.{{.FactoryMethod}}(p.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimarySrc}}, {{.IsNotNullSrc}}, {{.TableAttributeNumber}}),
 		func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v })
 {{- end}}
 	// package private
@@ -47,15 +46,7 @@ func ColumnUpdatesFrom(e *{{.GoType}}) (list []p.SQLExpression) {
 
 // String returns the debug string for *{{.GoType}} with all non-nil field values.
 func (e *{{.GoType}}) String() string {
-	b := new(bytes.Buffer)
-	fmt.Fprint(b, "{{.TableName}}.{{.GoType}}{")
-{{- range .Fields}}
-	if e.{{.GoName}} != nil {
-		fmt.Fprintf(b, "{{.GoName}}:%v ", *e.{{.GoName}})
-	}
-{{- end}}
-	fmt.Fprint(b, "}")
-	return b.String()
+	return p.StringWithFields(e, p.HideNilValues)
 }
 
 // AllColumns returns the list of all column accessors for usage in e.g. Select.
