@@ -65,10 +65,6 @@ func (a Int64Access) Compare(op string, i int) BinaryOperator {
 	return MakeBinaryOperator(a, op, ValuePrinter{i})
 }
 
-func (a Int64Access) NotNull() NullCheck {
-	return NullCheck{Operand: a, IsNot: true}
-}
-
 func (a Int64Access) Column() ColumnInfo { return a.ColumnInfo }
 
 // Float64Access can Read a column value (float) and Write a column value and Set a struct field (float64).

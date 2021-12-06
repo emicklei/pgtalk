@@ -55,6 +55,7 @@ func (o BinaryOperator) Like(pattern string) BinaryOperator {
 	}
 }
 
+// Collect is part of SQLExpression
 func (o BinaryOperator) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return o.Left.Collect(o.Right.Collect(list))
 }
@@ -94,6 +95,7 @@ func (u UnaryOperator) Or(right SQLExpression) BinaryOperator {
 	}
 }
 
+// Collect is part of SQLExpression
 func (u UnaryOperator) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return u.Operand.Collect(list)
 }
@@ -114,6 +116,17 @@ func (n NullCheck) SQLOn(w io.Writer) {
 	fmt.Fprint(w, " IS NULL)")
 }
 
+// Collect is part of SQLExpression
 func (n NullCheck) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return n.Operand.Collect(list)
+}
+
+// IsNotNull returns an expression with the IS NOT NULL condition
+func IsNotNull(e SQLExpression) SQLExpression {
+	return NullCheck{Operand: e, IsNot: true}
+}
+
+// IsNull returns an expression with the IS NULL condition
+func IsNull(e SQLExpression) SQLExpression {
+	return NullCheck{Operand: e, IsNot: false}
 }

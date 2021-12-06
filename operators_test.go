@@ -16,7 +16,7 @@ func TestTextOperators(t *testing.T) {
 	if got, want := SQL(a.Like("*b")), "(t1.col LIKE '*b')"; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
-	if got, want := SQL(a.NotNull()), "(t1.col NOT NULL)"; got != want {
+	if got, want := SQL(IsNotNull(a)), "(t1.col IS NOT NULL)"; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }

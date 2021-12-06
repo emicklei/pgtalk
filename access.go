@@ -42,6 +42,7 @@ func MakeValuePrinter(v interface{}) ValuePrinter { return ValuePrinter{v: v} }
 
 func (p ValuePrinter) SQLOn(b io.Writer) { fmt.Fprintf(b, "%v", p.v) }
 
+// Collect is part of SQLExpression
 func (p ValuePrinter) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return list
 }

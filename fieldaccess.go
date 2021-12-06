@@ -20,6 +20,7 @@ func NewFieldAccess[T any](
 
 func (a FieldAccess[T]) Column() ColumnInfo { return a.ColumnInfo }
 
+// Collect is part of SQLExpression
 func (a FieldAccess[T]) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return append(list, a)
 }

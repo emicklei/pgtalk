@@ -23,6 +23,7 @@ func (i *ResultIterator[T]) HasNext() bool {
 	if i.rows.Next() {
 		return true
 	}
+	// is Next returns false we can close the rows
 	i.rows.Close()
 	return false
 }

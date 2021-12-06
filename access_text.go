@@ -1,7 +1,6 @@
 package pgtalk
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -41,6 +40,7 @@ func (a TextAccess) Compare(op string, stringOrTextAccess interface{}) BinaryOpe
 	panic("string or TextAcces expected")
 }
 
+// Collect is part of SQLExpression
 func (a TextAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return append(list, a)
 }
@@ -57,10 +57,6 @@ func (a TextAccess) SetFieldValue(entity interface{}, fieldValue interface{}) er
 	return nil
 }
 
-func (a TextAccess) NotNull() NullCheck {
-	return NullCheck{Operand: a, IsNot: true}
-}
-
 func (a TextAccess) Like(pattern string) BinaryOperator {
 	return MakeBinaryOperator(a, "LIKE", LiteralString(pattern))
 }
@@ -74,7 +70,3 @@ func (a TextAccess) In(values ...string) BinaryOperator {
 }
 
 func (a TextAccess) Column() ColumnInfo { return a.ColumnInfo }
-
-func (a TextAccess) String() string {
-	return fmt.Sprintf("text(%v)", a.ColumnInfo)
-}

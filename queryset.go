@@ -92,8 +92,18 @@ func (q QuerySet[T]) Exists() UnaryOperator {
 	return UnaryOperator{Operator: "EXISTS", Operand: q}
 }
 
+// Collect is part of SQLExpression
 func (d QuerySet[T]) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return list // ?
+	return list // TODO
+}
+
+func (d QuerySet[T]) Iterate(ctx context.Context, conn *pgx.Conn) (*ResultIterator[T], error) {
+	rows, err := conn.Query(ctx, SQL(d))
+	return &ResultIterator[T]{
+		queryError: err,
+		rows:       rows,
+		selectors:  d.selectors,
+	}, err
 }
 
 func (d QuerySet[T]) Exec(ctx context.Context, conn *pgx.Conn) (list []*T, err error) {

@@ -12,7 +12,7 @@ var (
 		Alias:  "t1",
 	}
 	ci = ColumnInfo{
-		tableInfo: ti,
+		tableInfo:  ti,
 		columnName: "label",
 	}
 )
@@ -37,11 +37,10 @@ func TestTextLike(t *testing.T) {
 	}
 }
 
-
 func TestTextNotNull(t *testing.T) {
 	b := new(bytes.Buffer)
 	ta := NewTextAccess(ci, nil)
-	op := ta.NotNull()
+	op := IsNotNull(ta)
 	op.SQLOn(b)
 	if got, want := b.String(), "(t1.label IS NOT NULL)"; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)

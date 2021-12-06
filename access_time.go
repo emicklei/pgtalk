@@ -14,6 +14,7 @@ func NewTimeAccess(info ColumnInfo, writer func(dest interface{}, i *time.Time))
 	return TimeAccess{ColumnInfo: info, fieldWriter: writer}
 }
 
+// Collect is part of SQLExpression
 func (a TimeAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return append(list, a)
 }

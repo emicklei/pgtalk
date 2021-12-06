@@ -102,7 +102,7 @@ func TestFullSelect(t *testing.T) {
 	q := products.
 		Select(products.AllColumns()...).
 		Distinct().
-		Where(products.Code.Compare(">", "A").And(products.CategoryId.NotNull())).
+		Where(products.Code.Compare(">", "A").And(pgtalk.IsNotNull(products.CategoryId))).
 		GroupBy(products.CategoryId).
 		OrderBy(products.CategoryId).
 		Ascending().

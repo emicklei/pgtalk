@@ -15,6 +15,7 @@ func (a BytesAccess) Column() ColumnInfo { return a.ColumnInfo }
 
 func (a BytesAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error { return nil }
 
+// Collect is part of SQLExpression
 func (a BytesAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return append(list, a)
 }
@@ -71,6 +72,7 @@ func (a JSONBAccess) ValueToInsert() interface{} {
 
 func (a JSONBAccess) Column() ColumnInfo { return a.ColumnInfo }
 
+// Collect is part of SQLExpression
 func (a JSONBAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return append(list, a)
 }
