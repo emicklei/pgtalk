@@ -212,6 +212,9 @@ func StringWithFields(v interface{}, includeNils bool) string {
 	for i := 0; i < vt.NumField(); i++ {
 		f := vt.Field(i)
 		fv := rv.Field(i)
+		if fv.IsZero() {
+			continue
+		}
 		if fv.IsNil() && !includeNils {
 			continue
 		}
