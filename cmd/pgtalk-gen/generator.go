@@ -94,7 +94,7 @@ func goFieldTypeAndAccess(datatype string) (string, string) {
 	switch datatype {
 	case "date", "timestamp", "timestamp without time zone", "timestamp with time zone":
 		return "*time.Time", "NewTimeAccess"
-	case "text", "uuid":
+	case "text":
 		return "*string", "NewTextAccess"
 	case "bigint", "integer":
 		return "*int64", "NewInt64Access"
@@ -112,6 +112,8 @@ func goFieldTypeAndAccess(datatype string) (string, string) {
 		return "*pgtype.Bytea", "NewFieldAccess[pgtype.Bytea]"
 	case "text[]":
 		return "*pgtype.TextArray", "NewFieldAccess[pgtype.TextArray]"
+	case "uuid":
+		return "*pgtype.UUID", "NewFieldAccess[pgtype.UUID]"
 	}
 	if strings.HasPrefix(datatype, "character") {
 		return "*string", "NewTextAccess"

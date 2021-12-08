@@ -53,3 +53,15 @@ func (a FieldAccess[T]) SetFieldValue(entity interface{}, fieldValue interface{}
 func (a FieldAccess[T]) ValueToInsert() interface{} {
 	return a.valueToInsert
 }
+
+// Equals return a
+func (a FieldAccess[T]) Equals(operand interface{}) SQLExpression {
+	if fat, ok := operand.(FieldAccess[T]); ok {
+		return MakeBinaryOperator(a, "=", fat)
+	}
+	if t, ok := operand.(T); ok {
+		return MakeBinaryOperator(a, "=", valuePrinter{t})
+	}
+	var t T
+	panic("expected a " + fmt.Sprintf("%T", t))
+}

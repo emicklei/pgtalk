@@ -79,5 +79,5 @@ func (a BooleanAccess) ValueToInsert() interface{} {
 }
 
 func (a BooleanAccess) Equals(b bool) SQLExpression {
-	return MakeBinaryOperator(a, "=", ValuePrinter{b})
+	return MakeBinaryOperator(a, "=", valuePrinter{b})
 }

@@ -88,8 +88,8 @@ func (q QuerySet[T]) OrderBy(cas ...ColumnAccessor) QuerySet[T] {
 	}
 	return q
 }
-func (q QuerySet[T]) Exists() UnaryOperator {
-	return UnaryOperator{Operator: "EXISTS", Operand: q}
+func (q QuerySet[T]) Exists() unaryExpression {
+	return unaryExpression{Operator: "EXISTS", Operand: q}
 }
 
 // Collect is part of SQLExpression

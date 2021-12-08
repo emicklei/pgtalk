@@ -30,8 +30,11 @@ type Join struct {
 
 func (i Join) SQLOn(w io.Writer) {
 	fmt.Fprint(w, "SELECT ")
-	writeAccessOn(i.leftSet.selectAccessors(), w)
-	fmt.Fprint(w, ",")
+	left := i.leftSet.selectAccessors()
+	writeAccessOn(left, w)
+	if len(left) > 0 {
+		fmt.Fprint(w, ",")
+	}
 	writeAccessOn(i.rightSet.selectAccessors(), w)
 	fmt.Fprint(w, " FROM ")
 	i.leftSet.fromSectionOn(w)

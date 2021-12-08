@@ -1,28 +1,9 @@
 package pgtalk
 
 import (
-	"bytes"
-	"fmt"
-	"io"
 	"testing"
 	"time"
 )
-
-var (
-	polyTable = TableInfo{Name: "polies", Schema: "public", Alias: "p1"}
-	polyFTime = NewTimeAccess(MakeColumnInfo(polyTable, "ftime", NotPrimary, Nullable, 1),
-		func(dest interface{}, v *time.Time) { dest.(*poly).FTime = v })
-	polyFFloat = NewFloat64Access(MakeColumnInfo(polyTable, "ffloat", NotPrimary, Nullable, 1),
-		func(dest interface{}, v *float64) { dest.(*poly).FFloat = v })
-	polyColumns = append([]ColumnAccessor{}, polyFTime, polyFFloat)
-	polyAccess  = TableAccessor{TableInfo: polyTable, AllColumns: polyColumns}
-)
-
-type poly struct {
-	FTime  *time.Time
-	FFloat *float64
-	FBool  *bool
-}
 
 func TestPoly_float64(t *testing.T) {
 	p := new(poly)
@@ -77,31 +58,6 @@ func TestLiteral_String(t *testing.T) {
 	if got, want := ls, "'literal'"; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
-}
-
-func diff(left, right string) string {
-	//assume one line
-	b := new(bytes.Buffer)
-	io.WriteString(b, "\n")
-	io.WriteString(b, left)
-	io.WriteString(b, "\n")
-	leftRunes := []rune(left)
-	rightRunes := []rune(right)
-	size := len(leftRunes)
-	if l := len(rightRunes); l < size {
-		size = l
-	}
-	for c := 0; c < size; c++ {
-		l := leftRunes[c]
-		r := rightRunes[c]
-		if l == r {
-			b.WriteRune(l)
-		} else {
-			fmt.Fprintf(b, "^(%s)...", string(r))
-			break
-		}
-	}
-	return b.String()
 }
 
 func TestStringWithNonNilFields_poly(t *testing.T) {

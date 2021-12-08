@@ -9,13 +9,13 @@ const (
 	validComparisonOperators = "= > < >= <= <>"
 )
 
-type BinaryOperator struct {
+type binaryExpression struct {
 	Operator string
 	Left     SQLExpression
 	Right    SQLExpression
 }
 
-func (o BinaryOperator) SQLOn(b io.Writer) {
+func (o binaryExpression) SQLOn(b io.Writer) {
 	fmt.Fprint(b, "(")
 	o.Left.SQLOn(b)
 	fmt.Fprintf(b, " %s ", o.Operator)
@@ -23,40 +23,40 @@ func (o BinaryOperator) SQLOn(b io.Writer) {
 	fmt.Fprint(b, ")")
 }
 
-func MakeBinaryOperator(left SQLExpression, operator string, right SQLExpression) BinaryOperator {
-	return BinaryOperator{
+func MakeBinaryOperator(left SQLExpression, operator string, right SQLExpression) binaryExpression {
+	return binaryExpression{
 		Left:     left,
 		Operator: operator,
 		Right:    right,
 	}
 }
 
-func (o BinaryOperator) And(right SQLExpression) BinaryOperator {
-	return BinaryOperator{
+func (o binaryExpression) And(right SQLExpression) binaryExpression {
+	return binaryExpression{
 		Left:     o,
 		Operator: "AND",
 		Right:    right,
 	}
 }
 
-func (o BinaryOperator) Or(right SQLExpression) BinaryOperator {
-	return BinaryOperator{
+func (o binaryExpression) Or(right SQLExpression) binaryExpression {
+	return binaryExpression{
 		Left:     o,
 		Operator: "OR",
 		Right:    right,
 	}
 }
 
-func (o BinaryOperator) Like(pattern string) BinaryOperator {
-	return BinaryOperator{
+func (o binaryExpression) Like(pattern string) binaryExpression {
+	return binaryExpression{
 		Left:     o,
 		Operator: "LIKE",
-		Right:    ValuePrinter{pattern},
+		Right:    valuePrinter{pattern},
 	}
 }
 
 // Collect is part of SQLExpression
-func (o BinaryOperator) Collect(list []ColumnAccessor) []ColumnAccessor {
+func (o binaryExpression) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return o.Left.Collect(o.Right.Collect(list))
 }
 
@@ -65,30 +65,30 @@ type BetweenAnd struct {
 
 func MakeBetweenAnd(reader ColumnAccessor, begin, end SQLExpression) BetweenAnd { return BetweenAnd{} }
 
-type UnaryOperator struct {
+type unaryExpression struct {
 	Operator string
 	Operand  SQLExpression
 }
 
-func MakeUnaryOperator(operator string, operand SQLExpression) UnaryOperator {
-	return UnaryOperator{Operator: operator, Operand: operand}
+func MakeUnaryOperator(operator string, operand SQLExpression) unaryExpression {
+	return unaryExpression{Operator: operator, Operand: operand}
 }
 
-func (u UnaryOperator) SQLOn(w io.Writer) {
+func (u unaryExpression) SQLOn(w io.Writer) {
 	fmt.Fprintf(w, "%s (", u.Operator)
 	u.Operand.SQLOn(w)
 	fmt.Fprint(w, ")")
 }
 
-func (u UnaryOperator) And(right SQLExpression) BinaryOperator {
-	return BinaryOperator{
+func (u unaryExpression) And(right SQLExpression) binaryExpression {
+	return binaryExpression{
 		Left:     u,
 		Operator: "AND",
 		Right:    right,
 	}
 }
-func (u UnaryOperator) Or(right SQLExpression) BinaryOperator {
-	return BinaryOperator{
+func (u unaryExpression) Or(right SQLExpression) binaryExpression {
+	return binaryExpression{
 		Left:     u,
 		Operator: "OR",
 		Right:    right,
@@ -96,7 +96,7 @@ func (u UnaryOperator) Or(right SQLExpression) BinaryOperator {
 }
 
 // Collect is part of SQLExpression
-func (u UnaryOperator) Collect(list []ColumnAccessor) []ColumnAccessor {
+func (u unaryExpression) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return u.Operand.Collect(list)
 }
 

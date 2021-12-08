@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/jackc/pgtype"
 )
 
 type TableInfo struct {
@@ -35,24 +37,35 @@ type TableAccessor struct {
 
 var EmptyColumnAccessor = []ColumnAccessor{}
 
-type ValuePrinter struct {
+type valuePrinter struct {
 	v interface{}
 }
 
-func MakeValuePrinter(v interface{}) ValuePrinter { return ValuePrinter{v: v} }
+func MakeValuePrinter(v interface{}) valuePrinter { return valuePrinter{v: v} }
 
-func (p ValuePrinter) SQLOn(b io.Writer) { fmt.Fprintf(b, "%v", p.v) }
+func (p valuePrinter) SQLOn(b io.Writer) {
+	if e, ok := p.v.(pgtype.UUID); ok {
+		fmt.Fprintf(b, "'%s'::uuid", encodeUUID(e.Bytes))
+		return
+	}
+	fmt.Fprintf(b, "%v", p.v)
+}
+
+// encodeUUID converts a uuid byte array to UUID standard string form.
+func encodeUUID(src [16]byte) string {
+	return fmt.Sprintf("%x-%x-%x-%x-%x", src[0:4], src[4:6], src[6:8], src[8:10], src[10:16])
+}
 
 // Collect is part of SQLExpression
-func (p ValuePrinter) Collect(list []ColumnAccessor) []ColumnAccessor {
+func (p valuePrinter) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return list
 }
 
-type ValuesPrinter struct {
+type valuesPrinter struct {
 	vs []interface{}
 }
 
-func (p ValuesPrinter) SQLOn(b io.Writer) {
+func (p valuesPrinter) SQLOn(b io.Writer) {
 	fmt.Fprintf(b, "(")
 	for i, each := range p.vs {
 		if i > 0 {
@@ -65,7 +78,7 @@ func (p ValuesPrinter) SQLOn(b io.Writer) {
 	fmt.Fprintf(b, ")")
 }
 
-func (p ValuesPrinter) Collect(list []ColumnAccessor) []ColumnAccessor {
+func (p valuesPrinter) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return list
 }
 

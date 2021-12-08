@@ -106,11 +106,11 @@ These examples are from the test package in which a few database tables files (c
 - point
 - bytea, text[], interval
 
+Send me a PR for a missing type available from https://www.postgresql.org/docs/9.5/datatype.html .
+
 ## how to run the generator
 
-	PGTALK_CONN=postgresql://usr:pwd@host:5432/grimlockclone pgtalk-gen -o yourpackage
+	PGTALK_CONN=postgresql://usr:pwd@host:5432/database pgtalk-gen -o yourpackage
 	gotip fmt ./...
-
-https://www.postgresql.org/docs/9.5/datatype.html
 
 (c) 2021, http://ernestmicklei.com. MIT License.

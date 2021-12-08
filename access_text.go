@@ -23,11 +23,11 @@ func (a TextAccess) ValueToInsert() interface{} {
 	return a.valueToInsert
 }
 
-func (a TextAccess) Equals(stringOrTextAccess interface{}) BinaryOperator {
+func (a TextAccess) Equals(stringOrTextAccess interface{}) binaryExpression {
 	return a.Compare("=", stringOrTextAccess)
 }
 
-func (a TextAccess) Compare(op string, stringOrTextAccess interface{}) BinaryOperator {
+func (a TextAccess) Compare(op string, stringOrTextAccess interface{}) binaryExpression {
 	if !strings.Contains(validComparisonOperators, op) {
 		panic("invalid comparison operator:" + op)
 	}
@@ -57,16 +57,16 @@ func (a TextAccess) SetFieldValue(entity interface{}, fieldValue interface{}) er
 	return nil
 }
 
-func (a TextAccess) Like(pattern string) BinaryOperator {
+func (a TextAccess) Like(pattern string) binaryExpression {
 	return MakeBinaryOperator(a, "LIKE", LiteralString(pattern))
 }
 
-func (a TextAccess) In(values ...string) BinaryOperator {
+func (a TextAccess) In(values ...string) binaryExpression {
 	vs := make([]interface{}, len(values))
 	for i := 0; i < len(values); i++ {
 		vs[i] = values[i]
 	}
-	return MakeBinaryOperator(a, "IN", ValuesPrinter{vs})
+	return MakeBinaryOperator(a, "IN", valuesPrinter{vs})
 }
 
 func (a TextAccess) Column() ColumnInfo { return a.ColumnInfo }

@@ -24,7 +24,7 @@ func (a Int64Access) Collect(list []ColumnAccessor) []ColumnAccessor {
 }
 
 func (a Int64Access) BetweenAnd(begin int64, end int64) BetweenAnd {
-	return MakeBetweenAnd(a, ValuePrinter{begin}, ValuePrinter{end})
+	return MakeBetweenAnd(a, valuePrinter{begin}, valuePrinter{end})
 }
 
 func (a Int64Access) SetFieldValue(entity interface{}, fieldValue interface{}) error {
@@ -48,9 +48,9 @@ func (a Int64Access) Set(v int64) Int64Access {
 	return a
 }
 
-func (a Int64Access) Equals(intOrInt64Access interface{}) BinaryOperator {
+func (a Int64Access) Equals(intOrInt64Access interface{}) binaryExpression {
 	if i, ok := intOrInt64Access.(int); ok {
-		return MakeBinaryOperator(a, "=", ValuePrinter{i})
+		return MakeBinaryOperator(a, "=", valuePrinter{i})
 	}
 	if ia, ok := intOrInt64Access.(Int64Access); ok {
 		return MakeBinaryOperator(a, "=", ia)
@@ -58,11 +58,11 @@ func (a Int64Access) Equals(intOrInt64Access interface{}) BinaryOperator {
 	panic("int or Int64Access expected")
 }
 
-func (a Int64Access) Compare(op string, i int) BinaryOperator {
+func (a Int64Access) Compare(op string, i int) binaryExpression {
 	if !strings.Contains(validComparisonOperators, op) {
 		panic("invalid comparison operator:" + op)
 	}
-	return MakeBinaryOperator(a, op, ValuePrinter{i})
+	return MakeBinaryOperator(a, op, valuePrinter{i})
 }
 
 func (a Int64Access) Column() ColumnInfo { return a.ColumnInfo }
@@ -106,16 +106,16 @@ func (a Float64Access) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return append(list, a)
 }
 
-func (a Float64Access) Equals(float64OrFloat64Access interface{}) BinaryOperator {
+func (a Float64Access) Equals(float64OrFloat64Access interface{}) binaryExpression {
 	return a.Compare("=", float64OrFloat64Access)
 }
 
-func (a Float64Access) Compare(op string, float64OrFloat64Access interface{}) BinaryOperator {
+func (a Float64Access) Compare(op string, float64OrFloat64Access interface{}) binaryExpression {
 	if !strings.Contains(validComparisonOperators, op) {
 		panic("invalid comparison operator:" + op)
 	}
 	if f, ok := float64OrFloat64Access.(float64); ok {
-		return MakeBinaryOperator(a, op, ValuePrinter{f})
+		return MakeBinaryOperator(a, op, valuePrinter{f})
 	}
 	if ta, ok := float64OrFloat64Access.(Float64Access); ok {
 		return MakeBinaryOperator(a, op, ta)
