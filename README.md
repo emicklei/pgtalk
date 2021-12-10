@@ -18,8 +18,16 @@ These examples are from the test package in which a few database tables files (c
 
 	m := products.Insert(
 		products.ID.Set(10),
-		products.Code.Set("test"),
+		products.Code.Set("testit"),
 		products.CategoryID.Set(1))
+
+	{ // alternative
+
+		p := new(products.Product)
+		p.SetID(10).SetCode("testit").SetCategoryID(1)
+		
+		m = products.Insert(p.Setters()...)
+	}
 
 	it := m.Exec(aConnection)
 	if err := it.Err(); err != nil {
@@ -29,11 +37,20 @@ These examples are from the test package in which a few database tables files (c
 ### Update
 
 	m := products.Update(
-			products.ID.Set(10),
-			products.Code.Set("test"),
+			products.Code.Set("testme"),
 			products.CategoryID.Set(1)).
 		Where(products.ID.Equals(10)).
 		Returning(products.Code)
+
+	{ // alternative
+
+		p := new(products.Product)
+		p.SetID(10).SetCode("testme").SetCategoryID(1)
+		
+		m = products.Update(p.Setters()...).
+			Where(products.ID.Equals(p.ID)).
+			Returning(products.Code)
+	}
 
 	it := m.Exec(aConnection)	
 	for it.HasNext() {

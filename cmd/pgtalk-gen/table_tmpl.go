@@ -33,9 +33,15 @@ var (
 }}
 )
 
-// ColumnUpdatesFrom returns the list of changes to a {{.GoType}} for which updates need to be processed.
-// Cannot be used to set null values for columns.
-func ColumnUpdatesFrom(e *{{.GoType}}) (list []p.SQLExpression) {
+{{- range .Fields}}
+
+// Set{{.GoName}} set the address of the value to the field value and returns the receiver.
+func (e *{{$.GoType}}) Set{{.GoName}}(v {{.NonPointerGoType}}) *{{$.GoType}} { e.{{.GoName}} = &v ; return e }
+{{- end}}
+
+// Setters returns the list of changes to a {{.GoType}} for which updates/inserts need to be processed.
+// Can be used in Insert,Update,Select. Cannot be used to set null values for columns.
+func (e *{{.GoType}}) Setters() (list []p.ColumnAccessor) {
 {{- range .Fields}}
 	if e.{{.GoName}} != nil {
 		list = append(list, {{.GoName}}.Set(*e.{{.GoName}}))

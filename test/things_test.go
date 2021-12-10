@@ -32,6 +32,13 @@ func TestJSONB(t *testing.T) {
 		things.Ttimestamp.Set(time.Now()),
 		things.Tjson.Set(`{"key":"value"}`))
 
+	// insert 3
+	{
+		obj := new(things.Thing)
+		obj.SetID(2).SetTdate(time.Now())
+		things.Insert(obj.Setters()...)
+	}
+
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {
 		t.Fatal(err)
