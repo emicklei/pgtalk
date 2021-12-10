@@ -1,5 +1,7 @@
 # pgtalk
 
+[![GoDoc](https://pkg.go.dev/badge/github.com/emicklei/pgtalk)](https://pkg.go.dev/github.com/emicklei/pgtalk)
+
 More type safe SQL query building and execution using Go code generated (pgtalk-gen) from PostgreSQL table definitions.
 
 ## generics
