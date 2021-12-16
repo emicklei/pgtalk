@@ -122,11 +122,11 @@ func (n NullCheck) Collect(list []ColumnAccessor) []ColumnAccessor {
 }
 
 // IsNotNull returns an expression with the IS NOT NULL condition
-func IsNotNull(e SQLExpression) SQLExpression {
+func IsNotNull(e SQLExpression) NullCheck {
 	return NullCheck{Operand: e, IsNot: true}
 }
 
 // IsNull returns an expression with the IS NULL condition
-func IsNull(e SQLExpression) SQLExpression {
+func IsNull(e SQLExpression) NullCheck {
 	return NullCheck{Operand: e, IsNot: false}
 }
