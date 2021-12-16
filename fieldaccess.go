@@ -54,8 +54,8 @@ func (a FieldAccess[T]) ValueToInsert() interface{} {
 	return a.valueToInsert
 }
 
-// Equals return a
-func (a FieldAccess[T]) Equals(operand interface{}) SQLExpression {
+// Equals returns a SQLExpression
+func (a FieldAccess[T]) Equals(operand interface{}) binaryExpression {
 	if fat, ok := operand.(FieldAccess[T]); ok {
 		return MakeBinaryOperator(a, "=", fat)
 	}

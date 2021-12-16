@@ -11,9 +11,11 @@ import (
 )
 
 var (
-	oTarget  = flag.String("o", ".", "target directory")
-	oSchema  = flag.String("s", "public", "source database schema")
-	oVerbose = flag.Bool("v", true, "use verbose logging")
+	oTarget          = flag.String("o", ".", "target directory")
+	oSchema          = flag.String("s", "public", "source database schema")
+	oVerbose         = flag.Bool("v", true, "use verbose logging")
+	oIncludePatterns = flag.String("include", "*", "comma separated list of regexp for tables to include")
+	oExludePatterns  = flag.String("exclude", "", "comma separated list of regexp for tables to exclude")
 )
 
 func main() {
