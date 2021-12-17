@@ -15,19 +15,19 @@ const (
 )
 
 type MutationSet[T any] struct {
-	tableAccess   TableAccessor
+	tableInfo     TableInfo
 	selectors     []ColumnAccessor
 	condition     SQLExpression
 	returning     []ColumnAccessor
 	operationType int
 }
 
-func MakeMutationSet[T any](tableAccess TableAccessor, selectors []ColumnAccessor, operationType int) MutationSet[T] {
+func MakeMutationSet[T any](tableInfo TableInfo, selectors []ColumnAccessor, operationType int) MutationSet[T] {
 	if assertEnabled {
-		assertEachAccessorHasTableInfo(selectors, tableAccess.TableInfo)
+		assertEachAccessorHasTableInfo(selectors, tableInfo)
 	}
 	return MutationSet[T]{
-		tableAccess:   tableAccess,
+		tableInfo:     tableInfo,
 		selectors:     selectors,
 		condition:     EmptyCondition,
 		operationType: operationType}
@@ -37,7 +37,7 @@ func MakeMutationSet[T any](tableAccess TableAccessor, selectors []ColumnAccesso
 func (m MutationSet[T]) SQLOn(w io.Writer) {
 	if m.operationType == MutationInsert {
 		fmt.Fprint(w, "INSERT INTO ")
-		fmt.Fprintf(w, "%s.%s", m.tableAccess.Schema, m.tableAccess.Name)
+		fmt.Fprintf(w, "%s.%s", m.tableInfo.Schema, m.tableInfo.Name)
 		fmt.Fprint(w, " (")
 		m.columnsSectionOn(m.selectors, w)
 		fmt.Fprint(w, ") VALUES (")
@@ -51,7 +51,7 @@ func (m MutationSet[T]) SQLOn(w io.Writer) {
 	}
 	if m.operationType == MutationDelete {
 		fmt.Fprint(w, "DELETE FROM ")
-		m.tableAccess.SQLOn(w)
+		m.tableInfo.SQLOn(w)
 		if m.condition != EmptyCondition {
 			fmt.Fprint(w, " WHERE ")
 			m.condition.SQLOn(w)
@@ -64,7 +64,7 @@ func (m MutationSet[T]) SQLOn(w io.Writer) {
 	}
 	if m.operationType == MutationUpdate {
 		fmt.Fprint(w, "UPDATE ")
-		m.tableAccess.SQLOn(w)
+		m.tableInfo.SQLOn(w)
 		fmt.Fprint(w, " SET ")
 		m.setSectionOn(w)
 		if m.condition != EmptyCondition {
@@ -82,7 +82,7 @@ func (m MutationSet[T]) SQLOn(w io.Writer) {
 func (m MutationSet[T]) Where(condition SQLExpression) MutationSet[T] {
 	if assertEnabled {
 		access := condition.Collect([]ColumnAccessor{})
-		assertEachAccessorIn(access, m.tableAccess.AllColumns)
+		assertEachAccessorIn(access, m.tableInfo.Columns)
 	}
 	m.condition = condition
 	return m
@@ -90,7 +90,7 @@ func (m MutationSet[T]) Where(condition SQLExpression) MutationSet[T] {
 
 func (m MutationSet[T]) Returning(columns ...ColumnAccessor) MutationSet[T] {
 	if assertEnabled {
-		assertEachAccessorIn(columns, m.tableAccess.AllColumns)
+		assertEachAccessorIn(columns, m.tableInfo.Columns)
 	}
 	m.returning = columns
 	return m

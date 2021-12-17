@@ -37,6 +37,3 @@ type querySet interface {
 	selectAccessors() []ColumnAccessor
 	whereCondition() SQLExpression
 }
-
-// QuerySetFactoryFunc represents a generic Select function
-type QuerySetFactoryFunc[T any] func(...ColumnAccessor) QuerySet[T]

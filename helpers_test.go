@@ -18,7 +18,6 @@ var (
 	polyFUUID = NewFieldAccess[pgtype.UUID](MakeColumnInfo(polyTable, "fuuid", NotPrimary, Nullable, 1),
 		func(dest interface{}, v *pgtype.UUID) { dest.(*poly).FUUID = v })
 	polyColumns = append([]ColumnAccessor{}, polyFTime, polyFFloat)
-	polyAccess  = TableAccessor{TableInfo: polyTable, AllColumns: polyColumns}
 )
 
 type poly struct {

@@ -9,6 +9,12 @@ import (
 	"github.com/emicklei/pgtalk/test/things"
 )
 
+func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {
+	if got, want := len(things.AllColumns()), 4; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
+
 func TestJSONB(t *testing.T) {
 	ctx := context.Background()
 	if testConnect == nil {

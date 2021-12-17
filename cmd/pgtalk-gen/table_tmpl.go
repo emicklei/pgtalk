@@ -26,12 +26,13 @@ var (
 	// package private
 	_ = time.Now()
 	_ = pgtype.Empty // for the occasional unused import
-	tableInfo = p.TableInfo{Schema: "{{.Schema}}", Name: "{{.TableName}}", Alias: "{{.TableAlias}}"}
-	tableAccess = p.TableAccessor{TableInfo: tableInfo, 
-		Factory: func() interface{}{return new({{.GoType}})}, AllColumns: []p.ColumnAccessor{
-{{- range .Fields}}{{.GoName}},{{- end}}
-}}
+	tableInfo = p.TableInfo{Schema: "{{.Schema}}", Name: "{{.TableName}}", Alias: "{{.TableAlias}}" }
 )
+
+func init() {
+	// after var initialization (to prevent cycle) we need to update the tableInfo to set all columns
+	tableInfo.Columns = []p.ColumnAccessor{ {{- range .Fields}}{{.GoName}},{{- end}} }
+}
 
 {{- range .Fields}}
 
@@ -57,26 +58,26 @@ func (e *{{.GoType}}) String() string {
 
 // AllColumns returns the list of all column accessors for usage in e.g. Select.
 func AllColumns() []p.ColumnAccessor {
-	return tableAccess.AllColumns
+	return tableInfo.Columns
 }
 
 // Select returns a new QuerySet[{{.GoType}}] for fetching column data.
 func Select(cas ...p.ColumnAccessor) p.QuerySet[{{.GoType}}] {
-	return p.MakeQuerySet[{{.GoType}}](tableAccess, cas)
+	return p.MakeQuerySet[{{.GoType}}](tableInfo, cas)
 }
 
 // Insert creates a MutationSet for inserting data with zero or more columns.
 func Insert(cas ...p.ColumnAccessor) p.MutationSet[{{.GoType}}] {
-	return p.MakeMutationSet[{{.GoType}}](tableAccess, cas, p.MutationInsert)
+	return p.MakeMutationSet[{{.GoType}}](tableInfo, cas, p.MutationInsert)
 }
 
 // Delete creates a MutationSet for deleting data.
 func Delete() p.MutationSet[{{.GoType}}] {
-	return p.MakeMutationSet[{{.GoType}}](tableAccess, p.EmptyColumnAccessor, p.MutationDelete)
+	return p.MakeMutationSet[{{.GoType}}](tableInfo, p.EmptyColumnAccessor, p.MutationDelete)
 }
 
 // Update creates a MutationSet to update zero or more columns.
 func Update(cas ...p.ColumnAccessor) p.MutationSet[{{.GoType}}] {
-	return p.MakeMutationSet[{{.GoType}}](tableAccess, cas, p.MutationUpdate)
+	return p.MakeMutationSet[{{.GoType}}](tableInfo, cas, p.MutationUpdate)
 }
 `

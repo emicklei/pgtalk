@@ -10,7 +10,7 @@ import (
 
 type QuerySet[T any] struct {
 	preparedName string
-	tableAccess  TableAccessor
+	tableInfo    TableInfo
 	selectors    []ColumnAccessor
 	distinct     bool
 	condition    SQLExpression
@@ -21,21 +21,21 @@ type QuerySet[T any] struct {
 	sortOrder    string
 }
 
-func MakeQuerySet[T any](tableAccess TableAccessor, selectors []ColumnAccessor) QuerySet[T] {
+func MakeQuerySet[T any](tableInfo TableInfo, selectors []ColumnAccessor) QuerySet[T] {
 	if assertEnabled {
-		assertEachAccessorHasTableInfo(selectors, tableAccess.TableInfo)
+		assertEachAccessorHasTableInfo(selectors, tableInfo)
 	}
 	return QuerySet[T]{
-		tableAccess: tableAccess,
-		selectors:   selectors,
-		condition:   EmptyCondition}
+		tableInfo: tableInfo,
+		selectors: selectors,
+		condition: EmptyCondition}
 }
 
 // querySet
 func (q QuerySet[T]) selectAccessors() []ColumnAccessor { return q.selectors }
 func (q QuerySet[T]) whereCondition() SQLExpression     { return q.condition }
 func (q QuerySet[T]) fromSectionOn(w io.Writer) {
-	fmt.Fprintf(w, "%s.%s %s", q.tableAccess.TableInfo.Schema, q.tableAccess.TableInfo.Name, q.tableAccess.TableInfo.Alias)
+	fmt.Fprintf(w, "%s.%s %s", q.tableInfo.Schema, q.tableInfo.Name, q.tableInfo.Alias)
 }
 
 func (q QuerySet[T]) SQLOn(w io.Writer) {
@@ -84,7 +84,7 @@ func (q QuerySet[T]) Having(condition SQLExpression) QuerySet[T] { q.having = co
 func (q QuerySet[T]) OrderBy(cas ...ColumnAccessor) QuerySet[T] {
 	q.orderBy = cas
 	if assertEnabled {
-		assertEachAccessorHasTableInfo(cas, q.tableAccess.TableInfo)
+		assertEachAccessorHasTableInfo(cas, q.tableInfo)
 	}
 	return q
 }

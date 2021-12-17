@@ -12,9 +12,10 @@ import (
 )
 
 type TableInfo struct {
-	Name   string
-	Schema string
-	Alias  string
+	Name    string
+	Schema  string
+	Alias   string
+	Columns []ColumnAccessor
 }
 
 func (t TableInfo) SQLOn(w io.Writer) {
@@ -29,9 +30,8 @@ func (t TableInfo) String() string {
 	return fmt.Sprintf("table(%s.%s %s)", t.Schema, t.Name, t.Alias)
 }
 
-type TableAccessor struct {
+type TableAccessor[T any] struct {
 	TableInfo
-	Factory    NewEntityFunc
 	AllColumns []ColumnAccessor
 }
 
