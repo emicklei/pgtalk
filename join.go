@@ -202,8 +202,10 @@ func (m MultiJoin) SQLOn(w io.Writer) {
 		writeJoinType(jt, w)
 		set := m.sets[j+1]
 		set.fromSectionOn(w)
-		fmt.Fprint(w, " ON ")
-		m.conditions[j].SQLOn(w)
+		if j < len(m.conditions) {
+			fmt.Fprint(w, " ON ")
+			m.conditions[j].SQLOn(w)
+		}
 	}
 	if len(wheres) > 0 {
 		fmt.Fprint(w, " WHERE ")
