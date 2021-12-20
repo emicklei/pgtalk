@@ -13,6 +13,7 @@ import (
 var (
 	oTarget          = flag.String("o", ".", "target directory")
 	oSchema          = flag.String("s", "public", "source database schema")
+	oViews           = flag.Bool("views", false, "generated from views, default is false = use tables")
 	oVerbose         = flag.Bool("v", true, "use verbose logging")
 	oIncludePatterns = flag.String("include", ".*", "comma separated list of regexp for tables to include")
 	oExludePatterns  = flag.String("exclude", "", "comma separated list of regexp for tables to exclude")
@@ -28,9 +29,17 @@ func main() {
 	}
 	defer conn.Close(context.Background())
 
-	all, err := LoadTables(context.Background(), conn, *oSchema)
-	if err != nil {
-		log.Fatal(err)
+	var all []PgTable
+	if *oViews {
+		all, err = LoadViews(context.Background(), conn, *oSchema)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		all, err = LoadTables(context.Background(), conn, *oSchema)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	filter := NewTableFilter(*oIncludePatterns, *oExludePatterns)
 	for _, each := range all {

@@ -27,7 +27,7 @@ ORDER BY c.relname
 type PgTable struct {
 	Schema               string
 	Name                 string
-	DataType             int32
+	DataType             int32 // TODO used at all?
 	HasAutogeneratingKey bool
 	PrimaryKeys          []PgColumn
 	Columns              []PgColumn
