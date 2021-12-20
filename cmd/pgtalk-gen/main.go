@@ -14,7 +14,7 @@ var (
 	oTarget          = flag.String("o", ".", "target directory")
 	oSchema          = flag.String("s", "public", "source database schema")
 	oVerbose         = flag.Bool("v", true, "use verbose logging")
-	oIncludePatterns = flag.String("include", "*", "comma separated list of regexp for tables to include")
+	oIncludePatterns = flag.String("include", ".*", "comma separated list of regexp for tables to include")
 	oExludePatterns  = flag.String("exclude", "", "comma separated list of regexp for tables to exclude")
 )
 
@@ -32,7 +32,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	filter := NewTableFilter(*oIncludePatterns, *oExludePatterns)
 	for _, each := range all {
-		generateFromTable(each)
+		if filter.Includes(each.Name) {
+			generateFromTable(each)
+		}
 	}
 }
