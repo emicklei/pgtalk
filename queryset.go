@@ -106,7 +106,7 @@ func (d QuerySet[T]) Iterate(ctx context.Context, conn *pgx.Conn) (*ResultIterat
 	}, err
 }
 
-func (d QuerySet[T]) Exec(ctx context.Context, conn *pgx.Conn) (list []*T, err error) {
+func (d QuerySet[T]) Exec(ctx context.Context, conn Querier) (list []*T, err error) {
 	rows, err := conn.Query(ctx, SQL(d))
 	if err != nil {
 		return

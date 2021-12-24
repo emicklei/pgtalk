@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-
-	"github.com/jackc/pgx/v4"
 )
 
 const (
@@ -102,7 +100,7 @@ func (m MutationSet[T]) On() MutationSet[T] {
 }
 
 // Pre: must be run inside transaction
-func (m MutationSet[T]) Exec(ctx context.Context, conn *pgx.Conn) *ResultIterator[T] {
+func (m MutationSet[T]) Exec(ctx context.Context, conn Querier) *ResultIterator[T] {
 	args := []interface{}{}
 	for _, each := range m.selectors {
 		args = append(args, each.ValueToInsert())

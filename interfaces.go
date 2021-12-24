@@ -1,7 +1,10 @@
 package pgtalk
 
 import (
+	"context"
 	"io"
+
+	"github.com/jackc/pgx/v4"
 )
 
 // assertEnabled, if true then perform extra runtime assertion that may panic
@@ -36,4 +39,8 @@ type querySet interface {
 	fromSectionOn(io.Writer)
 	selectAccessors() []ColumnAccessor
 	whereCondition() SQLExpression
+}
+
+type Querier interface {
+	Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error)
 }
