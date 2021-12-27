@@ -18,14 +18,14 @@ func TestTemplate(t *testing.T) {
 			{
 				Name:                 "id",
 				GoName:               "ID",
-				GoType:               "*int64",
+				GoType:               "int64",
 				FactoryMethod:        "NewInt8Access",
 				TableAttributeNumber: 1,
 			},
 			{
 				Name:                 "currency",
 				GoName:               "Currency",
-				GoType:               "*string",
+				GoType:               "sql.NullString",
 				FactoryMethod:        "NewTextAccess",
 				TableAttributeNumber: 2,
 			},

@@ -1,17 +1,19 @@
 package pgtalk
 
 import (
+	"database/sql"
 	"strings"
 )
 
 type TextAccess struct {
 	ColumnInfo
-	fieldWriter   func(dest interface{}, i *string)
-	valueToInsert string
+	valueFieldWriter    func(dest interface{}, i string)
+	nullableFieldWriter func(dest interface{}, i sql.NullString)
+	valueToInsert       string
 }
 
-func NewTextAccess(info ColumnInfo, writer func(dest interface{}, i *string)) TextAccess {
-	return TextAccess{ColumnInfo: info, fieldWriter: writer}
+func NewTextAccess(info ColumnInfo, writer func(dest interface{}, i string), nullableWriter func(dest interface{}, i sql.NullString)) TextAccess {
+	return TextAccess{ColumnInfo: info, nullableFieldWriter: nullableWriter, valueFieldWriter: writer}
 }
 
 func (a TextAccess) Set(v string) TextAccess {
@@ -53,7 +55,11 @@ func (a TextAccess) SetFieldValue(entity interface{}, fieldValue interface{}) er
 	if !ok {
 		return NewValueConversionError(fieldValue, "string")
 	}
-	a.fieldWriter(entity, &s)
+	if a.notNull {
+		a.valueFieldWriter(entity, s)
+	} else {
+		a.nullableFieldWriter(entity, &s)
+	}
 	return nil
 }
 

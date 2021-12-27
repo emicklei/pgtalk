@@ -26,7 +26,7 @@ func generateFromTable(table PgTable) {
 		GoType:     asSingular(strcase.ToCamel(table.Name)),
 	}
 	for _, each := range table.Columns {
-		goType, method := goFieldTypeAndAccess(each.DataType)
+		goType, method := goFieldTypeAndAccess(each.DataType, each.NotNull)
 		f := ColumnField{
 			Name:                 each.Name,
 			GoName:               fieldName(each.Name),
@@ -39,6 +39,7 @@ func generateFromTable(table PgTable) {
 			IsPrimary:            each.IsPrimaryKey,
 			IsNotNull:            each.NotNull,
 			TableAttributeNumber: each.FieldOrdinal,
+			ValueFieldName:       nullableValueFieldName(each.DataType),
 		}
 		tt.Fields = append(tt.Fields, f)
 	}
@@ -90,14 +91,23 @@ func abbreviate(s string) string {
 	return b.String()
 }
 
-func goFieldTypeAndAccess(datatype string) (string, string) {
+func goFieldTypeAndAccess(datatype string, notNull bool) (string, string) {
 	switch datatype {
 	case "date", "timestamp", "timestamp without time zone", "timestamp with time zone":
-		return "*time.Time", "NewTimeAccess"
+		if notNull {
+			return "time.Time", "NewTimeAccess"
+		}
+		return "sql.NullTime", "NewTimeAccess"
 	case "text":
-		return "*string", "NewTextAccess"
+		if notNull {
+			return "string", "NewTextAccess"
+		}
+		return "sql.NullString", "NewTextAccess"
 	case "bigint", "integer":
-		return "*int64", "NewInt64Access"
+		if notNull {
+			return "int64", "NewInt64Access"
+		}
+		return "sql.NullInt64", "NewInt64Access"
 	case "jsonb":
 		return "*string", "NewJSONBAccess"
 	case "point":
@@ -161,4 +171,14 @@ func isNotNullSource(isNotNull bool) string {
 		return "p.NotNull"
 	}
 	return "p.Nullable"
+}
+
+func nullableValueFieldName(dataType string) string {
+	switch dataType {
+	case "text":
+		return "String"
+	case "timestamp with time zone", "date":
+		return "Time"
+	}
+	return "UNKOWN:" + dataType
 }

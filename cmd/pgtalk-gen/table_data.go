@@ -25,4 +25,5 @@ type ColumnField struct {
 	IsNotNull            bool
 	IsNotNullSrc         string
 	TableAttributeNumber int
+	ValueFieldName       string // String for sql.NullString
 }

@@ -7,16 +7,19 @@ import (
 // Int64Access can Read a column value (int8) and Write a column value and Set a struct field (int64).
 type Int64Access struct {
 	ColumnInfo
-	fieldWriter   func(dest interface{}, i *int64)
-	valueToInsert int64
+	fieldWriter         func(dest interface{}, i int64) // either or
+	nullableFieldWriter func(dest interface{}, i *int64)
+	valueToInsert       int64
 }
 
 func NewInt64Access(
 	info ColumnInfo,
-	writer func(dest interface{}, i *int64)) Int64Access {
+	valueWriter func(dest interface{}, i int64),
+	nullableWriter func(dest interface{}, i *int64)) Int64Access {
 	return Int64Access{
-		ColumnInfo:  info,
-		fieldWriter: writer}
+		ColumnInfo:          info,
+		fieldWriter:         valueWriter,
+		nullableFieldWriter: nullableWriter}
 }
 
 func (a Int64Access) Collect(list []ColumnAccessor) []ColumnAccessor {
@@ -35,7 +38,11 @@ func (a Int64Access) SetFieldValue(entity interface{}, fieldValue interface{}) e
 	if !ok {
 		return NewValueConversionError(fieldValue, "int64")
 	}
-	a.fieldWriter(entity, &i)
+	if a.notNull {
+		a.fieldWriter(entity, i)
+	} else {
+		a.nullableFieldWriter(entity, &i)
+	}
 	return nil
 }
 
