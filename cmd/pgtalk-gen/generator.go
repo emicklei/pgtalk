@@ -93,16 +93,26 @@ func abbreviate(s string) string {
 
 func goFieldTypeAndAccess(datatype string, notNull bool) (string, string) {
 	switch datatype {
-	case "date", "timestamp", "timestamp without time zone", "timestamp with time zone":
+	case "date":
 		if notNull {
 			return "time.Time", "NewTimeAccess"
 		}
 		return "sql.NullTime", "NewTimeAccess"
+	case "timestamp with time zone":
+		if notNull {
+			return "time.Time", "NewTimeAccess"
+		}
+		return "pgtype.Timestamptz", "NewTimeAccess"
+	case "timestamp", "timestamp without time zone":
+		if notNull {
+			return "time.Time", "NewTimeAccess"
+		}
+		return "pgtype.Timestamp", "NewTimeAccess"
 	case "text":
 		if notNull {
 			return "string", "NewTextAccess"
 		}
-		return "sql.NullString", "NewTextAccess"
+		return "pgtype.Text", "NewTextAccess"
 	case "bigint", "integer":
 		if notNull {
 			return "int64", "NewInt64Access"

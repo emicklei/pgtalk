@@ -39,7 +39,7 @@ func TestTextLike(t *testing.T) {
 
 func TestTextNotNull(t *testing.T) {
 	b := new(bytes.Buffer)
-	ta := NewTextAccess(ci, nil)
+	ta := NewTextAccess(ci, nil, nil)
 	op := IsNotNull(ta)
 	op.SQLOn(b)
 	if got, want := b.String(), "(t1.label IS NOT NULL)"; got != want {
