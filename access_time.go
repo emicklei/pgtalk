@@ -1,17 +1,21 @@
 package pgtalk
 
 import (
+	"database/sql"
 	"time"
 )
 
 type TimeAccess struct {
 	ColumnInfo
-	fieldWriter   func(dest interface{}, i *time.Time)
-	valueToInsert time.Time
+	valueFieldWriter    func(dest interface{}, i time.Time)
+	nullableFieldWriter func(dest interface{}, i sql.NullTime)
+	valueToInsert       time.Time
 }
 
-func NewTimeAccess(info ColumnInfo, writer func(dest interface{}, i *time.Time)) TimeAccess {
-	return TimeAccess{ColumnInfo: info, fieldWriter: writer}
+func NewTimeAccess(info ColumnInfo,
+	valueWriter func(dest interface{}, i time.Time),
+	nullableValueWriter func(dest interface{}, i sql.NullTime)) TimeAccess {
+	return TimeAccess{ColumnInfo: info, valueFieldWriter: valueWriter}
 }
 
 // Collect is part of SQLExpression
@@ -27,7 +31,11 @@ func (a TimeAccess) SetFieldValue(entity interface{}, fieldValue interface{}) er
 	if !ok {
 		return NewValueConversionError(fieldValue, "time.Time")
 	}
-	a.fieldWriter(entity, &v)
+	if a.notNull {
+		a.valueFieldWriter(entity, v)
+	} else {
+		a.nullableFieldWriter(entity, sql.NullTime{Time: v, Valid: true})
+	}
 	return nil
 }
 

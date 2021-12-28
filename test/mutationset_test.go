@@ -38,7 +38,7 @@ func TestUpdateReturning(t *testing.T) {
 		if err != nil {
 			t.Fatal(it.Err())
 		}
-		t.Logf("%s", *p.Code)
+		t.Logf("%v", p.Code)
 	}
 }
 

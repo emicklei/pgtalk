@@ -109,7 +109,7 @@ func goFieldTypeAndAccess(datatype string, notNull bool) (string, string) {
 		}
 		return "sql.NullInt64", "NewInt64Access"
 	case "jsonb":
-		return "*string", "NewJSONBAccess"
+		return "sql.NullString", "NewJSONBAccess"
 	case "point":
 		return "*pgtype.Point", "NewFieldAccess[pgtype.Point]"
 	case "boolean":
@@ -175,10 +175,12 @@ func isNotNullSource(isNotNull bool) string {
 
 func nullableValueFieldName(dataType string) string {
 	switch dataType {
-	case "text":
+	case "text", "jsonb":
 		return "String"
-	case "timestamp with time zone", "date":
+	case "timestamp with time zone", "date", "timestamp without time zone":
 		return "Time"
+	case "bigint":
+		return "Int64"
 	}
 	return "UNKOWN:" + dataType
 }

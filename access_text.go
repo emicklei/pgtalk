@@ -58,7 +58,7 @@ func (a TextAccess) SetFieldValue(entity interface{}, fieldValue interface{}) er
 	if a.notNull {
 		a.valueFieldWriter(entity, s)
 	} else {
-		a.nullableFieldWriter(entity, &s)
+		a.nullableFieldWriter(entity, sql.NullString{String: s, Valid: true})
 	}
 	return nil
 }

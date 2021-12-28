@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 	"time"
 
@@ -41,7 +42,7 @@ func TestJSONB(t *testing.T) {
 	// insert 3
 	{
 		obj := new(things.Thing)
-		obj.SetID(2).SetTdate(time.Now())
+		obj.SetID(2).SetTdate(sql.NullTime{Time: time.Now()})
 		things.Insert(obj.Setters()...)
 	}
 

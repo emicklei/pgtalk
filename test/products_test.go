@@ -28,7 +28,7 @@ func TestSelectProductsWhere(t *testing.T) {
 		t.Log("empty results")
 		return
 	}
-	log.Printf("%v,%v,%v", *products[0].ID, *products[0].Code, err)
+	log.Printf("%v,%v,%v", products[0].ID, products[0].Code, err)
 }
 
 func TestSelectAllColumns(t *testing.T) {
@@ -73,7 +73,7 @@ func TestInnerJoin(t *testing.T) {
 		p := new(products.Product)
 		c := new(categories.Category)
 		_ = it.Next(p, c)
-		t.Logf("%#v,%#v", *p.Code, *c.Title)
+		t.Logf("%#v,%#v", p.Code, c.Title)
 	}
 }
 
