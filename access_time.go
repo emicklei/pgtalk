@@ -2,16 +2,21 @@ package pgtalk
 
 import (
 	"time"
+
+	"github.com/jackc/pgtype"
 )
 
 type TimeAccess struct {
 	ColumnInfo
-	fieldWriter   func(dest interface{}, i *time.Time)
-	valueToInsert time.Time
+	valueFieldWriter    func(dest interface{}, i time.Time)
+	nullableFieldWriter func(dest interface{}, i pgtype.Date)
+	valueToInsert       time.Time
 }
 
-func NewTimeAccess(info ColumnInfo, writer func(dest interface{}, i *time.Time)) TimeAccess {
-	return TimeAccess{ColumnInfo: info, fieldWriter: writer}
+func NewTimeAccess(info ColumnInfo,
+	valueWriter func(dest interface{}, i time.Time),
+	nullableValueWriter func(dest interface{}, i pgtype.Date)) TimeAccess {
+	return TimeAccess{ColumnInfo: info, valueFieldWriter: valueWriter}
 }
 
 // Collect is part of SQLExpression
@@ -27,7 +32,11 @@ func (a TimeAccess) SetFieldValue(entity interface{}, fieldValue interface{}) er
 	if !ok {
 		return NewValueConversionError(fieldValue, "time.Time")
 	}
-	a.fieldWriter(entity, &v)
+	if a.notNull {
+		a.valueFieldWriter(entity, v)
+	} else {
+		a.nullableFieldWriter(entity, pgtype.Date{Time: v, Status: pgtype.Present})
+	}
 	return nil
 }
 

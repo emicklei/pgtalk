@@ -19,13 +19,17 @@ type {{.GoType}} struct {
 
 var (
 {{- range .Fields}}	
-	// {{.GoName}} represents the column "{{.Name}}" of with type "{{.DataType}}", nullable:{{.IsNotNull}}, primary:{{.IsPrimary}}
+	// {{.GoName}} represents the column "{{.Name}}" of with type "{{.DataType}}", nullable:{{not .IsNotNull}}, primary:{{.IsPrimary}}
 	{{.GoName}} = p.{{.FactoryMethod}}(p.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimarySrc}}, {{.IsNotNullSrc}}, {{.TableAttributeNumber}}),
-		func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v })
+		{{- if .IsNotNull }}
+			func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v }, nil
+		{{- else }}
+			nil, func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v }
+		{{- end }})
 {{- end}}
 	// package private
-	_ = time.Now()
-	_ = pgtype.Empty // for the occasional unused import
+	_ = time.Now 
+	_ = pgtype.Empty // for the occasional unused import from pgtype
 	tableInfo = p.TableInfo{Schema: "{{.Schema}}", Name: "{{.TableName}}", Alias: "{{.TableAlias}}" }
 )
 
@@ -35,18 +39,34 @@ func init() {
 }
 
 {{- range .Fields}}
+{{- if .IsNotNull }}
+
+// Set{{.GoName}} set the value to the field value and returns the receiver.
+func (e *{{$.GoType}}) Set{{.GoName}}(v {{.GoType}}) *{{$.GoType}} { e.{{.GoName}} = v ; return e }
+{{- else }}
 
 // Set{{.GoName}} set the address of the value to the field value and returns the receiver.
-func (e *{{$.GoType}}) Set{{.GoName}}(v {{.NonPointerGoType}}) *{{$.GoType}} { e.{{.GoName}} = &v ; return e }
+func (e *{{$.GoType}}) Set{{.GoName}}(v {{.GoType}}) *{{$.GoType}} { e.{{.GoName}} = v ; return e }
+{{- end }}
 {{- end}}
 
 // Setters returns the list of changes to a {{.GoType}} for which updates/inserts need to be processed.
 // Can be used in Insert,Update,Select. Cannot be used to set null values for columns.
 func (e *{{.GoType}}) Setters() (list []p.ColumnAccessor) {
 {{- range .Fields}}
-	if e.{{.GoName}} != nil {
-		list = append(list, {{.GoName}}.Set(*e.{{.GoName}}))
+	{{- if .IsNotNull }}
+	if e.{{.GoName}} != 0 {
+		list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
 	}
+	{{- else }}
+	if e.{{.GoName}}.Status == pgtype.Present {
+		{{- if .IsGenericFieldAccess }}
+		list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
+		{{- else }}
+		list = append(list, {{.GoName}}.Set(e.{{.GoName}}.{{.ValueFieldName}}))
+		{{- end }}
+	}
+	{{- end }}	
 {{- end}}	
 	return
 }

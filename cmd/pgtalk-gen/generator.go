@@ -26,7 +26,7 @@ func generateFromTable(table PgTable) {
 		GoType:     asSingular(strcase.ToCamel(table.Name)),
 	}
 	for _, each := range table.Columns {
-		goType, method := goFieldTypeAndAccess(each.DataType)
+		goType, method := goFieldTypeAndAccess(each.DataType, each.NotNull)
 		f := ColumnField{
 			Name:                 each.Name,
 			GoName:               fieldName(each.Name),
@@ -39,6 +39,8 @@ func generateFromTable(table PgTable) {
 			IsPrimary:            each.IsPrimaryKey,
 			IsNotNull:            each.NotNull,
 			TableAttributeNumber: each.FieldOrdinal,
+			ValueFieldName:       nullableValueFieldName(each.DataType),
+			IsGenericFieldAccess: strings.HasPrefix(method, "NewField"),
 		}
 		tt.Fields = append(tt.Fields, f)
 	}
@@ -90,36 +92,67 @@ func abbreviate(s string) string {
 	return b.String()
 }
 
-func goFieldTypeAndAccess(datatype string) (string, string) {
+func goFieldTypeAndAccess(datatype string, notNull bool) (string, string) {
 	switch datatype {
-	case "date", "timestamp", "timestamp without time zone", "timestamp with time zone":
-		return "*time.Time", "NewTimeAccess"
+	case "date":
+		if notNull {
+			return "time.Time", "NewTimeAccess"
+		}
+		return "pgtype.Date", "NewTimeAccess"
+	case "timestamp with time zone":
+		if notNull {
+			return "time.Time", "NewTimeAccess"
+		}
+		return "pgtype.Timestamptz", "NewFieldAccess[pgtype.Timestamptz]"
+	case "timestamp", "timestamp without time zone":
+		if notNull {
+			return "time.Time", "NewTimeAccess"
+		}
+		return "pgtype.Timestamp", "NewFieldAccess[pgtype.Timestamp]"
 	case "text":
-		return "*string", "NewTextAccess"
+		if notNull {
+			return "string", "NewTextAccess"
+		}
+		return "pgtype.Text", "NewTextAccess"
 	case "bigint", "integer":
-		return "*int64", "NewInt64Access"
+		if notNull {
+			return "int64", "NewInt64Access"
+		}
+		return "pgtype.Int8", "NewInt64Access"
 	case "jsonb":
-		return "*string", "NewJSONBAccess"
+		if notNull {
+			return "string", "NewJSONBAccess"
+		}
+		return "pgtype.JSONB", "NewJSONBAccess"
 	case "point":
-		return "*pgtype.Point", "NewFieldAccess[pgtype.Point]"
+		return "pgtype.Point", "NewFieldAccess[pgtype.Point]"
 	case "boolean":
-		return "*bool", "NewBooleanAccess"
+		if notNull {
+			return "bool", "NewBooleanAccess"
+		}
+		return "pgtype.Bool", "NewBooleanAccess"
 	case "daterange":
-		return "*pgtype.Daterange", "NewFieldAccess[pgtype.Daterange]"
+		return "pgtype.Daterange", "NewFieldAccess[pgtype.Daterange]"
 	case "interval":
-		return "*pgtype.Interval", "NewFieldAccess[pgtype.Interval]"
+		return "pgtype.Interval", "NewFieldAccess[pgtype.Interval]"
 	case "bytea":
-		return "*pgtype.Bytea", "NewFieldAccess[pgtype.Bytea]"
+		return "pgtype.Bytea", "NewFieldAccess[pgtype.Bytea]"
 	case "text[]":
-		return "*pgtype.TextArray", "NewFieldAccess[pgtype.TextArray]"
+		return "pgtype.TextArray", "NewFieldAccess[pgtype.TextArray]"
 	case "uuid":
-		return "*pgtype.UUID", "NewFieldAccess[pgtype.UUID]"
+		return "pgtype.UUID", "NewFieldAccess[pgtype.UUID]"
 	}
 	if strings.HasPrefix(datatype, "character") {
-		return "*string", "NewTextAccess"
+		if notNull {
+			return "string", "NewTextAccess"
+		}
+		return "pgtype.Text", "NewTextAccess"
 	}
 	if strings.HasPrefix(datatype, "numeric") {
-		return "*float64", "NewFieldAccess[float64]"
+		if notNull {
+			return "float64", "NewFieldAccess[float64]"
+		}
+		return "pgtype.Float8", "NewFieldAccess[pgtype.Float8]"
 	}
 	if *oVerbose {
 		log.Println("[WARN] unknown datatype, using fallback for:", datatype)
@@ -161,4 +194,18 @@ func isNotNullSource(isNotNull bool) string {
 		return "p.NotNull"
 	}
 	return "p.Nullable"
+}
+
+func nullableValueFieldName(dataType string) string {
+	switch dataType {
+	case "text":
+		return "String"
+	case "jsonb":
+		return "Bytes"
+	case "timestamp with time zone", "date", "timestamp without time zone":
+		return "Time"
+	case "bigint":
+		return "Int"
+	}
+	return "UNKOWN:" + dataType
 }

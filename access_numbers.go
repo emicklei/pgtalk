@@ -2,21 +2,26 @@ package pgtalk
 
 import (
 	"strings"
+
+	"github.com/jackc/pgtype"
 )
 
 // Int64Access can Read a column value (int8) and Write a column value and Set a struct field (int64).
 type Int64Access struct {
 	ColumnInfo
-	fieldWriter   func(dest interface{}, i *int64)
-	valueToInsert int64
+	fieldWriter         func(dest interface{}, i int64) // either or
+	nullableFieldWriter func(dest interface{}, i pgtype.Int8)
+	valueToInsert       int64
 }
 
 func NewInt64Access(
 	info ColumnInfo,
-	writer func(dest interface{}, i *int64)) Int64Access {
+	valueWriter func(dest interface{}, i int64),
+	nullableWriter func(dest interface{}, i pgtype.Int8)) Int64Access {
 	return Int64Access{
-		ColumnInfo:  info,
-		fieldWriter: writer}
+		ColumnInfo:          info,
+		fieldWriter:         valueWriter,
+		nullableFieldWriter: nullableWriter}
 }
 
 func (a Int64Access) Collect(list []ColumnAccessor) []ColumnAccessor {
@@ -35,7 +40,11 @@ func (a Int64Access) SetFieldValue(entity interface{}, fieldValue interface{}) e
 	if !ok {
 		return NewValueConversionError(fieldValue, "int64")
 	}
-	a.fieldWriter(entity, &i)
+	if a.notNull {
+		a.fieldWriter(entity, i)
+	} else {
+		a.nullableFieldWriter(entity, pgtype.Int8{Int: i, Status: pgtype.Present})
+	}
 	return nil
 }
 
@@ -70,12 +79,13 @@ func (a Int64Access) Column() ColumnInfo { return a.ColumnInfo }
 // Float64Access can Read a column value (float) and Write a column value and Set a struct field (float64).
 type Float64Access struct {
 	ColumnInfo
-	fieldWriter   func(dest interface{}, f *float64)
-	valueToInsert float64
+	fieldWriter         func(dest interface{}, f float64)
+	nullableFieldWriter func(dest interface{}, f pgtype.Float8)
+	valueToInsert       float64
 }
 
-func NewFloat64Access(info ColumnInfo, writer func(dest interface{}, f *float64)) Float64Access {
-	return Float64Access{ColumnInfo: info, fieldWriter: writer}
+func NewFloat64Access(info ColumnInfo, writer func(dest interface{}, f float64), nullableWriter func(dest interface{}, f pgtype.Float8)) Float64Access {
+	return Float64Access{ColumnInfo: info, fieldWriter: writer, nullableFieldWriter: nullableWriter}
 }
 
 func (a Float64Access) SetFieldValue(entity interface{}, fieldValue interface{}) error {
@@ -87,7 +97,7 @@ func (a Float64Access) SetFieldValue(entity interface{}, fieldValue interface{})
 		// TODO try string?
 		return NewValueConversionError(fieldValue, "float64")
 	}
-	a.fieldWriter(entity, &f)
+	a.fieldWriter(entity, f)
 	return nil
 }
 

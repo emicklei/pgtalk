@@ -195,7 +195,7 @@ func PrettySQL(sql SQLWriter) string {
 
 const HideNilValues = true
 
-func StringWithFields(v interface{}, includeNils bool) string {
+func StringWithFields(v interface{}, includePresent bool) string {
 	vt := reflect.TypeOf(v)
 	if vt.Kind() == reflect.Ptr {
 		vt = vt.Elem()
@@ -213,9 +213,6 @@ func StringWithFields(v interface{}, includeNils bool) string {
 		f := vt.Field(i)
 		fv := rv.Field(i)
 		if fv.IsZero() {
-			continue
-		}
-		if fv.IsNil() && !includeNils {
 			continue
 		}
 		var fi interface{}

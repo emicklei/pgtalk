@@ -25,4 +25,6 @@ type ColumnField struct {
 	IsNotNull            bool
 	IsNotNullSrc         string
 	TableAttributeNumber int
+	ValueFieldName       string //  can be empty
+	IsGenericFieldAccess bool
 }

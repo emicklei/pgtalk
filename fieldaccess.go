@@ -6,13 +6,14 @@ import (
 
 type FieldAccess[T any] struct {
 	ColumnInfo
-	fieldWriter   func(dest interface{}, u *T)
+	fieldWriter   func(dest interface{}, u T)
 	valueToInsert T
 }
 
 func NewFieldAccess[T any](
 	info ColumnInfo,
-	writer func(dest interface{}, u *T)) FieldAccess[T] {
+	ignore interface{},
+	writer func(dest interface{}, u T)) FieldAccess[T] {
 	return FieldAccess[T]{
 		ColumnInfo:  info,
 		fieldWriter: writer}
@@ -35,18 +36,12 @@ func (a FieldAccess[T]) SetFieldValue(entity interface{}, fieldValue interface{}
 	if fieldValue == nil {
 		return nil
 	}
-	// try both value of T and pointer to T
 	v, ok := fieldValue.(T)
-	if ok {
-		a.fieldWriter(entity, &v)
-		return nil
-	}
-	pv, ok := fieldValue.(*T)
 	if !ok {
 		var t *T
 		return NewValueConversionError(fieldValue, fmt.Sprintf("%T", t))
 	}
-	a.fieldWriter(entity, pv)
+	a.fieldWriter(entity, v)
 	return nil
 }
 
