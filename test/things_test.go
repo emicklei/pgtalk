@@ -34,7 +34,7 @@ func TestJSONB(t *testing.T) {
 	// insert 2
 	m := things.Insert(
 		things.ID.Set(2),
-		things.Tdate.Set(time.Now()),
+		//things.Tdate.Set(time.Now()),
 		things.Ttimestamp.Set(pgtalk.MakeTimestamp(time.Now())),
 		things.Tjson.Set([]byte(`{"key":"value"}`)))
 
@@ -51,6 +51,9 @@ func TestJSONB(t *testing.T) {
 	}
 	r := m.Exec(ctx, testConnect)
 	if err := r.Err(); err != nil {
+		for i, each := range m.ValuesToInsert() {
+			t.Logf("%d:%v", i, each)
+		}
 		t.Log(pgtalk.SQL(m))
 		t.Fatal(err)
 	}

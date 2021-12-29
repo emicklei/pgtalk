@@ -79,12 +79,13 @@ func (a Int64Access) Column() ColumnInfo { return a.ColumnInfo }
 // Float64Access can Read a column value (float) and Write a column value and Set a struct field (float64).
 type Float64Access struct {
 	ColumnInfo
-	fieldWriter   func(dest interface{}, f *float64)
-	valueToInsert float64
+	fieldWriter         func(dest interface{}, f float64)
+	nullableFieldWriter func(dest interface{}, f pgtype.Float8)
+	valueToInsert       float64
 }
 
-func NewFloat64Access(info ColumnInfo, writer func(dest interface{}, f *float64)) Float64Access {
-	return Float64Access{ColumnInfo: info, fieldWriter: writer}
+func NewFloat64Access(info ColumnInfo, writer func(dest interface{}, f float64), nullableWriter func(dest interface{}, f pgtype.Float8)) Float64Access {
+	return Float64Access{ColumnInfo: info, fieldWriter: writer, nullableFieldWriter: nullableWriter}
 }
 
 func (a Float64Access) SetFieldValue(entity interface{}, fieldValue interface{}) error {
@@ -96,7 +97,7 @@ func (a Float64Access) SetFieldValue(entity interface{}, fieldValue interface{})
 		// TODO try string?
 		return NewValueConversionError(fieldValue, "float64")
 	}
-	a.fieldWriter(entity, &f)
+	a.fieldWriter(entity, f)
 	return nil
 }
 

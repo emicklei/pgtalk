@@ -12,20 +12,20 @@ import (
 var (
 	polyTable = TableInfo{Name: "polies", Schema: "public", Alias: "p1"}
 	polyFTime = NewTimeAccess(MakeColumnInfo(polyTable, "ftime", NotPrimary, Nullable, 1),
-		func(dest interface{}, v *time.Time) { dest.(*poly).FTime = v })
+		func(dest interface{}, v time.Time) { dest.(*poly).FTime = v }, nil)
 	polyFFloat = NewFloat64Access(MakeColumnInfo(polyTable, "ffloat", NotPrimary, Nullable, 1),
-		func(dest interface{}, v *float64) { dest.(*poly).FFloat = v })
+		func(dest interface{}, v float64) { dest.(*poly).FFloat = v }, nil)
 	polyFUUID = NewFieldAccess[pgtype.UUID](MakeColumnInfo(polyTable, "fuuid", NotPrimary, Nullable, 1),
-		func(dest interface{}, v *pgtype.UUID) { dest.(*poly).FUUID = v })
+		nil, func(dest interface{}, v pgtype.UUID) { dest.(*poly).FUUID = v })
 	polyColumns = append([]ColumnAccessor{}, polyFTime, polyFFloat)
 )
 
 type poly struct {
-	FTime  *time.Time
-	FFloat *float64
-	FBool  *bool
+	FTime  time.Time
+	FFloat float64
+	FBool  bool
 	// pgtypes
-	FUUID *pgtype.UUID
+	FUUID pgtype.UUID
 }
 
 func diff(left, right string) string {

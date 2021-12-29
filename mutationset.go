@@ -101,15 +101,20 @@ func (m MutationSet[T]) On() MutationSet[T] {
 
 // Pre: must be run inside transaction
 func (m MutationSet[T]) Exec(ctx context.Context, conn Querier) *ResultIterator[T] {
-	args := []interface{}{}
-	for _, each := range m.selectors {
-		args = append(args, each.ValueToInsert())
-	}
-	rows, err := conn.Query(ctx, SQL(m), args...)
+	rows, err := conn.Query(ctx, SQL(m), m.ValuesToInsert()...)
 	if err == nil && !m.canProduceResults() {
 		rows.Close()
 	}
 	return &ResultIterator[T]{queryError: err, rows: rows, selectors: m.returning}
+}
+
+// ValuesToInsert returns the parameters values for the mutation query.
+func (m MutationSet[T]) ValuesToInsert() []interface{} {
+	args := make([]interface{}, len(m.selectors))
+	for i, each := range m.selectors {
+		args[i] = each.ValueToInsert()
+	}
+	return args
 }
 
 func (m MutationSet[T]) canProduceResults() bool {

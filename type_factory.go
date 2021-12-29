@@ -14,7 +14,7 @@ func MakeTimestamptz(t *time.Time) pgtype.Timestamptz {
 }
 
 func MakeTimestamp(t time.Time) pgtype.Timestamp {
-	return pgtype.Timestamp{Time: t, Status: pgtype.Present}
+	return pgtype.Timestamp{Time: t.UTC(), Status: pgtype.Present}
 }
 
 func MakeDate(t time.Time) pgtype.Date {
