@@ -2,7 +2,6 @@ package test
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 	"time"
 
@@ -36,13 +35,13 @@ func TestJSONB(t *testing.T) {
 	m := things.Insert(
 		things.ID.Set(2),
 		things.Tdate.Set(time.Now()),
-		things.Ttimestamp.Set(time.Now()),
-		things.Tjson.Set(`{"key":"value"}`))
+		things.Ttimestamp.Set(pgtalk.MakeTimestamp(time.Now())),
+		things.Tjson.Set([]byte(`{"key":"value"}`)))
 
 	// insert 3
 	{
 		obj := new(things.Thing)
-		obj.SetID(2).SetTdate(sql.NullTime{Time: time.Now()})
+		obj.SetID(2).SetTdate(pgtalk.MakeDate(time.Now()))
 		things.Insert(obj.Setters()...)
 	}
 
@@ -95,8 +94,8 @@ func TestJSONB_3(t *testing.T) {
 	m := things.Insert(
 		things.ID.Set(3),
 		things.Tdate.Set(time.Now()),
-		things.Ttimestamp.Set(time.Now()),
-		things.Tjson.Set(`{"key":"value"}`))
+		things.Ttimestamp.Set(pgtalk.MakeTimestamp(time.Now())),
+		things.Tjson.Set([]byte(`{"key":"value"}`)))
 
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {

@@ -1,18 +1,19 @@
 package pgtalk
 
 import (
-	"database/sql"
 	"strings"
+
+	"github.com/jackc/pgtype"
 )
 
 type TextAccess struct {
 	ColumnInfo
 	valueFieldWriter    func(dest interface{}, i string)
-	nullableFieldWriter func(dest interface{}, i sql.NullString)
+	nullableFieldWriter func(dest interface{}, i pgtype.Text)
 	valueToInsert       string
 }
 
-func NewTextAccess(info ColumnInfo, writer func(dest interface{}, i string), nullableWriter func(dest interface{}, i sql.NullString)) TextAccess {
+func NewTextAccess(info ColumnInfo, writer func(dest interface{}, i string), nullableWriter func(dest interface{}, i pgtype.Text)) TextAccess {
 	return TextAccess{ColumnInfo: info, nullableFieldWriter: nullableWriter, valueFieldWriter: writer}
 }
 
@@ -58,7 +59,7 @@ func (a TextAccess) SetFieldValue(entity interface{}, fieldValue interface{}) er
 	if a.notNull {
 		a.valueFieldWriter(entity, s)
 	} else {
-		a.nullableFieldWriter(entity, sql.NullString{String: s, Valid: true})
+		a.nullableFieldWriter(entity, pgtype.Text{String: s, Status: pgtype.Present})
 	}
 	return nil
 }

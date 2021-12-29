@@ -1,20 +1,21 @@
 package pgtalk
 
 import (
-	"database/sql"
 	"time"
+
+	"github.com/jackc/pgtype"
 )
 
 type TimeAccess struct {
 	ColumnInfo
 	valueFieldWriter    func(dest interface{}, i time.Time)
-	nullableFieldWriter func(dest interface{}, i sql.NullTime)
+	nullableFieldWriter func(dest interface{}, i pgtype.Date)
 	valueToInsert       time.Time
 }
 
 func NewTimeAccess(info ColumnInfo,
 	valueWriter func(dest interface{}, i time.Time),
-	nullableValueWriter func(dest interface{}, i sql.NullTime)) TimeAccess {
+	nullableValueWriter func(dest interface{}, i pgtype.Date)) TimeAccess {
 	return TimeAccess{ColumnInfo: info, valueFieldWriter: valueWriter}
 }
 
@@ -34,7 +35,7 @@ func (a TimeAccess) SetFieldValue(entity interface{}, fieldValue interface{}) er
 	if a.notNull {
 		a.valueFieldWriter(entity, v)
 	} else {
-		a.nullableFieldWriter(entity, sql.NullTime{Time: v, Valid: true})
+		a.nullableFieldWriter(entity, pgtype.Date{Time: v, Status: pgtype.Present})
 	}
 	return nil
 }

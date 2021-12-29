@@ -5,7 +5,6 @@ var tableTemplateSrc = `package {{.GoPackage}}
 // DO NOT EDIT
 
 import (
-	"database/sql"
 	p "github.com/emicklei/pgtalk"
 	"time"
 	"github.com/jackc/pgtype"
@@ -20,7 +19,7 @@ type {{.GoType}} struct {
 
 var (
 {{- range .Fields}}	
-	// {{.GoName}} represents the column "{{.Name}}" of with type "{{.DataType}}", nullable:{{.IsNotNull}}, primary:{{.IsPrimary}}
+	// {{.GoName}} represents the column "{{.Name}}" of with type "{{.DataType}}", nullable:{{not .IsNotNull}}, primary:{{.IsPrimary}}
 	{{.GoName}} = p.{{.FactoryMethod}}(p.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimarySrc}}, {{.IsNotNullSrc}}, {{.TableAttributeNumber}}),
 		{{- if .IsNotNull }}
 			func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v }, nil
@@ -29,8 +28,7 @@ var (
 		{{- end }})
 {{- end}}
 	// package private
-	_ = time.Now
-	_ = sql.Register // if no field is nullable
+	_ = time.Now 
 	_ = pgtype.Empty // for the occasional unused import from pgtype
 	tableInfo = p.TableInfo{Schema: "{{.Schema}}", Name: "{{.TableName}}", Alias: "{{.TableAlias}}" }
 )
@@ -61,8 +59,12 @@ func (e *{{.GoType}}) Setters() (list []p.ColumnAccessor) {
 		list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
 	}
 	{{- else }}
-	if e.{{.GoName}}.Valid {
+	if e.{{.GoName}}.Status == pgtype.Present {
+		{{- if .IsGenericFieldAccess }}
+		list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
+		{{- else }}
 		list = append(list, {{.GoName}}.Set(e.{{.GoName}}.{{.ValueFieldName}}))
+		{{- end }}
 	}
 	{{- end }}	
 {{- end}}	

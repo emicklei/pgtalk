@@ -1,6 +1,10 @@
 package pgtalk
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/jackc/pgtype"
+)
 
 // BytesAccess can Read a column value (jsonb) and Write a column value and Set a struct field ([]byte).
 type BytesAccess struct {
@@ -51,14 +55,14 @@ func (a BytesAccess) Set(v []byte) BytesAccess {
 
 type JSONBAccess struct {
 	ColumnInfo
-	valueFieldWriter    func(dest interface{}, b string)
-	nullableFieldWriter func(dest interface{}, b sql.NullString)
-	valueToInsert       string
+	valueFieldWriter    func(dest interface{}, b []byte)
+	nullableFieldWriter func(dest interface{}, b pgtype.JSONB)
+	valueToInsert       []byte
 }
 
 func NewJSONBAccess(info ColumnInfo,
-	valueWriter func(dest interface{}, b string),
-	nullableValueWriter func(dest interface{}, b sql.NullString)) JSONBAccess {
+	valueWriter func(dest interface{}, b []byte),
+	nullableValueWriter func(dest interface{}, b pgtype.JSONB)) JSONBAccess {
 	return JSONBAccess{ColumnInfo: info, valueFieldWriter: valueWriter, nullableFieldWriter: nullableValueWriter}
 }
 
@@ -71,16 +75,15 @@ func (a JSONBAccess) SetFieldValue(entity interface{}, fieldValue interface{}) e
 		// TODO try string?
 		return NewValueConversionError(fieldValue, "[]byte")
 	}
-	var s = string(f)
 	if a.notNull {
-		a.valueFieldWriter(entity, s)
+		a.valueFieldWriter(entity, f)
 	} else {
-		a.nullableFieldWriter(entity, sql.NullString{String: s, Valid: true})
+		a.nullableFieldWriter(entity, pgtype.JSONB{Bytes: f, Status: pgtype.Present})
 	}
 	return nil
 }
 
-func (a JSONBAccess) Set(s string) JSONBAccess {
+func (a JSONBAccess) Set(s []byte) JSONBAccess {
 	a.valueToInsert = s
 	return a
 }

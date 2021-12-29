@@ -1,22 +1,23 @@
 package pgtalk
 
 import (
-	"database/sql"
 	"strings"
+
+	"github.com/jackc/pgtype"
 )
 
 // Int64Access can Read a column value (int8) and Write a column value and Set a struct field (int64).
 type Int64Access struct {
 	ColumnInfo
 	fieldWriter         func(dest interface{}, i int64) // either or
-	nullableFieldWriter func(dest interface{}, i sql.NullInt64)
+	nullableFieldWriter func(dest interface{}, i pgtype.Int8)
 	valueToInsert       int64
 }
 
 func NewInt64Access(
 	info ColumnInfo,
 	valueWriter func(dest interface{}, i int64),
-	nullableWriter func(dest interface{}, i sql.NullInt64)) Int64Access {
+	nullableWriter func(dest interface{}, i pgtype.Int8)) Int64Access {
 	return Int64Access{
 		ColumnInfo:          info,
 		fieldWriter:         valueWriter,
@@ -42,7 +43,7 @@ func (a Int64Access) SetFieldValue(entity interface{}, fieldValue interface{}) e
 	if a.notNull {
 		a.fieldWriter(entity, i)
 	} else {
-		a.nullableFieldWriter(entity, sql.NullInt64{Int64: i, Valid: true})
+		a.nullableFieldWriter(entity, pgtype.Int8{Int: i, Status: pgtype.Present})
 	}
 	return nil
 }
