@@ -55,9 +55,7 @@ func (e *{{$.GoType}}) Set{{.GoName}}(v {{.GoType}}) *{{$.GoType}} { e.{{.GoName
 func (e *{{.GoType}}) Setters() (list []p.ColumnAccessor) {
 {{- range .Fields}}
 	{{- if .IsNotNull }}
-	if e.{{.GoName}} != 0 {
-		list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
-	}
+	list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
 	{{- else }}
 	if e.{{.GoName}}.Status == pgtype.Present {
 		{{- if .IsGenericFieldAccess }}
