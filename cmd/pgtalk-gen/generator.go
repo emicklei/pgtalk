@@ -204,7 +204,7 @@ func nullableValueFieldName(dataType string) string {
 		return "Bytes"
 	case "timestamp with time zone", "date", "timestamp without time zone":
 		return "Time"
-	case "bigint":
+	case "bigint", "integer":
 		return "Int"
 	}
 	return "UNKOWN:" + dataType
