@@ -17,7 +17,6 @@ type ColumnField struct {
 	DataType             string
 	GoStructType         string
 	GoType               string
-	NonPointerGoType     string
 	GoName               string
 	FactoryMethod        string
 	IsPrimary            bool
@@ -27,4 +26,6 @@ type ColumnField struct {
 	TableAttributeNumber int
 	ValueFieldName       string //  can be empty
 	IsGenericFieldAccess bool
+	NonConvertedGoType   string
+	ConvertFuncName      string
 }

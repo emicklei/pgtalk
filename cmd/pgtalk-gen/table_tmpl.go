@@ -41,11 +41,11 @@ func init() {
 {{- range .Fields}}
 {{- if .IsNotNull }}
 
-// Set{{.GoName}} set the value to the field value and returns the receiver.
+// Set{{.GoName}} sets the value to the field value and returns the receiver.
 func (e *{{$.GoType}}) Set{{.GoName}}(v {{.GoType}}) *{{$.GoType}} { e.{{.GoName}} = v ; return e }
 {{- else }}
 
-// Set{{.GoName}} set the address of the value to the field value and returns the receiver.
+// Set{{.GoName}} sets the value to the field value and returns the receiver.
 func (e *{{$.GoType}}) Set{{.GoName}}(v {{.GoType}}) *{{$.GoType}} { e.{{.GoName}} = v ; return e }
 {{- end }}
 {{- end}}

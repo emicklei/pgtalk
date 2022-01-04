@@ -48,7 +48,7 @@ func ensureTables(conn *pgx.Conn) error {
 	_, err = conn.Exec(ctx, `
 	drop table IF EXISTS things;
 	create table things(
-		id serial primary key,
+		id uuid,
 		tDate date,
 		tTimestamp timestamp without time zone,
 		TJSON jsonb

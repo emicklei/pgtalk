@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"regexp"
 	"strings"
 )
@@ -40,14 +40,14 @@ func (f TableFilter) Includes(name string) bool {
 			}
 		}
 		if !included {
-			fmt.Println("filters does not include:", name, f.includes)
+			log.Println("[skip] filters does not include:", name, f.includes)
 			return false
 		}
 	}
 	// must not be in excludes
 	for _, each := range f.excludes {
 		if each.MatchString(name) {
-			fmt.Println("filters does exclude:", name, f.excludes)
+			log.Println("[skip] filters does exclude:", name, f.excludes)
 			return false
 		}
 	}

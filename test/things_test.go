@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/emicklei/pgtalk"
+	"github.com/emicklei/pgtalk/convert"
 	"github.com/emicklei/pgtalk/test/things"
+	"github.com/google/uuid"
 )
 
 func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {
@@ -23,7 +25,7 @@ func TestJSONB(t *testing.T) {
 
 	// delete 2
 	tx, _ := testConnect.Begin(ctx)
-	del := things.Delete().Where(things.ID.Equals(2))
+	del := things.Delete()
 	it := del.Exec(ctx, testConnect)
 	t.Log(pgtalk.SQL(del))
 	if it.Err() != nil {
@@ -33,15 +35,15 @@ func TestJSONB(t *testing.T) {
 
 	// insert 2
 	m := things.Insert(
-		things.ID.Set(2),
+		things.ID.Set(convert.UUID(uuid.New())),
 		//things.Tdate.Set(time.Now()),
-		things.Ttimestamp.Set(pgtalk.MakeTimestamp(time.Now())),
+		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
 		things.Tjson.Set([]byte(`{"key":"value"}`)))
 
 	// insert 3
 	{
 		obj := new(things.Thing)
-		obj.SetID(2).SetTdate(pgtalk.MakeDate(time.Now()))
+		obj.SetID(convert.UUID(uuid.New())).SetTdate(convert.TimeToDate(time.Now()))
 		things.Insert(obj.Setters()...)
 	}
 
@@ -95,9 +97,9 @@ func TestJSONB_3(t *testing.T) {
 
 	// insert 3
 	m := things.Insert(
-		things.ID.Set(3),
-		things.Tdate.Set(time.Now()),
-		things.Ttimestamp.Set(pgtalk.MakeTimestamp(time.Now())),
+		things.ID.Set(convert.UUID(uuid.New())),
+		things.Tdate.Set(convert.TimeToDate(time.Now())),
+		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
 		things.Tjson.Set([]byte(`{"key":"value"}`)))
 
 	tx, err := testConnect.Begin(ctx)

@@ -5,8 +5,16 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgtype"
 )
+
+func UUID(v uuid.UUID) pgtype.UUID {
+	return pgtype.UUID{
+		Bytes:  v,
+		Status: pgtype.Present,
+	}
+}
 
 func StringToUUID(s string) (pgtype.UUID, bool) {
 	data, err := parseUUID(s)

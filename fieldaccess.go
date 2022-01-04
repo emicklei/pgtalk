@@ -58,5 +58,5 @@ func (a FieldAccess[T]) Equals(operand interface{}) binaryExpression {
 		return MakeBinaryOperator(a, "=", valuePrinter{t})
 	}
 	var t T
-	panic("expected a " + fmt.Sprintf("%T", t))
+	panic("expected a " + fmt.Sprintf("%T", t) + " got a " + fmt.Sprintf("%T", operand))
 }
