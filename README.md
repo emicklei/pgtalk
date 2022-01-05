@@ -10,8 +10,6 @@ This package requires Go SDK version 1.18+ because it uses type parameterization
 
 ## examples
 
-See also [booking demo](https://github.com/emicklei/pgtalk-demo).
-
 These examples are from the test package in which a few database tables files (categories,products,things) are generated.
 
 ### Insert
@@ -132,4 +130,4 @@ If you want to include and/or exclude table names, use additional flags such as:
 
 	pgtalk-gen -o yourpackage -include "address.*,employee.*" -exclude "org.*"
 
-(c) 2021, http://ernestmicklei.com. MIT License.
+(c) 2022, http://ernestmicklei.com. MIT License.

@@ -2,6 +2,7 @@ package pgtalk
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"reflect"
@@ -48,7 +49,17 @@ func (p valuePrinter) SQLOn(b io.Writer) {
 		fmt.Fprintf(b, "'%s'::uuid", encodeUUID(e.Bytes))
 		return
 	}
+	if e, ok := p.v.(pgtype.Date); ok {
+		fmt.Fprintf(b, "'%s'::date", toJSON(e))
+		return
+	}
 	fmt.Fprintf(b, "%v", p.v)
+}
+
+// hack
+func toJSON(m json.Marshaler) string {
+	data, _ := m.MarshalJSON()
+	return strings.Trim(string(data), "\"")
 }
 
 // encodeUUID converts a uuid byte array to UUID standard string form.

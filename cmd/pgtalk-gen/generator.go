@@ -196,11 +196,10 @@ var pgMappings = map[string]mapping{
 		newAccessFuncCall:      "NewJSONBAccess",
 	},
 	"uuid": {
-		nullableValueFieldName: "-",
-		goFieldType:            "string",
-		convertFuncName:        "StringToUUID",
-		nullableGoFieldType:    "pgtype.UUID",
-		newAccessFuncCall:      "NewFieldAccess[pgtype.UUID]",
+		goFieldType:         "string",
+		convertFuncName:     "StringToUUID",
+		nullableGoFieldType: "pgtype.UUID",
+		newAccessFuncCall:   "NewFieldAccess[pgtype.UUID]",
 	},
 	"numeric": {
 		nullableValueFieldName: "Float",
@@ -210,11 +209,8 @@ var pgMappings = map[string]mapping{
 		newAccessFuncCall:      "NewFieldAccess[pgtype.Float8]",
 	},
 	"point": {
-		nullableValueFieldName: "-",
-		goFieldType:            "-",
-		convertFuncName:        "-",
-		nullableGoFieldType:    "pgtype.Point",
-		newAccessFuncCall:      "NewFieldAccess[pgtype.Point]",
+		nullableGoFieldType: "pgtype.Point",
+		newAccessFuncCall:   "NewFieldAccess[pgtype.Point]",
 	},
 	"boolean": {
 		nullableValueFieldName: "Bool",
@@ -224,22 +220,19 @@ var pgMappings = map[string]mapping{
 		newAccessFuncCall:      "NewFieldAccess[pgtype.Bool]",
 	},
 	"daterange": {
-		nullableValueFieldName: "-",
-		goFieldType:            "-",
-		convertFuncName:        "-",
-		nullableGoFieldType:    "pgtype.DateRange",
-		newAccessFuncCall:      "NewFieldAccess[pgtype.DateRange]",
+		nullableGoFieldType: "pgtype.DateRange",
+		newAccessFuncCall:   "NewFieldAccess[pgtype.DateRange]",
 	},
-	// bytea
-	// interval
-	// text[]
+	"bytea": {
+		nullableGoFieldType: "pgtype.Bytea",
+		newAccessFuncCall:   "NewFieldAccess[pgtype.Bytea]",
+	},
+	"text[]": {
+		nullableGoFieldType: "pgtype.TextArray",
+		newAccessFuncCall:   "NewFieldAccess[pgtype.TextArray]",
+	},
+	"interval": {
+		nullableGoFieldType: "pgtype.Interval",
+		newAccessFuncCall:   "NewFieldAccess[pgtype.Interval]",
+	},
 }
-
-/**
-	case "interval":
-		return "pgtype.Interval", "NewFieldAccess[pgtype.Interval]"
-	case "bytea":
-		return "pgtype.Bytea", "NewFieldAccess[pgtype.Bytea]"
-	case "text[]":
-		return "pgtype.TextArray", "NewFieldAccess[pgtype.TextArray]"
-**/

@@ -60,3 +60,15 @@ func (a FieldAccess[T]) Equals(operand interface{}) binaryExpression {
 	var t T
 	panic("expected a " + fmt.Sprintf("%T", t) + " got a " + fmt.Sprintf("%T", operand))
 }
+
+// Less returns a SQLExpression
+func (a FieldAccess[T]) Less(operand interface{}) binaryExpression {
+	if fat, ok := operand.(FieldAccess[T]); ok {
+		return MakeBinaryOperator(a, "<", fat)
+	}
+	if t, ok := operand.(T); ok {
+		return MakeBinaryOperator(a, "<", valuePrinter{t})
+	}
+	var t T
+	panic("expected a " + fmt.Sprintf("%T", t) + " got a " + fmt.Sprintf("%T", operand))
+}
