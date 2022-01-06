@@ -43,7 +43,7 @@ func TestJSONB(t *testing.T) {
 	// insert 3
 	{
 		obj := new(things.Thing)
-		obj.SetID(convert.UUID(uuid.New())).SetTdate(convert.TimeToDate(time.Now()))
+		obj.SetID(uuid.NewString()).SetTdate(time.Now())
 		things.Insert(obj.Setters()...)
 	}
 

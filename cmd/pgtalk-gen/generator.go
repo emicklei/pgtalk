@@ -149,7 +149,7 @@ var pgMappings = map[string]mapping{
 	"timestamp with time zone": {
 		nullableValueFieldName: "Time",
 		goFieldType:            "time.Time",
-		convertFuncName:        "TimeToTimestampz",
+		convertFuncName:        "TimeToTimestamptz",
 		nullableGoFieldType:    "pgtype.Timestamptz",
 		newAccessFuncCall:      "NewFieldAccess[pgtype.Timestamptz]",
 	},

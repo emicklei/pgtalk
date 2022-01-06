@@ -21,6 +21,6 @@ var ThingAccess = structAccess{
 }
 
 func TestStructAccess(t *testing.T) {
-	ex := ThingAccess.Tdate.Less(convert.TimeToDate(time.Now()))
+	ex := ThingAccess.Tdate.LessThan(convert.TimeToDate(time.Now()))
 	log.Println(pgtalk.SQL(ex))
 }

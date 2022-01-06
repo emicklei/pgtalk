@@ -6,6 +6,7 @@ var tableTemplateSrc = `package {{.GoPackage}}
 
 import (
 	p "github.com/emicklei/pgtalk"
+	c "github.com/emicklei/pgtalk/convert"
 	"time"
 	"github.com/jackc/pgtype"
 )
@@ -45,8 +46,14 @@ func init() {
 func (e *{{$.GoType}}) Set{{.GoName}}(v {{.GoType}}) *{{$.GoType}} { e.{{.GoName}} = v ; return e }
 {{- else }}
 
+{{ if eq .ConvertFuncName "" }}
 // Set{{.GoName}} sets the value to the field value and returns the receiver.
 func (e *{{$.GoType}}) Set{{.GoName}}(v {{.GoType}}) *{{$.GoType}} { e.{{.GoName}} = v ; return e }
+{{- else}}
+// Set{{.GoName}} sets the value to the field value and returns the receiver.
+func (e *{{$.GoType}}) Set{{.GoName}}(v {{.NonConvertedGoType}}) *{{$.GoType}} { e.{{.GoName}} = c.{{.ConvertFuncName}}(v) ; return e }
+{{- end }}
+
 {{- end }}
 {{- end}}
 

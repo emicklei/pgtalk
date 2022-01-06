@@ -16,15 +16,15 @@ func UUID(v uuid.UUID) pgtype.UUID {
 	}
 }
 
-func StringToUUID(s string) (pgtype.UUID, bool) {
+func StringToUUID(s string) pgtype.UUID {
 	data, err := parseUUID(s)
 	if err != nil {
-		return pgtype.UUID{}, false
+		panic(err)
 	}
 	return pgtype.UUID{
 		Bytes:  data,
 		Status: pgtype.Present,
-	}, true
+	}
 }
 
 // parseUUID converts a string UUID in standard form to a byte array.
@@ -59,11 +59,8 @@ func UUIDToString(t pgtype.UUID) (string, bool) {
 	return string(data), true
 }
 
-func TimeToTimestamptz(t *time.Time) pgtype.Timestamptz {
-	if t == nil {
-		return pgtype.Timestamptz{Status: pgtype.Null}
-	}
-	return pgtype.Timestamptz{Time: *t, Status: pgtype.Present}
+func TimeToTimestamptz(t time.Time) pgtype.Timestamptz {
+	return pgtype.Timestamptz{Time: t, Status: pgtype.Present}
 }
 
 func TimeToTimestamp(t time.Time) pgtype.Timestamp {
@@ -76,4 +73,12 @@ func TimeToDate(t time.Time) pgtype.Date {
 
 func StringToText(s string) pgtype.Text {
 	return pgtype.Text{String: s, Status: pgtype.Present}
+}
+
+func Int64ToInt8(i int64) pgtype.Int8 {
+	return pgtype.Int8{Int: i, Status: pgtype.Present}
+}
+
+func ByteSliceToJSONB(d []byte) pgtype.JSONB {
+	return pgtype.JSONB{Bytes: d, Status: pgtype.Present}
 }

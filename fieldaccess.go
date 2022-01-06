@@ -62,7 +62,7 @@ func (a FieldAccess[T]) Equals(operand interface{}) binaryExpression {
 }
 
 // Less returns a SQLExpression
-func (a FieldAccess[T]) Less(operand interface{}) binaryExpression {
+func (a FieldAccess[T]) LessThan(operand interface{}) binaryExpression {
 	if fat, ok := operand.(FieldAccess[T]); ok {
 		return MakeBinaryOperator(a, "<", fat)
 	}
