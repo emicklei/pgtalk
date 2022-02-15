@@ -28,7 +28,7 @@ func LoadViews(ctx context.Context, conn *pgx.Conn, schema string) (list []PgTab
 			return list, tre.New(err, "LoadViews", "schema", schema)
 		}
 		if *oVerbose {
-			log.Println("found columns in view", each.Name, len(columns))
+			log.Println("found columns in view:", each.Name, len(columns))
 		}
 		table := PgTable{
 			Schema:   schema,

@@ -7,8 +7,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
-	"time"
 
 	"github.com/iancoleman/strcase"
 )
@@ -18,12 +18,17 @@ func generateFromTable(table PgTable) {
 		log.Printf("generating from %s.%s\n", table.Schema, table.Name)
 	}
 	tt := TableType{
-		Created:    time.Now(),
-		Schema:     *oSchema,
-		TableName:  table.Name,
-		TableAlias: alias(table.Name),
-		GoPackage:  table.Name,
-		GoType:     asSingular(strcase.ToCamel(table.Name)),
+		BuildVersion: "(dev)",
+		Schema:       *oSchema,
+		TableName:    table.Name,
+		TableAlias:   alias(table.Name),
+		GoPackage:    table.Name,
+		GoType:       asSingular(strcase.ToCamel(table.Name)),
+	}
+	// need version to put in generated files
+	bi, ok := debug.ReadBuildInfo()
+	if ok && len(bi.Main.Version) > 0 {
+		tt.BuildVersion = bi.Main.Version
 	}
 	for _, each := range table.Columns {
 		m, ok := pgMappings[each.DataType]
@@ -196,8 +201,7 @@ var pgMappings = map[string]mapping{
 		newAccessFuncCall:      "NewJSONBAccess",
 	},
 	"uuid": {
-		goFieldType:         "string",
-		convertFuncName:     "StringToUUID",
+		goFieldType:         "pgtype.UUID",
 		nullableGoFieldType: "pgtype.UUID",
 		newAccessFuncCall:   "NewFieldAccess[pgtype.UUID]",
 	},
@@ -220,8 +224,9 @@ var pgMappings = map[string]mapping{
 		newAccessFuncCall:      "NewFieldAccess[pgtype.Bool]",
 	},
 	"daterange": {
-		nullableGoFieldType: "pgtype.DateRange",
-		newAccessFuncCall:   "NewFieldAccess[pgtype.DateRange]",
+		nullableGoFieldType: "pgtype.Daterange",
+		goFieldType:         "pgtype.Daterange",
+		newAccessFuncCall:   "NewFieldAccess[pgtype.Daterange]",
 	},
 	"bytea": {
 		nullableGoFieldType: "pgtype.Bytea",

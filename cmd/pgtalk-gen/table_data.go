@@ -1,15 +1,13 @@
 package main
 
-import "time"
-
 type TableType struct {
-	Created    time.Time
-	Schema     string
-	TableName  string
-	TableAlias string
-	GoPackage  string
-	GoType     string
-	Fields     []ColumnField
+	BuildVersion string
+	Schema       string
+	TableName    string
+	TableAlias   string
+	GoPackage    string
+	GoType       string
+	Fields       []ColumnField
 }
 
 type ColumnField struct {
