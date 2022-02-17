@@ -9,7 +9,7 @@ import (
 
 	"github.com/emicklei/tre"
 	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/v4"
+	pgx "github.com/jackc/pgx/v4"
 )
 
 const pgLoadTableDef = `

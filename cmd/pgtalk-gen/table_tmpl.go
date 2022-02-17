@@ -105,4 +105,9 @@ func Delete() p.MutationSet[{{.GoType}}] {
 func Update(cas ...p.ColumnAccessor) p.MutationSet[{{.GoType}}] {
 	return p.MakeMutationSet[{{.GoType}}](tableInfo, cas, p.MutationUpdate)
 }
+
+// Filter returns a new QuerySet[{{.GoType}}] for fetching all column data for which the condition is true.
+func Filter(condition p.SQLExpression) p.QuerySet[{{.GoType}}] {
+	return p.MakeQuerySet[{{.GoType}}](tableInfo, tableInfo.Columns).Where(condition)
+}
 `
