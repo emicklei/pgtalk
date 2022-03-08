@@ -13,7 +13,7 @@ func TestFieldAccess_Daterange_WriteInto(t *testing.T) {
 		dr pgtype.Daterange
 	}
 	p := new(entity)
-	a := NewFieldAccess[pgtype.Daterange](
+	a := NewFieldAccess(
 		MakeColumnInfo(TableInfo{}, "TestFieldAccess_Daterange_WriteInto", false, false, 1),
 		nil, func(dest interface{}, v pgtype.Daterange) { dest.(*entity).dr = v })
 	rv := pgtype.Daterange{

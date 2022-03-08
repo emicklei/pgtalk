@@ -15,7 +15,7 @@ var (
 		func(dest interface{}, v time.Time) { dest.(*poly).FTime = v }, nil)
 	polyFFloat = NewFloat64Access(MakeColumnInfo(polyTable, "ffloat", NotPrimary, Nullable, 1),
 		func(dest interface{}, v float64) { dest.(*poly).FFloat = v }, nil)
-	polyFUUID = NewFieldAccess[pgtype.UUID](MakeColumnInfo(polyTable, "fuuid", NotPrimary, Nullable, 1),
+	polyFUUID = NewFieldAccess(MakeColumnInfo(polyTable, "fuuid", NotPrimary, Nullable, 1),
 		nil, func(dest interface{}, v pgtype.UUID) { dest.(*poly).FUUID = v })
 	polyColumns = append([]ColumnAccessor{}, polyFTime, polyFFloat)
 )

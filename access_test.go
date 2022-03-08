@@ -7,7 +7,7 @@ import (
 
 func TestPoly_float64(t *testing.T) {
 	p := new(poly)
-	a := NewFieldAccess[float64](
+	a := NewFieldAccess(
 		MakeColumnInfo(TableInfo{}, "TestPoly", false, false, 1),
 		nil, func(dest interface{}, f float64) { dest.(*poly).FFloat = f })
 	if err := a.SetFieldValue(p, 42.0); err != nil {
@@ -27,7 +27,7 @@ func TestPoly_float64(t *testing.T) {
 
 func TestPoly_time(t *testing.T) {
 	p := new(poly)
-	a := NewFieldAccess[time.Time](
+	a := NewFieldAccess(
 		MakeColumnInfo(TableInfo{}, "TestPoly", false, false, 1),
 		nil, func(dest interface{}, v time.Time) { dest.(*poly).FTime = v })
 	n := time.Now()
@@ -41,7 +41,7 @@ func TestPoly_time(t *testing.T) {
 
 func TestPoly_bool(t *testing.T) {
 	p := new(poly)
-	a := NewFieldAccess[bool](
+	a := NewFieldAccess(
 		MakeColumnInfo(TableInfo{}, "TestPoly", false, false, 1),
 		nil, func(dest interface{}, v bool) { dest.(*poly).FBool = v })
 	if err := a.SetFieldValue(p, true); err != nil {

@@ -162,6 +162,7 @@ func (c ColumnInfo) SQLOn(w io.Writer) {
 	fmt.Fprintf(w, "%s.%s", c.tableInfo.Alias, c.Name())
 }
 
+// SQL returns the full SQL string for any SQLWriter implementation.
 func SQL(w SQLWriter) string {
 	b := new(bytes.Buffer)
 	w.SQLOn(b)

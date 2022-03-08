@@ -22,7 +22,7 @@ func TestGenericFloat64Access_WriteInto(t *testing.T) {
 		amount float64
 	}
 	p := new(price)
-	a := NewFieldAccess[float64](
+	a := NewFieldAccess(
 		MakeColumnInfo(TableInfo{}, "TestGenericFloat64Access_WriteInto", false, false, 1),
 		nil, func(dest interface{}, f float64) { dest.(*price).amount = f })
 	if err := a.SetFieldValue(p, 42.0); err != nil {
