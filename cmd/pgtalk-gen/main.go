@@ -22,6 +22,10 @@ var (
 func main() {
 	flag.Parse()
 	connectionString := os.Getenv("PGTALK_CONN")
+	if len(connectionString) == 0 {
+		fmt.Fprintf(os.Stderr, "Missing value of environment variable PGTALK_CONN\n")
+		os.Exit(1)
+	}
 	conn, err := pgx.Connect(context.Background(), connectionString)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
