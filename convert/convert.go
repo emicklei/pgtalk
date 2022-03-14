@@ -48,15 +48,13 @@ func parseUUID(src string) (dst [16]byte, err error) {
 	return dst, err
 }
 
-func UUIDToString(t pgtype.UUID) (string, bool) {
+// UUIDToString returns format xxxx-yyyy-zzzz-rrrr-tttt
+func UUIDToString(t pgtype.UUID) string {
 	if t.Status != pgtype.Present {
-		return "", false
+		return ""
 	}
-	data, err := t.MarshalJSON()
-	if err != nil {
-		return "", false
-	}
-	return string(data), true
+	src := t.Bytes
+	return fmt.Sprintf("%x-%x-%x-%x-%x", src[0:4], src[4:6], src[6:8], src[8:10], src[10:16])
 }
 
 func TimeToTimestamptz(t time.Time) pgtype.Timestamptz {
