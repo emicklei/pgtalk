@@ -1,8 +1,6 @@
 package pgtalk
 
 import (
-	"fmt"
-
 	"github.com/jackc/pgx/v4"
 )
 
@@ -31,18 +29,17 @@ func (i *ResultIterator[T]) HasNext() bool {
 func (i *ResultIterator[T]) Next() (*T, error) {
 	entity := new(T)
 	list := i.rows.FieldDescriptions()
-	vals, err := i.rows.Values()
-	if err != nil {
-		return entity, fmt.Errorf("unable to get values:%v", err)
-	}
 	// order of list is not the same as selectors?
-	for f, each := range list {
+	toScan := []any{}
+	for _, each := range list {
 		for _, other := range i.selectors {
 			if other.Column().tableAttributeNumber == each.TableAttributeNumber {
-				// TODO error handling
-				other.SetFieldValue(entity, vals[f])
+				toScan = append(toScan, other.FieldToScan(entity))
 			}
 		}
+	}
+	if err := i.rows.Scan(toScan...); err != nil {
+		return nil, err
 	}
 	return entity, nil
 }

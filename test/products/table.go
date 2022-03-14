@@ -24,25 +24,25 @@ type Product struct {
 var (
 	// ID represents the column "id" of with type "integer", nullable:false, primary:true
 	ID = p.NewInt64Access(p.MakeColumnInfo(tableInfo, "id", p.IsPrimary, p.NotNull, 1),
-		func(dest interface{}, v int64) { dest.(*Product).ID = v }, nil)
+		func(dest any) any { return &dest.(*Product).ID })
 	// CreatedAt represents the column "created_at" of with type "timestamp with time zone", nullable:true, primary:false
 	CreatedAt = p.NewFieldAccess[pgtype.Timestamptz](p.MakeColumnInfo(tableInfo, "created_at", p.NotPrimary, p.Nullable, 2),
-		nil, func(dest interface{}, v pgtype.Timestamptz) { dest.(*Product).CreatedAt = v })
+		func(dest any) any { return &dest.(*Product).CreatedAt })
 	// UpdatedAt represents the column "updated_at" of with type "timestamp with time zone", nullable:true, primary:false
 	UpdatedAt = p.NewFieldAccess[pgtype.Timestamptz](p.MakeColumnInfo(tableInfo, "updated_at", p.NotPrimary, p.Nullable, 3),
-		nil, func(dest interface{}, v pgtype.Timestamptz) { dest.(*Product).UpdatedAt = v })
+		func(dest any) any { return &dest.(*Product).UpdatedAt })
 	// DeletedAt represents the column "deleted_at" of with type "timestamp with time zone", nullable:true, primary:false
 	DeletedAt = p.NewFieldAccess[pgtype.Timestamptz](p.MakeColumnInfo(tableInfo, "deleted_at", p.NotPrimary, p.Nullable, 4),
-		nil, func(dest interface{}, v pgtype.Timestamptz) { dest.(*Product).DeletedAt = v })
+		func(dest any) any { return &dest.(*Product).DeletedAt })
 	// Code represents the column "code" of with type "text", nullable:true, primary:false
 	Code = p.NewTextAccess(p.MakeColumnInfo(tableInfo, "code", p.NotPrimary, p.Nullable, 5),
-		nil, func(dest interface{}, v pgtype.Text) { dest.(*Product).Code = v })
+		func(dest any) any { return &dest.(*Product).Code })
 	// Price represents the column "price" of with type "bigint", nullable:true, primary:false
 	Price = p.NewInt64Access(p.MakeColumnInfo(tableInfo, "price", p.NotPrimary, p.Nullable, 6),
-		nil, func(dest interface{}, v pgtype.Int8) { dest.(*Product).Price = v })
+		func(dest any) any { return &dest.(*Product).Price })
 	// CategoryId represents the column "category_id" of with type "bigint", nullable:true, primary:false
 	CategoryId = p.NewInt64Access(p.MakeColumnInfo(tableInfo, "category_id", p.NotPrimary, p.Nullable, 7),
-		nil, func(dest interface{}, v pgtype.Int8) { dest.(*Product).CategoryId = v })
+		func(dest any) any { return &dest.(*Product).CategoryId })
 	// package private
 	_         = time.Now
 	_         = pgtype.Empty // for the occasional unused import from pgtype

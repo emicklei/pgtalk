@@ -19,7 +19,7 @@ var (
 
 func TestTextIn(t *testing.T) {
 	b := new(bytes.Buffer)
-	ta := NewTextAccess(ci, nil, nil)
+	ta := NewTextAccess(ci, nil)
 	in := ta.In("a", "b")
 	in.SQLOn(b)
 	if got, want := b.String(), "(t1.label IN ('a','b'))"; got != want {
@@ -29,7 +29,7 @@ func TestTextIn(t *testing.T) {
 
 func TestTextLike(t *testing.T) {
 	b := new(bytes.Buffer)
-	ta := NewTextAccess(ci, nil, nil)
+	ta := NewTextAccess(ci, nil)
 	in := ta.Like("*me")
 	in.SQLOn(b)
 	if got, want := b.String(), "(t1.label LIKE '*me')"; got != want {
@@ -39,7 +39,7 @@ func TestTextLike(t *testing.T) {
 
 func TestTextNotNull(t *testing.T) {
 	b := new(bytes.Buffer)
-	ta := NewTextAccess(ci, nil, nil)
+	ta := NewTextAccess(ci, nil)
 	op := IsNotNull(ta)
 	op.SQLOn(b)
 	if got, want := b.String(), "(t1.label IS NOT NULL)"; got != want {
@@ -49,7 +49,7 @@ func TestTextNotNull(t *testing.T) {
 
 func TestTextEquals(t *testing.T) {
 	b := new(bytes.Buffer)
-	ta := NewTextAccess(ci, nil, nil)
+	ta := NewTextAccess(ci, nil)
 	op := ta.Equals("me")
 	op.SQLOn(b)
 	if got, want := b.String(), "(t1.label = 'me')"; got != want {

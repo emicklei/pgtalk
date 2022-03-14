@@ -132,19 +132,11 @@ func (i *JoinResultIterator) Next(left interface{}, right interface{}) error {
 	sw := []interface{}{}
 	// left
 	for _, each := range i.leftSet.selectAccessors() {
-		rw := scanToWrite{
-			access: each,
-			entity: left,
-		}
-		sw = append(sw, rw)
+		sw = append(sw, each.FieldToScan(left))
 	}
 	// right
 	for _, each := range i.rightSet.selectAccessors() {
-		rw := scanToWrite{
-			access: each,
-			entity: right,
-		}
-		sw = append(sw, rw)
+		sw = append(sw, each.FieldToScan(right))
 	}
 	return i.rows.Scan(sw...)
 }
@@ -263,11 +255,7 @@ func (i *MultiJoinResultIterator) Next(models ...interface{}) error {
 	// all sets
 	for m, eachSet := range i.querySets {
 		for _, each := range eachSet.selectAccessors() {
-			rw := scanToWrite{
-				access: each,
-				entity: models[m],
-			}
-			sw = append(sw, rw)
+			sw = append(sw, each.FieldToScan(models[m]))
 		}
 	}
 	return i.rows.Scan(sw...)

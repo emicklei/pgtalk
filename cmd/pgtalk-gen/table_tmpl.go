@@ -22,11 +22,7 @@ var (
 {{- range .Fields}}	
 	// {{.GoName}} represents the column "{{.Name}}" of with type "{{.DataType}}", nullable:{{not .IsNotNull}}, primary:{{.IsPrimary}}
 	{{.GoName}} = p.{{.FactoryMethod}}(p.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimarySrc}}, {{.IsNotNullSrc}}, {{.TableAttributeNumber}}),
-		{{- if .IsNotNull }}
-			func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v }, nil
-		{{- else }}
-			nil, func(dest interface{}, v {{.GoType}}) { dest.(*{{$.GoType}}).{{.GoName}} = v }
-		{{- end }})
+		func(dest any) any { return &dest.(*{{$.GoType}}).{{.GoName}} })
 {{- end}}
 	// package private
 	_ = time.Now 

@@ -21,16 +21,16 @@ type Thing struct {
 var (
 	// ID represents the column "id" of with type "uuid", nullable:true, primary:false
 	ID = p.NewFieldAccess[pgtype.UUID](p.MakeColumnInfo(tableInfo, "id", p.NotPrimary, p.Nullable, 1),
-		nil, func(dest interface{}, v pgtype.UUID) { dest.(*Thing).ID = v })
+		func(dest any) any { return &dest.(*Thing).ID })
 	// Tdate represents the column "tdate" of with type "date", nullable:true, primary:false
 	Tdate = p.NewFieldAccess[pgtype.Date](p.MakeColumnInfo(tableInfo, "tdate", p.NotPrimary, p.Nullable, 2),
-		nil, func(dest interface{}, v pgtype.Date) { dest.(*Thing).Tdate = v })
+		func(dest any) any { return &dest.(*Thing).Tdate })
 	// Ttimestamp represents the column "ttimestamp" of with type "timestamp without time zone", nullable:true, primary:false
 	Ttimestamp = p.NewFieldAccess[pgtype.Timestamp](p.MakeColumnInfo(tableInfo, "ttimestamp", p.NotPrimary, p.Nullable, 3),
-		nil, func(dest interface{}, v pgtype.Timestamp) { dest.(*Thing).Ttimestamp = v })
+		func(dest any) any { return &dest.(*Thing).Ttimestamp })
 	// Tjson represents the column "tjson" of with type "jsonb", nullable:true, primary:false
 	Tjson = p.NewJSONBAccess(p.MakeColumnInfo(tableInfo, "tjson", p.NotPrimary, p.Nullable, 4),
-		nil, func(dest interface{}, v pgtype.JSONB) { dest.(*Thing).Tjson = v })
+		func(dest any) any { return &dest.(*Thing).Tjson })
 	// package private
 	_         = time.Now
 	_         = pgtype.Empty // for the occasional unused import from pgtype

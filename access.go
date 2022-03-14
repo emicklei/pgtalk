@@ -93,15 +93,6 @@ func (p valuesPrinter) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return list
 }
 
-type scanToWrite struct {
-	access ColumnAccessor
-	entity interface{}
-}
-
-func (s scanToWrite) Scan(fieldValue interface{}) error {
-	return s.access.SetFieldValue(s.entity, fieldValue)
-}
-
 type LiteralString string
 
 func (l LiteralString) SQLOn(b io.Writer) {

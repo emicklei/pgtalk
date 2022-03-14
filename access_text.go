@@ -2,19 +2,16 @@ package pgtalk
 
 import (
 	"strings"
-
-	"github.com/jackc/pgtype"
 )
 
 type TextAccess struct {
 	ColumnInfo
-	valueFieldWriter    func(dest interface{}, i string)
-	nullableFieldWriter func(dest interface{}, i pgtype.Text)
-	valueToInsert       string
+	valueFieldWriter FieldAccessFunc
+	valueToInsert    string
 }
 
-func NewTextAccess(info ColumnInfo, writer func(dest interface{}, i string), nullableWriter func(dest interface{}, i pgtype.Text)) TextAccess {
-	return TextAccess{ColumnInfo: info, nullableFieldWriter: nullableWriter, valueFieldWriter: writer}
+func NewTextAccess(info ColumnInfo, writer FieldAccessFunc) TextAccess {
+	return TextAccess{ColumnInfo: info, valueFieldWriter: writer}
 }
 
 func (a TextAccess) Set(v string) TextAccess {
@@ -48,20 +45,8 @@ func (a TextAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return append(list, a)
 }
 
-func (a TextAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error {
-	if fieldValue == nil {
-		return nil
-	}
-	s, ok := fieldValue.(string)
-	if !ok {
-		return NewValueConversionError(fieldValue, "string")
-	}
-	if a.notNull {
-		a.valueFieldWriter(entity, s)
-	} else {
-		a.nullableFieldWriter(entity, pgtype.Text{String: s, Status: pgtype.Present})
-	}
-	return nil
+func (a TextAccess) FieldToScan(entity any) any {
+	return a.valueFieldWriter(entity)
 }
 
 func (a TextAccess) Like(pattern string) binaryExpression {

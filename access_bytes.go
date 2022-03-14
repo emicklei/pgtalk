@@ -1,47 +1,28 @@
 package pgtalk
 
-import (
-	"database/sql"
-
-	"github.com/jackc/pgtype"
-)
-
 // BytesAccess can Read a column value (jsonb) and Write a column value and Set a struct field ([]byte).
 type BytesAccess struct {
 	ColumnInfo
-	valueFieldWriter    func(dest interface{}, b string)
-	nullableFieldWriter func(dest interface{}, b sql.NullString)
-	valueToInsert       []byte
+	valueFieldWriter func(dest any) *string
+	valueToInsert    []byte
 }
 
 func NewBytesAccess(info ColumnInfo,
-	valueWriter func(dest interface{}, b string),
-	nullableValueWriter func(dest interface{}, b sql.NullString)) BytesAccess {
+	valueWriter func(dest any) *string) BytesAccess {
 	return BytesAccess{ColumnInfo: info,
-		valueFieldWriter:    valueWriter,
-		nullableFieldWriter: nullableValueWriter,
+		valueFieldWriter: valueWriter,
 	}
 }
 
 func (a BytesAccess) Column() ColumnInfo { return a.ColumnInfo }
-
-func (a BytesAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error { return nil }
 
 // Collect is part of SQLExpression
 func (a BytesAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return append(list, a)
 }
 
-func (a BytesAccess) WriteInto(entity interface{}, fieldValue interface{}) {
-	if fieldValue == nil {
-		return
-	}
-	var bytesValue = fieldValue.([]byte)
-	if a.notNull {
-		a.valueFieldWriter(entity, string(bytesValue))
-	} else {
-		a.nullableFieldWriter(entity, sql.NullString{String: string(bytesValue), Valid: true})
-	}
+func (a BytesAccess) FieldToScan(entity any) any {
+	return a.valueFieldWriter(entity)
 }
 
 func (a BytesAccess) ValueToInsert() interface{} {
@@ -55,32 +36,13 @@ func (a BytesAccess) Set(v []byte) BytesAccess {
 
 type JSONBAccess struct {
 	ColumnInfo
-	valueFieldWriter    func(dest interface{}, b []byte)
-	nullableFieldWriter func(dest interface{}, b pgtype.JSONB)
-	valueToInsert       []byte
+	valueFieldWriter FieldAccessFunc
+	valueToInsert    []byte
 }
 
 func NewJSONBAccess(info ColumnInfo,
-	valueWriter func(dest interface{}, b []byte),
-	nullableValueWriter func(dest interface{}, b pgtype.JSONB)) JSONBAccess {
-	return JSONBAccess{ColumnInfo: info, valueFieldWriter: valueWriter, nullableFieldWriter: nullableValueWriter}
-}
-
-func (a JSONBAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error {
-	if fieldValue == nil {
-		return nil
-	}
-	f, ok := fieldValue.([]byte)
-	if !ok {
-		// TODO try string?
-		return NewValueConversionError(fieldValue, "[]byte")
-	}
-	if a.notNull {
-		a.valueFieldWriter(entity, f)
-	} else {
-		a.nullableFieldWriter(entity, pgtype.JSONB{Bytes: f, Status: pgtype.Present})
-	}
-	return nil
+	valueWriter func(dest any) any) JSONBAccess {
+	return JSONBAccess{ColumnInfo: info, valueFieldWriter: valueWriter}
 }
 
 func (a JSONBAccess) Set(s []byte) JSONBAccess {
@@ -90,6 +52,10 @@ func (a JSONBAccess) Set(s []byte) JSONBAccess {
 
 func (a JSONBAccess) ValueToInsert() interface{} {
 	return a.valueToInsert
+}
+
+func (a JSONBAccess) FieldToScan(entity any) any {
+	return a.valueFieldWriter(entity)
 }
 
 func (a JSONBAccess) Column() ColumnInfo { return a.ColumnInfo }

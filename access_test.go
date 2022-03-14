@@ -2,55 +2,7 @@ package pgtalk
 
 import (
 	"testing"
-	"time"
 )
-
-func TestPoly_float64(t *testing.T) {
-	p := new(poly)
-	a := NewFieldAccess(
-		MakeColumnInfo(TableInfo{}, "TestPoly", false, false, 1),
-		nil, func(dest interface{}, f float64) { dest.(*poly).FFloat = f })
-	if err := a.SetFieldValue(p, 42.0); err != nil {
-		t.Fatal(err)
-	}
-	if got, want := p.FFloat, 42.0; got != want {
-		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
-	}
-	forty2 := 42.0
-	if err := a.SetFieldValue(p, forty2); err != nil {
-		t.Fatal(err)
-	}
-	if got, want := p.FFloat, 42.0; got != want {
-		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
-	}
-}
-
-func TestPoly_time(t *testing.T) {
-	p := new(poly)
-	a := NewFieldAccess(
-		MakeColumnInfo(TableInfo{}, "TestPoly", false, false, 1),
-		nil, func(dest interface{}, v time.Time) { dest.(*poly).FTime = v })
-	n := time.Now()
-	if err := a.SetFieldValue(p, n); err != nil {
-		t.Fatal(err)
-	}
-	if got, want := p.FTime, n; got != want {
-		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
-	}
-}
-
-func TestPoly_bool(t *testing.T) {
-	p := new(poly)
-	a := NewFieldAccess(
-		MakeColumnInfo(TableInfo{}, "TestPoly", false, false, 1),
-		nil, func(dest interface{}, v bool) { dest.(*poly).FBool = v })
-	if err := a.SetFieldValue(p, true); err != nil {
-		t.Fatal(err)
-	}
-	if got, want := p.FBool, true; got != want {
-		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
-	}
-}
 
 func TestLiteral_String(t *testing.T) {
 	l := LiteralString("literal")

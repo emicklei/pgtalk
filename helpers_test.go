@@ -12,11 +12,11 @@ import (
 var (
 	polyTable = TableInfo{Name: "polies", Schema: "public", Alias: "p1"}
 	polyFTime = NewTimeAccess(MakeColumnInfo(polyTable, "ftime", NotPrimary, Nullable, 1),
-		func(dest interface{}, v time.Time) { dest.(*poly).FTime = v }, nil)
+		func(dest any) any { return &dest.(*poly).FTime })
 	polyFFloat = NewFloat64Access(MakeColumnInfo(polyTable, "ffloat", NotPrimary, Nullable, 1),
-		func(dest interface{}, v float64) { dest.(*poly).FFloat = v }, nil)
-	polyFUUID = NewFieldAccess(MakeColumnInfo(polyTable, "fuuid", NotPrimary, Nullable, 1),
-		nil, func(dest interface{}, v pgtype.UUID) { dest.(*poly).FUUID = v })
+		func(dest any) any { return &dest.(*poly).FFloat })
+	polyFUUID = NewFieldAccess[pgtype.UUID](MakeColumnInfo(polyTable, "fuuid", NotPrimary, Nullable, 1),
+		func(dest any) any { return &dest.(*poly).FUUID })
 	polyColumns = append([]ColumnAccessor{}, polyFTime, polyFFloat)
 )
 

@@ -19,9 +19,10 @@ type NewEntityFunc func() interface{}
 type ColumnAccessor interface {
 	Name() string
 	SQLOn(w io.Writer)
-	SetFieldValue(entity interface{}, fieldValue interface{}) error
 	ValueToInsert() interface{}
 	Column() ColumnInfo
+	// FieldToScan return the address of the value of the field in the entity
+	FieldToScan(entity any) any
 }
 
 type SQLWriter interface {
@@ -44,3 +45,5 @@ type querySet interface {
 type Querier interface {
 	Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error)
 }
+
+type FieldAccessFunc = func(entity any) any

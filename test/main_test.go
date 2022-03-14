@@ -9,14 +9,14 @@ import (
 	"testing"
 
 	"github.com/emicklei/pgtalk"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
 )
 
 var testConnect *pgx.Conn
 
 func TestMain(m *testing.M) {
-	// connectionString := "postgres://postgres:pgtalk@localhost:5432/pgtalk"
-	connectionString := os.Getenv("PGTALK_CONN")
+	connectionString := "postgres://postgres:pgtalk@localhost:5432/pgtalk"
 	if len(connectionString) == 0 {
 		println("no database env set")
 		os.Exit(m.Run())
@@ -29,9 +29,10 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 	testConnect = conn
-	if err := ensureTables(conn); err != nil {
-		fmt.Println("DB WARN:", err)
-	}
+	// if err := ensureTables(conn); err != nil {
+	// 	fmt.Println("DB WARN:", err)
+	// }
+	uuid.EnableRandPool()
 	pgtalk.EnableAssert()
 	code := m.Run()
 	fmt.Println("... db close")

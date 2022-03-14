@@ -19,10 +19,10 @@ type Category struct {
 var (
 	// ID represents the column "id" of with type "integer", nullable:false, primary:true
 	ID = p.NewInt64Access(p.MakeColumnInfo(tableInfo, "id", p.IsPrimary, p.NotNull, 1),
-		func(dest interface{}, v int64) { dest.(*Category).ID = v }, nil)
+		func(dest any) any { return &dest.(*Category).ID })
 	// Title represents the column "title" of with type "text", nullable:true, primary:false
 	Title = p.NewTextAccess(p.MakeColumnInfo(tableInfo, "title", p.NotPrimary, p.Nullable, 2),
-		nil, func(dest interface{}, v pgtype.Text) { dest.(*Category).Title = v })
+		func(dest any) any { return &dest.(*Category).Title })
 	// package private
 	_         = time.Now
 	_         = pgtype.Empty // for the occasional unused import from pgtype

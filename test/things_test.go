@@ -9,11 +9,71 @@ import (
 	"github.com/emicklei/pgtalk/convert"
 	"github.com/emicklei/pgtalk/test/things"
 	"github.com/google/uuid"
+	"github.com/jackc/pgtype"
 )
 
 func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {
 	if got, want := len(things.AllColumns()), 4; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
+
+func TestManageThing(t *testing.T) {
+	// CREATE
+	ctx := context.Background()
+	id := uuid.New()
+	t.Log(id.String())
+	create := things.Insert(
+		things.ID.Set(convert.UUID(id)),
+		things.Tdate.Set(convert.TimeToDate(time.Now())),
+		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
+		things.Tjson.Set([]byte(`{"key":"value"}`)))
+	t.Log(pgtalk.PrettySQL(create))
+	tx, err := testConnect.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = create.Exec(ctx, testConnect)
+	err = tx.Commit(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// READ
+	{
+		read := things.Select(things.ID, things.Tdate, things.Ttimestamp, things.Tjson).Where(things.ID.Equals(convert.UUID(id)))
+		t.Log(pgtalk.PrettySQL(read))
+		list, err := read.Exec(ctx, testConnect)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log(list)
+	}
+	// UPDATE
+	{
+		update := things.Update(things.Tdate.Set(pgtype.Date{Status: pgtype.Null})).Where(things.ID.Equals(convert.UUID(id)))
+		t.Log(pgtalk.PrettySQL(update))
+		tx, err = testConnect.Begin(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		update.Exec(ctx, testConnect)
+		err = tx.Commit(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	// READ
+	{
+		read := things.Select(things.ID, things.Tdate, things.Ttimestamp, things.Tjson).Where(things.ID.Equals(convert.UUID(id)))
+		t.Log(pgtalk.PrettySQL(read))
+		list, err := read.Exec(ctx, testConnect)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log(list)
+		if got, want := list[0].Tdate.Status, pgtype.Null; got != want {
+			t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+		}
 	}
 }
 
@@ -37,15 +97,15 @@ func TestJSONB(t *testing.T) {
 	m := things.Insert(
 		things.ID.Set(convert.UUID(uuid.New())),
 		//things.Tdate.Set(time.Now()),
-		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
+		//things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
 		things.Tjson.Set([]byte(`{"key":"value"}`)))
 
 	// insert 3
-	{
-		obj := new(things.Thing)
-		obj.SetID(convert.StringToUUID(uuid.NewString())).SetTdate(time.Now())
-		things.Insert(obj.Setters()...)
-	}
+	// {
+	// 	obj := new(things.Thing)
+	// 	obj.SetID(convert.StringToUUID(uuid.NewString())).SetTdate(time.Now())
+	// 	things.Insert(obj.Setters()...)
+	// }
 
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {
@@ -98,8 +158,8 @@ func TestJSONB_3(t *testing.T) {
 	// insert 3
 	m := things.Insert(
 		things.ID.Set(convert.UUID(uuid.New())),
-		things.Tdate.Set(convert.TimeToDate(time.Now())),
-		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
+		//things.Tdate.Set(convert.TimeToDate(time.Now())),
+		//things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
 		things.Tjson.Set([]byte(`{"key":"value"}`)))
 
 	tx, err := testConnect.Begin(ctx)

@@ -2,42 +2,22 @@ package pgtalk
 
 import (
 	"time"
-
-	"github.com/jackc/pgtype"
 )
 
 type TimeAccess struct {
 	ColumnInfo
-	valueFieldWriter    func(dest interface{}, i time.Time)
-	nullableFieldWriter func(dest interface{}, i pgtype.Date)
-	valueToInsert       time.Time
+	valueFieldWriter FieldAccessFunc
+	valueToInsert    time.Time
 }
 
 func NewTimeAccess(info ColumnInfo,
-	valueWriter func(dest interface{}, i time.Time),
-	nullableValueWriter func(dest interface{}, i pgtype.Date)) TimeAccess {
+	valueWriter FieldAccessFunc) TimeAccess {
 	return TimeAccess{ColumnInfo: info, valueFieldWriter: valueWriter}
 }
 
 // Collect is part of SQLExpression
 func (a TimeAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return append(list, a)
-}
-
-func (a TimeAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error {
-	if fieldValue == nil {
-		return nil
-	}
-	v, ok := fieldValue.(time.Time)
-	if !ok {
-		return NewValueConversionError(fieldValue, "time.Time")
-	}
-	if a.notNull {
-		a.valueFieldWriter(entity, v)
-	} else {
-		a.nullableFieldWriter(entity, pgtype.Date{Time: v, Status: pgtype.Present})
-	}
-	return nil
 }
 
 func (a TimeAccess) ValueToInsert() interface{} {
@@ -51,30 +31,22 @@ func (a TimeAccess) Set(v time.Time) TimeAccess {
 
 func (a TimeAccess) Column() ColumnInfo { return a.ColumnInfo }
 
-type BooleanAccess struct {
-	ColumnInfo
-	fieldWriter   func(dest interface{}, b *bool)
-	valueToInsert bool
+func (a TimeAccess) FieldToScan(entity any) any {
+	return a.valueFieldWriter(entity)
 }
 
-func NewBooleanAccess(info ColumnInfo, writer func(dest interface{}, b *bool)) BooleanAccess {
-	return BooleanAccess{ColumnInfo: info, fieldWriter: writer}
+type BooleanAccess struct {
+	ColumnInfo
+	valueFieldWriter FieldAccessFunc
+	valueToInsert    bool
+}
+
+func NewBooleanAccess(info ColumnInfo, writer FieldAccessFunc) BooleanAccess {
+	return BooleanAccess{ColumnInfo: info, valueFieldWriter: writer}
 }
 
 func (a BooleanAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
 	return append(list, a)
-}
-
-func (a BooleanAccess) SetFieldValue(entity interface{}, fieldValue interface{}) error {
-	if fieldValue == nil {
-		return nil
-	}
-	v, ok := fieldValue.(bool)
-	if !ok {
-		return NewValueConversionError(fieldValue, "bool")
-	}
-	a.fieldWriter(entity, &v)
-	return nil
 }
 
 func (a BooleanAccess) Column() ColumnInfo { return a.ColumnInfo }
@@ -89,4 +61,8 @@ func (a BooleanAccess) ValueToInsert() interface{} {
 
 func (a BooleanAccess) Equals(b bool) SQLExpression {
 	return MakeBinaryOperator(a, "=", valuePrinter{b})
+}
+
+func (a BooleanAccess) FieldToScan(entity any) any {
+	return a.valueFieldWriter(entity)
 }

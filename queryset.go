@@ -116,11 +116,7 @@ func (d QuerySet[T]) Exec(ctx context.Context, conn Querier) (list []*T, err err
 		entity := new(T)
 		sw := []interface{}{}
 		for _, each := range d.selectors {
-			rw := scanToWrite{
-				access: each,
-				entity: entity,
-			}
-			sw = append(sw, rw)
+			sw = append(sw, each.FieldToScan(entity))
 		}
 		if err := rows.Scan(sw...); err != nil {
 			return list, err
