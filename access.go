@@ -99,8 +99,7 @@ type scanToWrite struct {
 }
 
 func (s scanToWrite) Scan(fieldValue interface{}) error {
-	s.access.SetFieldValue(s.entity, fieldValue)
-	return nil
+	return s.access.SetFieldValue(s.entity, fieldValue)
 }
 
 type LiteralString string
