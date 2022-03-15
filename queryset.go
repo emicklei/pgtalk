@@ -15,10 +15,11 @@ type QuerySet[T any] struct {
 	distinct     bool
 	condition    SQLExpression
 	limit        int
+	offset       int
 	groupBy      []ColumnAccessor
 	having       SQLExpression
 	orderBy      []ColumnAccessor
-	sortOrder    string
+	sortOption   string
 }
 
 func MakeQuerySet[T any](tableInfo TableInfo, selectors []ColumnAccessor) QuerySet[T] {
@@ -62,17 +63,24 @@ func (q QuerySet[T]) SQLOn(w io.Writer) {
 		fmt.Fprint(w, " ORDER BY ")
 		writeAccessOn(q.orderBy, w)
 	}
+	if q.sortOption != "" {
+		fmt.Fprint(w, " ", q.sortOption, " ")
+	}
 	if q.limit > 0 {
 		fmt.Fprintf(w, " LIMIT %d", q.limit)
+	}
+	if q.offset > 0 {
+		fmt.Fprintf(w, " OFFSET %d", q.offset)
 	}
 }
 
 func (q QuerySet[T]) Named(preparedName string) QuerySet[T]     { q.preparedName = preparedName; return q }
 func (q QuerySet[T]) Distinct() QuerySet[T]                     { q.distinct = true; return q }
-func (q QuerySet[T]) Ascending() QuerySet[T]                    { q.sortOrder = "ASC"; return q }
-func (q QuerySet[T]) Descending() QuerySet[T]                   { q.sortOrder = "DESC"; return q }
+func (q QuerySet[T]) Ascending() QuerySet[T]                    { q.sortOption = "ASC"; return q }
+func (q QuerySet[T]) Descending() QuerySet[T]                   { q.sortOption = "DESC"; return q }
 func (q QuerySet[T]) Where(condition SQLExpression) QuerySet[T] { q.condition = condition; return q }
 func (q QuerySet[T]) Limit(limit int) QuerySet[T]               { q.limit = limit; return q }
+func (q QuerySet[T]) Offset(offset int) QuerySet[T]             { q.offset = offset; return q }
 func (q QuerySet[T]) GroupBy(cas ...ColumnAccessor) QuerySet[T] {
 	q.groupBy = cas
 	if assertEnabled {
