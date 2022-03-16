@@ -48,7 +48,7 @@ func main() {
 	filter := NewTableFilter(*oIncludePatterns, *oExludePatterns)
 	for _, each := range all {
 		if filter.Includes(each.Name) {
-			generateFromTable(each)
+			generateFromTable(each, *oViews)
 		}
 	}
 }

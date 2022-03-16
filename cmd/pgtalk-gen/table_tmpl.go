@@ -25,6 +25,7 @@ var (
 		func(dest any) any { return &dest.(*{{$.GoType}}).{{.GoName}} })
 {{- end}}
 	// package private
+	_ = c.UUID // for the occasional unused import from convert
 	_ = time.Now 
 	_ = pgtype.Empty // for the occasional unused import from pgtype
 	tableInfo = p.TableInfo{Schema: "{{.Schema}}", Name: "{{.TableName}}", Alias: "{{.TableAlias}}" }

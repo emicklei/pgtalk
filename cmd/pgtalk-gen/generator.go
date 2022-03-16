@@ -13,7 +13,7 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
-func generateFromTable(table PgTable) {
+func generateFromTable(table PgTable, isView bool) {
 	if *oVerbose {
 		log.Printf("generating from %s.%s\n", table.Schema, table.Name)
 	}
@@ -40,12 +40,16 @@ func generateFromTable(table PgTable) {
 		if !each.NotNull {
 			goType = m.nullableGoFieldType
 		}
+		factoryMethod := m.newFuncCall
+		if !each.NotNull || factoryMethod == "" {
+			factoryMethod = m.newAccessFuncCall
+		}
 		f := ColumnField{
 			Name:                 each.Name,
 			GoName:               fieldName(each.Name),
 			GoType:               goType,
 			DataType:             each.DataType,
-			FactoryMethod:        m.newAccessFuncCall,
+			FactoryMethod:        factoryMethod,
 			IsPrimarySrc:         isPrimarySource(each.IsPrimaryKey),
 			IsNotNullSrc:         isNotNullSource(each.NotNull),
 			IsPrimary:            each.IsPrimaryKey,
@@ -62,9 +66,17 @@ func generateFromTable(table PgTable) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	path := filepath.Join(*oTarget, table.Name)
+	kind := "tables"
+	if isView {
+		kind = "views"
+	}
+	path := filepath.Join(*oTarget, kind, table.Name)
 	os.MkdirAll(path, os.ModeDir|os.ModePerm)
-	path = filepath.Join(path, "table.go")
+	fileName := "table.go"
+	if isView {
+		fileName = "view.go"
+	}
+	path = filepath.Join(path, fileName)
 	fileOut, err := os.Create(path)
 	if err != nil {
 		log.Fatal(err)
@@ -140,104 +152,4 @@ func isNotNullSource(isNotNull bool) string {
 		return "p.NotNull"
 	}
 	return "p.Nullable"
-}
-
-type mapping struct {
-	goFieldType            string // non-nullable type
-	nullableGoFieldType    string // full name of the nullable type
-	nullableValueFieldName string // to access the go field value of a nullable type
-	convertFuncName        string // to convert from a go field value to a nullable type
-	newAccessFuncCall      string // to create the accessor
-}
-
-var pgMappings = map[string]mapping{
-	"timestamp with time zone": {
-		nullableValueFieldName: "Time",
-		goFieldType:            "time.Time",
-		convertFuncName:        "TimeToTimestamptz",
-		nullableGoFieldType:    "pgtype.Timestamptz",
-		newAccessFuncCall:      "NewFieldAccess[pgtype.Timestamptz]",
-	},
-	"timestamp without time zone": {
-		nullableValueFieldName: "Time",
-		goFieldType:            "time.Time",
-		convertFuncName:        "TimeToTimestamp",
-		nullableGoFieldType:    "pgtype.Timestamp",
-		newAccessFuncCall:      "NewFieldAccess[pgtype.Timestamp]",
-	},
-	"date": {
-		nullableValueFieldName: "Time",
-		goFieldType:            "time.Time",
-		convertFuncName:        "TimeToDate",
-		nullableGoFieldType:    "pgtype.Date",
-		newAccessFuncCall:      "NewFieldAccess[pgtype.Date]",
-	},
-	"text": {
-		nullableValueFieldName: "String",
-		goFieldType:            "string",
-		convertFuncName:        "StringToText",
-		nullableGoFieldType:    "pgtype.Text",
-		newAccessFuncCall:      "NewTextAccess",
-	},
-	"bigint": {
-		nullableValueFieldName: "Int",
-		goFieldType:            "int64",
-		convertFuncName:        "Int64ToInt8",
-		nullableGoFieldType:    "pgtype.Int8",
-		newAccessFuncCall:      "NewInt64Access",
-	},
-	"integer": {
-		nullableValueFieldName: "Int",
-		goFieldType:            "int64",
-		convertFuncName:        "Int64ToInt8",
-		nullableGoFieldType:    "pgtype.Int8",
-		newAccessFuncCall:      "NewInt64Access",
-	},
-	"jsonb": {
-		nullableValueFieldName: "Bytes",
-		goFieldType:            "[]byte",
-		convertFuncName:        "ByteSliceToJSONB",
-		nullableGoFieldType:    "pgtype.JSONB",
-		newAccessFuncCall:      "NewJSONBAccess",
-	},
-	"uuid": {
-		goFieldType:         "pgtype.UUID",
-		nullableGoFieldType: "pgtype.UUID",
-		newAccessFuncCall:   "NewFieldAccess[pgtype.UUID]",
-	},
-	"numeric": {
-		nullableValueFieldName: "Float",
-		goFieldType:            "float64",
-		convertFuncName:        "Float64ToFloat8",
-		nullableGoFieldType:    "pgtype.Float8",
-		newAccessFuncCall:      "NewFieldAccess[pgtype.Float8]",
-	},
-	"point": {
-		nullableGoFieldType: "pgtype.Point",
-		newAccessFuncCall:   "NewFieldAccess[pgtype.Point]",
-	},
-	"boolean": {
-		nullableValueFieldName: "Bool",
-		goFieldType:            "bool",
-		convertFuncName:        "Bool",
-		nullableGoFieldType:    "pgtype.Bool",
-		newAccessFuncCall:      "NewFieldAccess[pgtype.Bool]",
-	},
-	"daterange": {
-		nullableGoFieldType: "pgtype.Daterange",
-		goFieldType:         "pgtype.Daterange",
-		newAccessFuncCall:   "NewFieldAccess[pgtype.Daterange]",
-	},
-	"bytea": {
-		nullableGoFieldType: "pgtype.Bytea",
-		newAccessFuncCall:   "NewFieldAccess[pgtype.Bytea]",
-	},
-	"text[]": {
-		nullableGoFieldType: "pgtype.TextArray",
-		newAccessFuncCall:   "NewFieldAccess[pgtype.TextArray]",
-	},
-	"interval": {
-		nullableGoFieldType: "pgtype.Interval",
-		newAccessFuncCall:   "NewFieldAccess[pgtype.Interval]",
-	},
 }
