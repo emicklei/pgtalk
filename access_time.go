@@ -34,3 +34,8 @@ func (a TimeAccess) Column() ColumnInfo { return a.ColumnInfo }
 func (a TimeAccess) FieldToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
+
+func (a TimeAccess) TableAlias(alias string) TimeAccess {
+	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
+	return a
+}

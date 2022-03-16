@@ -62,3 +62,8 @@ func (a TextAccess) In(values ...string) binaryExpression {
 }
 
 func (a TextAccess) Column() ColumnInfo { return a.ColumnInfo }
+
+func (a TextAccess) TableAlias(alias string) TextAccess {
+	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
+	return a
+}

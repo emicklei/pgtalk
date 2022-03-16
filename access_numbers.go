@@ -61,6 +61,11 @@ func (a Int64Access) Compare(op string, i int) binaryExpression {
 
 func (a Int64Access) Column() ColumnInfo { return a.ColumnInfo }
 
+func (a Int64Access) TableAlias(alias string) Int64Access {
+	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
+	return a
+}
+
 // Float64Access can Read a column value (float) and Write a column value and Set a struct field (float64).
 type Float64Access struct {
 	ColumnInfo
@@ -107,4 +112,9 @@ func (a Float64Access) Compare(op string, float64OrFloat64Access interface{}) bi
 
 func (a Float64Access) FieldToScan(entity any) any {
 	return a.fieldWriter(entity)
+}
+
+func (a Float64Access) TableAlias(alias string) Float64Access {
+	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
+	return a
 }

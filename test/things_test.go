@@ -13,7 +13,13 @@ import (
 )
 
 func TestSelfJoin(t *testing.T) {
-
+	left := things.Select(things.Tdate)
+	right := things.Select(things.Tdate).TableAlias("other")
+	join := left.Join(right).On(things.ID.Equals(things.ID.TableAlias("other")))
+	sql := pgtalk.SQL(join)
+	if got, want := sql, "SELECT t1.tdate,other.tdate FROM public.things t1 INNER JOIN public.things other ON (t1.id = other.id)"; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
 }
 
 func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {

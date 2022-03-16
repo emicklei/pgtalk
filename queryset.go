@@ -33,18 +33,21 @@ func MakeQuerySet[T any](tableInfo TableInfo, selectors []ColumnAccessor) QueryS
 }
 
 // querySet
-// USED? TODO
-func (q QuerySet[T]) table() TableInfo                  { return q.tableInfo }
 func (q QuerySet[T]) selectAccessors() []ColumnAccessor { return q.selectors }
 func (q QuerySet[T]) whereCondition() SQLExpression     { return q.condition }
 func (q QuerySet[T]) fromSectionOn(w WriteContext) {
 	fmt.Fprintf(w, "%s.%s %s", q.tableInfo.Schema, q.tableInfo.Name, w.TableAlias(q.tableInfo.Name, q.tableInfo.Alias))
 }
 
-func (q QuerySet[T]) SQLOn(w WriteContext) {
+func (q QuerySet[T]) augmentedContext(w WriteContext) WriteContext {
 	if q.tableAliasOverride != "" {
-		w = w.WithAlias(q.tableInfo.Name, q.tableAliasOverride)
+		return w.WithAlias(q.tableInfo.Name, q.tableAliasOverride)
 	}
+	return w
+}
+
+func (q QuerySet[T]) SQLOn(w WriteContext) {
+	w = q.augmentedContext(w)
 	fmt.Fprint(w, "SELECT ")
 	if q.distinct {
 		fmt.Fprint(w, "DISTINCT ")
@@ -79,14 +82,31 @@ func (q QuerySet[T]) SQLOn(w WriteContext) {
 	}
 }
 
-func (q QuerySet[T]) Alias(alias string) QuerySet[T]            { q.tableAliasOverride = alias; return q }
-func (q QuerySet[T]) Named(preparedName string) QuerySet[T]     { q.preparedName = preparedName; return q }
-func (q QuerySet[T]) Distinct() QuerySet[T]                     { q.distinct = true; return q }
-func (q QuerySet[T]) Ascending() QuerySet[T]                    { q.sortOption = "ASC"; return q }
-func (q QuerySet[T]) Descending() QuerySet[T]                   { q.sortOption = "DESC"; return q }
+// TableAlias will override the default table or view alias
+func (q QuerySet[T]) TableAlias(alias string) QuerySet[T] { q.tableAliasOverride = alias; return q }
+
+// Named sets the name for preparing the statement
+func (q QuerySet[T]) Named(preparedName string) QuerySet[T] { q.preparedName = preparedName; return q }
+
+// Distinct is a SQL instruction
+func (q QuerySet[T]) Distinct() QuerySet[T] { q.distinct = true; return q }
+
+// Ascending is a SQL instruction for ASC sort option
+func (q QuerySet[T]) Ascending() QuerySet[T] { q.sortOption = "ASC"; return q }
+
+// Descending is a SQL instruction for DESC sort option
+func (q QuerySet[T]) Descending() QuerySet[T] { q.sortOption = "DESC"; return q }
+
+// Where is a SQL instruction
 func (q QuerySet[T]) Where(condition SQLExpression) QuerySet[T] { q.condition = condition; return q }
-func (q QuerySet[T]) Limit(limit int) QuerySet[T]               { q.limit = limit; return q }
-func (q QuerySet[T]) Offset(offset int) QuerySet[T]             { q.offset = offset; return q }
+
+// Limit is a SQL instruction
+func (q QuerySet[T]) Limit(limit int) QuerySet[T] { q.limit = limit; return q }
+
+// Offset is a SQL instruction
+func (q QuerySet[T]) Offset(offset int) QuerySet[T] { q.offset = offset; return q }
+
+// GroupBy is a SQL instruction
 func (q QuerySet[T]) GroupBy(cas ...ColumnAccessor) QuerySet[T] {
 	q.groupBy = cas
 	if assertEnabled {

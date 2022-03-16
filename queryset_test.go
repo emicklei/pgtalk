@@ -11,7 +11,7 @@ func TestQuerySetSelect(t *testing.T) {
 	q.offset = 2
 	q.condition = IsNotNull(polyFUUID)
 	q.orderBy = []ColumnAccessor{polyFUUID}
-	q = q.Alias("ppp")
+	q = q.TableAlias("ppp")
 	if got, want := SQL(q), "SELECT ppp.ftime,ppp.ffloat FROM public.polies ppp WHERE (ppp.fuuid IS NOT NULL) ORDER BY ppp.fuuid LIMIT 1 OFFSET 2"; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}

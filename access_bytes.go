@@ -34,6 +34,11 @@ func (a BytesAccess) Set(v []byte) BytesAccess {
 	return a
 }
 
+func (a BytesAccess) TableAlias(alias string) BytesAccess {
+	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
+	return a
+}
+
 type JSONBAccess struct {
 	ColumnInfo
 	valueFieldWriter FieldAccessFunc
@@ -68,4 +73,9 @@ func (a JSONBAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
 // Extract returns an expresion to get the path, extracted from the JSONB data, as a column
 func (a JSONBAccess) Extract(path string) SQLExpression {
 	return MakeBinaryOperator(a, "->", LiteralString(path))
+}
+
+func (a JSONBAccess) TableAlias(alias string) JSONBAccess {
+	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
+	return a
 }

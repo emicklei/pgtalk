@@ -43,6 +43,7 @@ type querySet interface {
 	fromSectionOn(w WriteContext)
 	selectAccessors() []ColumnAccessor
 	whereCondition() SQLExpression
+	augmentedContext(w WriteContext) WriteContext
 }
 
 type Querier interface {

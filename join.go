@@ -31,23 +31,25 @@ type Join struct {
 func (i Join) SQLOn(w WriteContext) {
 	fmt.Fprint(w, "SELECT ")
 	left := i.leftSet.selectAccessors()
-	writeAccessOn(left, w)
+	wl := i.leftSet.augmentedContext(w)
+	wr := i.rightSet.augmentedContext(w)
+	writeAccessOn(left, wl)
 	if len(left) > 0 {
-		fmt.Fprint(w, ",")
+		fmt.Fprint(wl, ",")
 	}
-	writeAccessOn(i.rightSet.selectAccessors(), w)
+	writeAccessOn(i.rightSet.selectAccessors(), wr)
 	fmt.Fprint(w, " FROM ")
-	i.leftSet.fromSectionOn(w)
+	i.leftSet.fromSectionOn(wl)
 	writeJoinType(i.joinType, w)
-	i.rightSet.fromSectionOn(w)
+	i.rightSet.fromSectionOn(wr)
 	fmt.Fprint(w, " ON ")
 	i.condition.SQLOn(w) // TODO which tableInfo to use?
 	if _, ok := i.leftSet.whereCondition().(NoCondition); !ok {
-		fmt.Fprint(w, " WHERE ")
-		i.leftSet.whereCondition().SQLOn(w)
+		fmt.Fprint(wl, " WHERE ")
+		i.leftSet.whereCondition().SQLOn(wl)
 	}
 	if i.limit > 0 {
-		fmt.Fprintf(w, " LIMIT %d", i.limit)
+		fmt.Fprintf(wl, " LIMIT %d", i.limit)
 	}
 	// TODO RightSet where
 }

@@ -18,8 +18,9 @@ func NewWriteContext(w io.Writer) WriteContext {
 }
 
 func (w WriteContext) WithAlias(tableName, alias string) WriteContext {
-	w.aliases[tableName] = alias
-	return w
+	cp := NewWriteContext(w.writer)
+	cp.aliases[tableName] = alias
+	return cp
 }
 
 // Write is part of io.Writer
@@ -37,6 +38,6 @@ func (w WriteContext) TableAlias(tableName, defaultAlias string) string {
 
 func SQL(some SQLWriter) string {
 	buf := new(bytes.Buffer)
-	some.SQLOn(NewWriteContext(buf)) // info is ignored
+	some.SQLOn(NewWriteContext(buf))
 	return buf.String()
 }

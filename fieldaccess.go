@@ -77,3 +77,8 @@ func (a FieldAccess[T]) Compare(operator string, operand any) binaryExpression {
 	}
 	return MakeBinaryOperator(a, operator, valuePrinter{operand})
 }
+
+func (a FieldAccess[T]) TableAlias(alias string) FieldAccess[T] {
+	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
+	return a
+}

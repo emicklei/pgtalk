@@ -31,3 +31,8 @@ func (a BooleanAccess) Equals(b bool) SQLExpression {
 func (a BooleanAccess) FieldToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
+
+func (a BooleanAccess) TableAlias(alias string) BooleanAccess {
+	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
+	return a
+}
