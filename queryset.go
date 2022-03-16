@@ -64,7 +64,7 @@ func (q QuerySet[T]) SQLOn(w io.Writer) {
 		writeAccessOn(q.orderBy, w)
 	}
 	if q.sortOption != "" {
-		fmt.Fprint(w, " ", q.sortOption, " ")
+		fmt.Fprint(w, " ", q.sortOption)
 	}
 	if q.limit > 0 {
 		fmt.Fprintf(w, " LIMIT %d", q.limit)
