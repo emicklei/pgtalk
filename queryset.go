@@ -3,23 +3,23 @@ package pgtalk
 import (
 	"context"
 	"fmt"
-	"io"
 
 	"github.com/jackc/pgx/v4"
 )
 
 type QuerySet[T any] struct {
-	preparedName string
-	tableInfo    TableInfo
-	selectors    []ColumnAccessor
-	distinct     bool
-	condition    SQLExpression
-	limit        int
-	offset       int
-	groupBy      []ColumnAccessor
-	having       SQLExpression
-	orderBy      []ColumnAccessor
-	sortOption   string
+	preparedName       string
+	tableInfo          TableInfo
+	tableAliasOverride string
+	selectors          []ColumnAccessor
+	distinct           bool
+	condition          SQLExpression
+	limit              int
+	offset             int
+	groupBy            []ColumnAccessor
+	having             SQLExpression
+	orderBy            []ColumnAccessor
+	sortOption         string
 }
 
 func MakeQuerySet[T any](tableInfo TableInfo, selectors []ColumnAccessor) QuerySet[T] {
@@ -33,13 +33,18 @@ func MakeQuerySet[T any](tableInfo TableInfo, selectors []ColumnAccessor) QueryS
 }
 
 // querySet
+// USED? TODO
+func (q QuerySet[T]) table() TableInfo                  { return q.tableInfo }
 func (q QuerySet[T]) selectAccessors() []ColumnAccessor { return q.selectors }
 func (q QuerySet[T]) whereCondition() SQLExpression     { return q.condition }
-func (q QuerySet[T]) fromSectionOn(w io.Writer) {
-	fmt.Fprintf(w, "%s.%s %s", q.tableInfo.Schema, q.tableInfo.Name, q.tableInfo.Alias)
+func (q QuerySet[T]) fromSectionOn(w WriteContext) {
+	fmt.Fprintf(w, "%s.%s %s", q.tableInfo.Schema, q.tableInfo.Name, w.TableAlias(q.tableInfo.Name, q.tableInfo.Alias))
 }
 
-func (q QuerySet[T]) SQLOn(w io.Writer) {
+func (q QuerySet[T]) SQLOn(w WriteContext) {
+	if q.tableAliasOverride != "" {
+		w = w.WithAlias(q.tableInfo.Name, q.tableAliasOverride)
+	}
 	fmt.Fprint(w, "SELECT ")
 	if q.distinct {
 		fmt.Fprint(w, "DISTINCT ")
@@ -74,6 +79,7 @@ func (q QuerySet[T]) SQLOn(w io.Writer) {
 	}
 }
 
+func (q QuerySet[T]) Alias(alias string) QuerySet[T]            { q.tableAliasOverride = alias; return q }
 func (q QuerySet[T]) Named(preparedName string) QuerySet[T]     { q.preparedName = preparedName; return q }
 func (q QuerySet[T]) Distinct() QuerySet[T]                     { q.distinct = true; return q }
 func (q QuerySet[T]) Ascending() QuerySet[T]                    { q.sortOption = "ASC"; return q }
@@ -92,7 +98,6 @@ func (q QuerySet[T]) Having(condition SQLExpression) QuerySet[T] { q.having = co
 func (q QuerySet[T]) OrderBy(cas ...ColumnAccessor) QuerySet[T] {
 	q.orderBy = cas
 	if assertEnabled {
-		assertEachAccessorHasTableInfo(cas, q.tableInfo)
 	}
 	return q
 }

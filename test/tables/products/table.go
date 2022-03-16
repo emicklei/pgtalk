@@ -35,15 +35,16 @@ var (
 	DeletedAt = p.NewFieldAccess[pgtype.Timestamptz](p.MakeColumnInfo(tableInfo, "deleted_at", p.NotPrimary, p.Nullable, 4),
 		func(dest any) any { return &dest.(*Product).DeletedAt })
 	// Code represents the column "code" of with type "text", nullable:true, primary:false
-	Code = p.NewTextAccess(p.MakeColumnInfo(tableInfo, "code", p.NotPrimary, p.Nullable, 5),
+	Code = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "code", p.NotPrimary, p.Nullable, 5),
 		func(dest any) any { return &dest.(*Product).Code })
 	// Price represents the column "price" of with type "bigint", nullable:true, primary:false
-	Price = p.NewInt64Access(p.MakeColumnInfo(tableInfo, "price", p.NotPrimary, p.Nullable, 6),
+	Price = p.NewFieldAccess[pgtype.Int8](p.MakeColumnInfo(tableInfo, "price", p.NotPrimary, p.Nullable, 6),
 		func(dest any) any { return &dest.(*Product).Price })
 	// CategoryId represents the column "category_id" of with type "bigint", nullable:true, primary:false
-	CategoryId = p.NewInt64Access(p.MakeColumnInfo(tableInfo, "category_id", p.NotPrimary, p.Nullable, 7),
+	CategoryId = p.NewFieldAccess[pgtype.Int8](p.MakeColumnInfo(tableInfo, "category_id", p.NotPrimary, p.Nullable, 7),
 		func(dest any) any { return &dest.(*Product).CategoryId })
 	// package private
+	_         = c.UUID // for the occasional unused import from convert
 	_         = time.Now
 	_         = pgtype.Empty // for the occasional unused import from pgtype
 	tableInfo = p.TableInfo{Schema: "public", Name: "products", Alias: "p1"}
@@ -89,13 +90,13 @@ func (e *Product) Setters() (list []p.ColumnAccessor) {
 		list = append(list, DeletedAt.Set(e.DeletedAt))
 	}
 	if e.Code.Status == pgtype.Present {
-		list = append(list, Code.Set(e.Code.String))
+		list = append(list, Code.Set(e.Code))
 	}
 	if e.Price.Status == pgtype.Present {
-		list = append(list, Price.Set(e.Price.Int))
+		list = append(list, Price.Set(e.Price))
 	}
 	if e.CategoryId.Status == pgtype.Present {
-		list = append(list, CategoryId.Set(e.CategoryId.Int))
+		list = append(list, CategoryId.Set(e.CategoryId))
 	}
 	return
 }

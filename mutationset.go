@@ -31,8 +31,8 @@ func MakeMutationSet[T any](tableInfo TableInfo, selectors []ColumnAccessor, ope
 		operationType: operationType}
 }
 
-// SQL returns the full SQL mutation query
-func (m MutationSet[T]) SQLOn(w io.Writer) {
+// SQLOn returns the full SQL mutation query
+func (m MutationSet[T]) SQLOn(w WriteContext) {
 	if m.operationType == MutationInsert {
 		fmt.Fprint(w, "INSERT INTO ")
 		fmt.Fprintf(w, "%s.%s", m.tableInfo.Schema, m.tableInfo.Name)
@@ -49,7 +49,7 @@ func (m MutationSet[T]) SQLOn(w io.Writer) {
 	}
 	if m.operationType == MutationDelete {
 		fmt.Fprint(w, "DELETE FROM ")
-		m.tableInfo.SQLOn(w)
+		m.tableInfo.SQLOn(m.tableInfo, w)
 		if m.condition != EmptyCondition {
 			fmt.Fprint(w, " WHERE ")
 			m.condition.SQLOn(w)
@@ -62,7 +62,7 @@ func (m MutationSet[T]) SQLOn(w io.Writer) {
 	}
 	if m.operationType == MutationUpdate {
 		fmt.Fprint(w, "UPDATE ")
-		m.tableInfo.SQLOn(w)
+		m.tableInfo.SQLOn(m.tableInfo, w)
 		fmt.Fprint(w, " SET ")
 		m.setSectionOn(w)
 		if m.condition != EmptyCondition {
@@ -101,7 +101,8 @@ func (m MutationSet[T]) On() MutationSet[T] {
 
 // Pre: must be run inside transaction
 func (m MutationSet[T]) Exec(ctx context.Context, conn Querier) *ResultIterator[T] {
-	rows, err := conn.Query(ctx, SQL(m), m.ValuesToInsert()...)
+	query := SQL(m)
+	rows, err := conn.Query(ctx, query, m.ValuesToInsert()...)
 	if err == nil && !m.canProduceResults() {
 		rows.Close()
 	}

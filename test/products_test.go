@@ -6,14 +6,15 @@ import (
 	"testing"
 
 	"github.com/emicklei/pgtalk"
-	"github.com/emicklei/pgtalk/test/categories"
-	"github.com/emicklei/pgtalk/test/products"
+	"github.com/emicklei/pgtalk/convert"
+	"github.com/emicklei/pgtalk/test/tables/categories"
+	"github.com/emicklei/pgtalk/test/tables/products"
 )
 
 func TestSelectProductsWhere(t *testing.T) {
 	q := products.
 		Select(products.ID, products.Code).
-		Where(products.Code.Equals("F42").
+		Where(products.Code.Equals(convert.StringToText("F42")).
 			And(products.ID.Equals(1))).
 		Limit(1)
 	if got, want := pgtalk.SQL(q), `SELECT p1.id,p1.code FROM public.products p1 WHERE ((p1.code = 'F42') AND (p1.id = 1)) LIMIT 1`; got != want {
@@ -43,7 +44,7 @@ func TestSelectAllColumns(t *testing.T) {
 func TestIn(t *testing.T) {
 	q := products.
 		Select(products.AllColumns()...).
-		Where(products.Code.In("F42", "f42"))
+		Where(products.Code.In(convert.StringToText("F42"), convert.StringToText("f42")))
 	if got, want := pgtalk.SQL(q), `SELECT p1.id,p1.created_at,p1.updated_at,p1.deleted_at,p1.code,p1.price,p1.category_id FROM public.products p1 WHERE (p1.code IN ('F42','f42'))`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
@@ -59,10 +60,11 @@ func TestExists(t *testing.T) {
 }
 
 func TestInnerJoin(t *testing.T) {
-	q := products.Select(products.Code).Where(products.Code.Equals("F42")).
+	q := products.Select(products.Code).Where(products.Code.Equals(convert.StringToText("F42"))).
 		Join(categories.Select(categories.Title)).
 		On(products.ID.Equals(categories.ID))
 	if got, want := pgtalk.SQL(q), `SELECT p1.code,c1.title FROM public.products p1 INNER JOIN public.categories c1 ON (p1.id = c1.id) WHERE (p1.code = 'F42')`; got != want {
+		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 	if testConnect == nil {
@@ -78,7 +80,7 @@ func TestInnerJoin(t *testing.T) {
 }
 
 func TestLeftJoin(t *testing.T) {
-	q := products.Select(products.Code).Where(products.Code.Equals("F42")).
+	q := products.Select(products.Code).Where(products.Code.Equals(convert.StringToText("F42"))).
 		LeftOuterJoin(categories.Select(categories.Title)).
 		On(products.ID.Equals(categories.ID))
 	if got, want := pgtalk.SQL(q), `SELECT p1.code,c1.title FROM public.products p1 LEFT OUTER JOIN public.categories c1 ON (p1.id = c1.id) WHERE (p1.code = 'F42')`; got != want {
@@ -87,7 +89,7 @@ func TestLeftJoin(t *testing.T) {
 }
 
 func TestMultiLeftJoin(t *testing.T) {
-	q := products.Select(products.Code).Where(products.Code.Equals("F42")).
+	q := products.Select(products.Code).Where(products.Code.Equals(convert.StringToText("F42"))).
 		LeftOuterJoin(categories.Select(categories.Title)).
 		On(products.CategoryId.Equals(categories.ID)).
 		LeftOuterJoin(categories.Select(categories.Title)).

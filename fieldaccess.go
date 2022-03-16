@@ -2,6 +2,7 @@ package pgtalk
 
 import (
 	"fmt"
+	"strings"
 )
 
 type FieldAccess[T any] struct {
@@ -47,8 +48,7 @@ func (a FieldAccess[T]) Equals(operand interface{}) binaryExpression {
 	if t, ok := operand.(T); ok {
 		return MakeBinaryOperator(a, "=", valuePrinter{t})
 	}
-	var t T
-	panic("expected a " + fmt.Sprintf("%T", t) + " got a " + fmt.Sprintf("%T", operand))
+	return MakeBinaryOperator(a, "=", valuePrinter{operand})
 }
 
 // Less returns a SQLExpression
@@ -61,4 +61,19 @@ func (a FieldAccess[T]) LessThan(operand interface{}) binaryExpression {
 	}
 	var t T
 	panic("expected a " + fmt.Sprintf("%T", t) + " got a " + fmt.Sprintf("%T", operand))
+}
+
+func (a FieldAccess[T]) In(values ...any) binaryExpression {
+	vs := make([]interface{}, len(values))
+	for i := 0; i < len(values); i++ {
+		vs[i] = values[i]
+	}
+	return MakeBinaryOperator(a, "IN", valuesPrinter{vs})
+}
+
+func (a FieldAccess[T]) Compare(operator string, operand any) binaryExpression {
+	if !strings.Contains(validComparisonOperators, operator) {
+		panic("invalid comparison operator:" + operator)
+	}
+	return MakeBinaryOperator(a, operator, valuePrinter{operand})
 }

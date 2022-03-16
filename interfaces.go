@@ -2,7 +2,6 @@ package pgtalk
 
 import (
 	"context"
-	"io"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -17,17 +16,21 @@ func EnableAssert() { assertEnabled = true }
 type NewEntityFunc func() interface{}
 
 type ColumnAccessor interface {
+	SQLWriter
 	Name() string
-	SQLOn(w io.Writer)
 	ValueToInsert() interface{}
 	Column() ColumnInfo
-	// FieldToScan return the address of the value of the field in the entity
+	// FieldToScan returns the address of the value of the field in the entity
 	FieldToScan(entity any) any
 }
 
 type SQLWriter interface {
-	// SQLOn writes a valid SQL on a Writer
-	SQLOn(w io.Writer)
+	// SQLOn writes a valid SQL on a Writer in a context
+	SQLOn(w WriteContext)
+}
+
+type SQLer interface {
+	SQL() string
 }
 
 type SQLExpression interface {
@@ -37,7 +40,7 @@ type SQLExpression interface {
 }
 
 type querySet interface {
-	fromSectionOn(io.Writer)
+	fromSectionOn(w WriteContext)
 	selectAccessors() []ColumnAccessor
 	whereCondition() SQLExpression
 }

@@ -21,9 +21,10 @@ var (
 	ID = p.NewInt64Access(p.MakeColumnInfo(tableInfo, "id", p.IsPrimary, p.NotNull, 1),
 		func(dest any) any { return &dest.(*Category).ID })
 	// Title represents the column "title" of with type "text", nullable:true, primary:false
-	Title = p.NewTextAccess(p.MakeColumnInfo(tableInfo, "title", p.NotPrimary, p.Nullable, 2),
+	Title = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "title", p.NotPrimary, p.Nullable, 2),
 		func(dest any) any { return &dest.(*Category).Title })
 	// package private
+	_         = c.UUID // for the occasional unused import from convert
 	_         = time.Now
 	_         = pgtype.Empty // for the occasional unused import from pgtype
 	tableInfo = p.TableInfo{Schema: "public", Name: "categories", Alias: "c1"}
@@ -45,7 +46,7 @@ func (e *Category) SetTitle(v string) *Category { e.Title = c.StringToText(v); r
 func (e *Category) Setters() (list []p.ColumnAccessor) {
 	list = append(list, ID.Set(e.ID))
 	if e.Title.Status == pgtype.Present {
-		list = append(list, Title.Set(e.Title.String))
+		list = append(list, Title.Set(e.Title))
 	}
 	return
 }

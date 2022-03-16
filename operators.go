@@ -2,7 +2,6 @@ package pgtalk
 
 import (
 	"fmt"
-	"io"
 )
 
 const (
@@ -15,12 +14,12 @@ type binaryExpression struct {
 	Right    SQLExpression
 }
 
-func (o binaryExpression) SQLOn(b io.Writer) {
-	fmt.Fprint(b, "(")
-	o.Left.SQLOn(b)
-	fmt.Fprintf(b, " %s ", o.Operator)
-	o.Right.SQLOn(b)
-	fmt.Fprint(b, ")")
+func (o binaryExpression) SQLOn(w WriteContext) {
+	fmt.Fprint(w, "(")
+	o.Left.SQLOn(w)
+	fmt.Fprintf(w, " %s ", o.Operator)
+	o.Right.SQLOn(w)
+	fmt.Fprint(w, ")")
 }
 
 func MakeBinaryOperator(left SQLExpression, operator string, right SQLExpression) binaryExpression {
@@ -74,7 +73,7 @@ func MakeUnaryOperator(operator string, operand SQLExpression) unaryExpression {
 	return unaryExpression{Operator: operator, Operand: operand}
 }
 
-func (u unaryExpression) SQLOn(w io.Writer) {
+func (u unaryExpression) SQLOn(w WriteContext) {
 	fmt.Fprintf(w, "%s (", u.Operator)
 	u.Operand.SQLOn(w)
 	fmt.Fprint(w, ")")
@@ -106,7 +105,7 @@ type NullCheck struct {
 	IsNot bool
 }
 
-func (n NullCheck) SQLOn(w io.Writer) {
+func (n NullCheck) SQLOn(w WriteContext) {
 	fmt.Fprint(w, "(")
 	n.Operand.SQLOn(w)
 	if n.IsNot {

@@ -7,10 +7,14 @@ import (
 
 	"github.com/emicklei/pgtalk"
 	"github.com/emicklei/pgtalk/convert"
-	"github.com/emicklei/pgtalk/test/things"
+	"github.com/emicklei/pgtalk/test/tables/things"
 	"github.com/google/uuid"
 	"github.com/jackc/pgtype"
 )
+
+func TestSelfJoin(t *testing.T) {
+
+}
 
 func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {
 	if got, want := len(things.AllColumns()), 4; got != want {
@@ -28,7 +32,6 @@ func TestManageThing(t *testing.T) {
 		things.Tdate.Set(convert.TimeToDate(time.Now())),
 		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
 		things.Tjson.Set([]byte(`{"key":"value"}`)))
-	t.Log(pgtalk.PrettySQL(create))
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {
 		t.Fatal(err)
@@ -41,7 +44,7 @@ func TestManageThing(t *testing.T) {
 	// READ
 	{
 		read := things.Select(things.ID, things.Tdate, things.Ttimestamp, things.Tjson).Where(things.ID.Equals(convert.UUID(id)))
-		t.Log(pgtalk.PrettySQL(read))
+		t.Log(pgtalk.SQL(read))
 		list, err := read.Exec(ctx, testConnect)
 		if err != nil {
 			t.Fatal(err)
@@ -51,7 +54,7 @@ func TestManageThing(t *testing.T) {
 	// UPDATE
 	{
 		update := things.Update(things.Tdate.Set(pgtype.Date{Status: pgtype.Null})).Where(things.ID.Equals(convert.UUID(id)))
-		t.Log(pgtalk.PrettySQL(update))
+		t.Log(pgtalk.SQL(update))
 		tx, err = testConnect.Begin(ctx)
 		if err != nil {
 			t.Fatal(err)
@@ -65,7 +68,7 @@ func TestManageThing(t *testing.T) {
 	// READ
 	{
 		read := things.Select(things.ID, things.Tdate, things.Ttimestamp, things.Tjson).Where(things.ID.Equals(convert.UUID(id)))
-		t.Log(pgtalk.PrettySQL(read))
+		t.Log(pgtalk.SQL(read))
 		list, err := read.Exec(ctx, testConnect)
 		if err != nil {
 			t.Fatal(err)
@@ -184,5 +187,5 @@ func TestJSONB_3(t *testing.T) {
 
 func TestExtraJSONBField(t *testing.T) {
 	a := things.Tjson.Extract("title")
-	t.Log(pgtalk.PrettySQL(a))
+	t.Log(a) // TODO
 }

@@ -28,7 +28,7 @@ type Join struct {
 	limit        int
 }
 
-func (i Join) SQLOn(w io.Writer) {
+func (i Join) SQLOn(w WriteContext) {
 	fmt.Fprint(w, "SELECT ")
 	left := i.leftSet.selectAccessors()
 	writeAccessOn(left, w)
@@ -41,7 +41,7 @@ func (i Join) SQLOn(w io.Writer) {
 	writeJoinType(i.joinType, w)
 	i.rightSet.fromSectionOn(w)
 	fmt.Fprint(w, " ON ")
-	i.condition.SQLOn(w)
+	i.condition.SQLOn(w) // TODO which tableInfo to use?
 	if _, ok := i.leftSet.whereCondition().(NoCondition); !ok {
 		fmt.Fprint(w, " WHERE ")
 		i.leftSet.whereCondition().SQLOn(w)
@@ -171,7 +171,12 @@ func (m MultiJoin) Exec(ctx context.Context, conn *pgx.Conn) (*MultiJoinResultIt
 	return &MultiJoinResultIterator{queryError: err, querySets: m.sets, rows: rows}, nil
 }
 
-func (m MultiJoin) SQLOn(w io.Writer) {
+type tableWhere struct {
+	expression SQLExpression
+	tableInfo  TableInfo
+}
+
+func (m MultiJoin) SQLOn(w WriteContext) {
 	fmt.Fprint(w, "SELECT ")
 	for i, each := range m.sets {
 		if i > 0 && len(each.selectAccessors()) > 0 {

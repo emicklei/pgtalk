@@ -32,6 +32,7 @@ var (
 	Tjson = p.NewJSONBAccess(p.MakeColumnInfo(tableInfo, "tjson", p.NotPrimary, p.Nullable, 4),
 		func(dest any) any { return &dest.(*Thing).Tjson })
 	// package private
+	_         = c.UUID // for the occasional unused import from convert
 	_         = time.Now
 	_         = pgtype.Empty // for the occasional unused import from pgtype
 	tableInfo = p.TableInfo{Schema: "public", Name: "things", Alias: "t1"}
