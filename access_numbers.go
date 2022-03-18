@@ -21,10 +21,6 @@ func NewInt64Access(
 		fieldWriter: valueWriter}
 }
 
-func (a Int64Access) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return append(list, a)
-}
-
 func (a Int64Access) BetweenAnd(begin int64, end int64) BetweenAnd {
 	return MakeBetweenAnd(a, valuePrinter{begin}, valuePrinter{end})
 }
@@ -88,10 +84,6 @@ func (a Float64Access) Set(v float64) Float64Access {
 }
 
 func (a Float64Access) Column() ColumnInfo { return a.ColumnInfo }
-
-func (a Float64Access) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return append(list, a)
-}
 
 func (a Float64Access) Equals(float64OrFloat64Access interface{}) binaryExpression {
 	return a.Compare("=", float64OrFloat64Access)

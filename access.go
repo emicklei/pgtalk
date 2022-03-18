@@ -54,11 +54,6 @@ func encodeUUID(src [16]byte) string {
 	return fmt.Sprintf("%x-%x-%x-%x-%x", src[0:4], src[4:6], src[6:8], src[8:10], src[10:16])
 }
 
-// Collect is part of SQLExpression
-func (p valuePrinter) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return list
-}
-
 type valuesPrinter struct {
 	vs []interface{}
 }
@@ -74,10 +69,6 @@ func (p valuesPrinter) SQLOn(w WriteContext) {
 	fmt.Fprintf(w, ")")
 }
 
-func (p valuesPrinter) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return list
-}
-
 type LiteralString string
 
 func (l LiteralString) SQLOn(w WriteContext) {
@@ -86,14 +77,11 @@ func (l LiteralString) SQLOn(w WriteContext) {
 	io.WriteString(w, "'")
 }
 
-func (l LiteralString) Collect(list []ColumnAccessor) []ColumnAccessor { return list }
-
 type NoCondition struct{}
 
 var EmptyCondition = NoCondition{}
 
-func (n NoCondition) SQLOn(w WriteContext)                           {}
-func (n NoCondition) Collect(list []ColumnAccessor) []ColumnAccessor { return list }
+func (n NoCondition) SQLOn(w WriteContext) {}
 
 const (
 	IsPrimary  = true

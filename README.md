@@ -80,7 +80,7 @@ or by example
 
 ### Multi Join
 
-	q := offer.Select(offer.AllColumns()...).
+	q := offer.Select(offer.Columns()...).
 		Where(offer.ID.In("01F674G8MDRAPBWA6SB1HWE2VC").And(offer.IsActive.Equals(true))).
 		LeftOuterJoin(offer_buyer_permission_rel.Select(offer_buyer_permission_rel.BuyerPermission)).
 		On(offer_buyer_permission_rel.OfferId.Equals(offer.ID)).

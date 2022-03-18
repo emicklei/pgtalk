@@ -10,10 +10,6 @@ func NewBooleanAccess(info ColumnInfo, writer FieldAccessFunc) BooleanAccess {
 	return BooleanAccess{ColumnInfo: info, valueFieldWriter: writer}
 }
 
-func (a BooleanAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return append(list, a)
-}
-
 func (a BooleanAccess) Column() ColumnInfo { return a.ColumnInfo }
 
 func (a BooleanAccess) Set(v bool) BooleanAccess {

@@ -40,11 +40,6 @@ func (a TextAccess) Compare(op string, stringOrTextAccess interface{}) binaryExp
 	panic("string or TextAcces expected")
 }
 
-// Collect is part of SQLExpression
-func (a TextAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return append(list, a)
-}
-
 func (a TextAccess) FieldToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }

@@ -8,6 +8,7 @@ import (
 	p "github.com/emicklei/pgtalk"
 	c "github.com/emicklei/pgtalk/convert"
 	"time"
+	"strings"
 	"github.com/jackc/pgtype"
 )
 
@@ -86,7 +87,11 @@ func Columns(names ...string) (list []p.ColumnAccessor) {
 	}
 	for _, each := range names {
 		for _, other := range tableInfo.Columns {
-			if other.Column().Name() == each {
+			n := other.Column().Name()
+			if strings.HasPrefix(n,"'") { // mixed case names are quoted
+				n = strings.Trim(n,"'")
+			} 
+			if n == each {
 				list = append(list, other)
 			}
 		}

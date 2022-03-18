@@ -16,11 +16,6 @@ func NewBytesAccess(info ColumnInfo,
 
 func (a BytesAccess) Column() ColumnInfo { return a.ColumnInfo }
 
-// Collect is part of SQLExpression
-func (a BytesAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return append(list, a)
-}
-
 func (a BytesAccess) FieldToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
@@ -64,11 +59,6 @@ func (a JSONBAccess) FieldToScan(entity any) any {
 }
 
 func (a JSONBAccess) Column() ColumnInfo { return a.ColumnInfo }
-
-// Collect is part of SQLExpression
-func (a JSONBAccess) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return append(list, a)
-}
 
 // Extract returns an expresion to get the path, extracted from the JSONB data, as a column
 func (a JSONBAccess) Extract(path string) SQLExpression {
