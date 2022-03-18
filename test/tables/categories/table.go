@@ -56,9 +56,20 @@ func (e *Category) String() string {
 	return p.StringWithFields(e, p.HideNilValues)
 }
 
-// AllColumns returns the list of all column accessors for usage in e.g. Select.
-func AllColumns() []p.ColumnAccessor {
-	return tableInfo.Columns
+// Columns returns the ColumnAccessor list for the given column names.
+// If the names is empty then return all columns.
+func Columns(names ...string) (list []p.ColumnAccessor) {
+	if len(names) == 0 {
+		return tableInfo.Columns
+	}
+	for _, each := range names {
+		for _, other := range tableInfo.Columns {
+			if other.Column().Name() == each {
+				list = append(list, other)
+			}
+		}
+	}
+	return
 }
 
 // Select returns a new QuerySet[Category] for fetching column data.
@@ -79,9 +90,4 @@ func Delete() p.MutationSet[Category] {
 // Update creates a MutationSet to update zero or more columns.
 func Update(cas ...p.ColumnAccessor) p.MutationSet[Category] {
 	return p.MakeMutationSet[Category](tableInfo, cas, p.MutationUpdate)
-}
-
-// Filter returns a new QuerySet[Category] for fetching all column data for which the condition is true.
-func Filter(condition p.SQLExpression) p.QuerySet[Category] {
-	return p.MakeQuerySet[Category](tableInfo, tableInfo.Columns).Where(condition)
 }

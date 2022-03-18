@@ -17,6 +17,11 @@ func (t TableInfo) SQLOn(tableInfo TableInfo, w io.Writer) {
 	fmt.Fprintf(w, "%s.%s %s", t.Schema, t.Name, t.Alias)
 }
 
+func (t TableInfo) WithColumns(list []ColumnAccessor) TableInfo {
+	t.Columns = list
+	return t
+}
+
 func (t TableInfo) Equals(o TableInfo) bool {
 	return t.Name == o.Name && t.Schema == o.Schema && t.Alias == o.Alias
 }

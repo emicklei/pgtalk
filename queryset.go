@@ -13,7 +13,7 @@ type QuerySet[T any] struct {
 	tableAliasOverride string
 	selectors          []ColumnAccessor
 	distinct           bool
-	condition          SQLExpression
+	condition          SQLWriter
 	limit              int
 	offset             int
 	groupBy            []ColumnAccessor
@@ -34,7 +34,7 @@ func MakeQuerySet[T any](tableInfo TableInfo, selectors []ColumnAccessor) QueryS
 
 // querySet
 func (q QuerySet[T]) selectAccessors() []ColumnAccessor { return q.selectors }
-func (q QuerySet[T]) whereCondition() SQLExpression     { return q.condition }
+func (q QuerySet[T]) whereCondition() SQLWriter         { return q.condition }
 func (q QuerySet[T]) fromSectionOn(w WriteContext) {
 	fmt.Fprintf(w, "%s.%s %s", q.tableInfo.Schema, q.tableInfo.Name, w.TableAlias(q.tableInfo.Name, q.tableInfo.Alias))
 }
@@ -123,11 +123,6 @@ func (q QuerySet[T]) OrderBy(cas ...ColumnAccessor) QuerySet[T] {
 }
 func (q QuerySet[T]) Exists() unaryExpression {
 	return unaryExpression{Operator: "EXISTS", Operand: q}
-}
-
-// Collect is part of SQLExpression
-func (d QuerySet[T]) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return list // TODO
 }
 
 func (d QuerySet[T]) Iterate(ctx context.Context, conn *pgx.Conn) (*ResultIterator[T], error) {

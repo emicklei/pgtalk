@@ -29,9 +29,9 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 	testConnect = conn
-	// if err := ensureTables(conn); err != nil {
-	// 	fmt.Println("DB WARN:", err)
-	// }
+	if err := ensureTables(conn); err != nil {
+		fmt.Println("DB WARN:", err)
+	}
 	uuid.EnableRandPool()
 	pgtalk.EnableAssert()
 	code := m.Run()
@@ -52,7 +52,8 @@ func ensureTables(conn *pgx.Conn) error {
 		id uuid,
 		tDate date,
 		tTimestamp timestamp without time zone,
-		TJSON jsonb
+		TJSON jsonb,
+		tText text
 	);
 	drop table IF EXISTS products;
 	create table products(

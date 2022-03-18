@@ -35,14 +35,12 @@ type SQLer interface {
 
 type SQLExpression interface {
 	SQLWriter
-	// Collect returns all ColumnAccessor that are used in the expression. It exists for assertion.
-	Collect(list []ColumnAccessor) []ColumnAccessor
 }
 
 type querySet interface {
 	fromSectionOn(w WriteContext)
 	selectAccessors() []ColumnAccessor
-	whereCondition() SQLExpression
+	whereCondition() SQLWriter
 	augmentedContext(w WriteContext) WriteContext
 }
 

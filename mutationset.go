@@ -78,10 +78,6 @@ func (m MutationSet[T]) SQLOn(w WriteContext) {
 }
 
 func (m MutationSet[T]) Where(condition SQLExpression) MutationSet[T] {
-	if assertEnabled {
-		access := condition.Collect([]ColumnAccessor{})
-		assertEachAccessorIn(access, m.tableInfo.Columns)
-	}
 	m.condition = condition
 	return m
 }

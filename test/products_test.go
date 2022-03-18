@@ -34,7 +34,7 @@ func TestSelectProductsWhere(t *testing.T) {
 
 func TestSelectAllColumns(t *testing.T) {
 	q := products.
-		Select(products.AllColumns()...).
+		Select(products.Columns()...).
 		Limit(2)
 	if got, want := pgtalk.SQL(q), `SELECT p1.id,p1.created_at,p1.updated_at,p1.deleted_at,p1.code,p1.price,p1.category_id FROM public.products p1 LIMIT 2`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
@@ -43,7 +43,7 @@ func TestSelectAllColumns(t *testing.T) {
 
 func TestIn(t *testing.T) {
 	q := products.
-		Select(products.AllColumns()...).
+		Select(products.Columns()...).
 		Where(products.Code.In(convert.StringToText("F42"), convert.StringToText("f42")))
 	if got, want := pgtalk.SQL(q), `SELECT p1.id,p1.created_at,p1.updated_at,p1.deleted_at,p1.code,p1.price,p1.category_id FROM public.products p1 WHERE (p1.code IN ('F42','f42'))`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
@@ -102,7 +102,7 @@ func TestMultiLeftJoin(t *testing.T) {
 
 func TestFullSelect(t *testing.T) {
 	q := products.
-		Select(products.AllColumns()...).
+		Select(products.Columns()...).
 		Distinct().
 		Where(products.Code.Compare(">", "A").And(pgtalk.IsNotNull(products.CategoryId))).
 		GroupBy(products.CategoryId).

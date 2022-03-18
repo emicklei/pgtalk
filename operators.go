@@ -54,11 +54,6 @@ func (o binaryExpression) Like(pattern string) binaryExpression {
 	}
 }
 
-// Collect is part of SQLExpression
-func (o binaryExpression) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return o.Left.Collect(o.Right.Collect(list))
-}
-
 type BetweenAnd struct {
 }
 
@@ -94,11 +89,6 @@ func (u unaryExpression) Or(right SQLExpression) binaryExpression {
 	}
 }
 
-// Collect is part of SQLExpression
-func (u unaryExpression) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return u.Operand.Collect(list)
-}
-
 type NullCheck struct {
 	Operand SQLExpression
 	// IsNot == true -> IS NOT NULL
@@ -113,11 +103,6 @@ func (n NullCheck) SQLOn(w WriteContext) {
 		return
 	}
 	fmt.Fprint(w, " IS NULL)")
-}
-
-// Collect is part of SQLExpression
-func (n NullCheck) Collect(list []ColumnAccessor) []ColumnAccessor {
-	return n.Operand.Collect(list)
 }
 
 // IsNotNull returns an expression with the IS NOT NULL condition

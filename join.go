@@ -190,7 +190,7 @@ func (m MultiJoin) SQLOn(w WriteContext) {
 	first := m.sets[0]
 	first.fromSectionOn(w)
 	// collect all conditions from all sets
-	wheres := []SQLExpression{}
+	wheres := []SQLWriter{}
 	for _, each := range m.sets {
 		if each.whereCondition() != EmptyCondition {
 			wheres = append(wheres, each.whereCondition())

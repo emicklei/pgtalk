@@ -78,10 +78,22 @@ func (e *{{.GoType}}) String() string {
 	return p.StringWithFields(e, p.HideNilValues)
 }
 
-// AllColumns returns the list of all column accessors for usage in e.g. Select.
-func AllColumns() []p.ColumnAccessor {
-	return tableInfo.Columns
+// Columns returns the ColumnAccessor list for the given column names.
+// If the names is empty then return all columns.
+func Columns(names ...string) (list []p.ColumnAccessor) {
+	if len(names) == 0 {
+		return tableInfo.Columns
+	}
+	for _, each := range names {
+		for _, other := range tableInfo.Columns {
+			if other.Column().Name() == each {
+				list = append(list, other)
+			}
+		}
+	}
+	return
 }
+
 
 // Select returns a new QuerySet[{{.GoType}}] for fetching column data.
 func Select(cas ...p.ColumnAccessor) p.QuerySet[{{.GoType}}] {
@@ -101,10 +113,5 @@ func Delete() p.MutationSet[{{.GoType}}] {
 // Update creates a MutationSet to update zero or more columns.
 func Update(cas ...p.ColumnAccessor) p.MutationSet[{{.GoType}}] {
 	return p.MakeMutationSet[{{.GoType}}](tableInfo, cas, p.MutationUpdate)
-}
-
-// Filter returns a new QuerySet[{{.GoType}}] for fetching all column data for which the condition is true.
-func Filter(condition p.SQLExpression) p.QuerySet[{{.GoType}}] {
-	return p.MakeQuerySet[{{.GoType}}](tableInfo, tableInfo.Columns).Where(condition)
 }
 `

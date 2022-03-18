@@ -22,8 +22,19 @@ func TestSelfJoin(t *testing.T) {
 	}
 }
 
+func TestGetColumn(t *testing.T) {
+	ids := things.Columns("id")
+	t.Log(ids)
+}
+
+func TestCustomExpression(t *testing.T) {
+	// select id, ttext || ttext from (select t1.id, t1.ttext from things t1) t2
+	q := things.Select(things.ID, things.Ttext).Collect(things.ID, things.Ttext.Concat(things.Ttext))
+	t.Log(pgtalk.SQL(q))
+}
+
 func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {
-	if got, want := len(things.AllColumns()), 4; got != want {
+	if got, want := len(things.Columns()), 5; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -37,7 +48,9 @@ func TestManageThing(t *testing.T) {
 		things.ID.Set(convert.UUID(id)),
 		things.Tdate.Set(convert.TimeToDate(time.Now())),
 		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
-		things.Tjson.Set([]byte(`{"key":"value"}`)))
+		things.Tjson.Set([]byte(`{"key":"value"}`)),
+		things.Ttext.Set(convert.StringToText("hello")),
+	)
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {
 		t.Fatal(err)
@@ -146,7 +159,7 @@ func TestJSONB_3(t *testing.T) {
 	// delete 3
 	tx, _ := testConnect.Begin(ctx)
 	// reverse columns
-	s := things.AllColumns()
+	s := things.Columns()
 	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
 		s[i], s[j] = s[j], s[i]
 	}

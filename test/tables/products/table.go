@@ -106,9 +106,20 @@ func (e *Product) String() string {
 	return p.StringWithFields(e, p.HideNilValues)
 }
 
-// AllColumns returns the list of all column accessors for usage in e.g. Select.
-func AllColumns() []p.ColumnAccessor {
-	return tableInfo.Columns
+// Columns returns the ColumnAccessor list for the given column names.
+// If the names is empty then return all columns.
+func Columns(names ...string) (list []p.ColumnAccessor) {
+	if len(names) == 0 {
+		return tableInfo.Columns
+	}
+	for _, each := range names {
+		for _, other := range tableInfo.Columns {
+			if other.Column().Name() == each {
+				list = append(list, other)
+			}
+		}
+	}
+	return
 }
 
 // Select returns a new QuerySet[Product] for fetching column data.
@@ -129,9 +140,4 @@ func Delete() p.MutationSet[Product] {
 // Update creates a MutationSet to update zero or more columns.
 func Update(cas ...p.ColumnAccessor) p.MutationSet[Product] {
 	return p.MakeMutationSet[Product](tableInfo, cas, p.MutationUpdate)
-}
-
-// Filter returns a new QuerySet[Product] for fetching all column data for which the condition is true.
-func Filter(condition p.SQLExpression) p.QuerySet[Product] {
-	return p.MakeQuerySet[Product](tableInfo, tableInfo.Columns).Where(condition)
 }
