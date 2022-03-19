@@ -41,13 +41,13 @@ func TestSelectMaps(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, each := range list {
-		id := each["id"].([16]uint8)
-		t.Logf("%v (%T)", id, id)
-		txt := each["ttext"].(string)
-		t.Logf("%v (%T)", txt, txt)
+		id := each["id"].(pgtype.UUID)
+		t.Logf("%v (%T)", id.Bytes, id)
+		txt := each["ttext"].(pgtype.Text)
+		t.Logf("%v (%T)", txt.String, txt)
 		// skip nil check
-		dt := each["tdate"].(time.Time)
-		t.Logf("%v (%T)", dt, dt)
+		dt := each["tdate"].(pgtype.Date)
+		t.Logf("%v (%T)", dt.Time, dt)
 	}
 }
 

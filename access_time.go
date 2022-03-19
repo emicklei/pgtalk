@@ -34,3 +34,8 @@ func (a TimeAccess) TableAlias(alias string) TimeAccess {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a
 }
+
+// AppendScannable is part of ColumnAccessor
+func (a TimeAccess) AppendScannable(list []any) []any {
+	return append(list, &a.valueToInsert)
+}

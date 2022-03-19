@@ -3,6 +3,7 @@ package pgtalk
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -161,18 +162,19 @@ func (d QuerySet[T]) ExecIntoMaps(ctx context.Context, conn Querier) (list []map
 	}
 	defer rows.Close()
 	for rows.Next() {
-		sw := []any{}
+		sw := []any{} // sw holds addresses to the valueToInsert
 		for _, each := range d.selectors {
-			v := each.ValueToInsert()
-			sw = append(sw, &v)
+			sw = each.AppendScannable(sw)
 		}
 		if err := rows.Scan(sw...); err != nil {
 			return list, err
 		}
 		row := map[string]any{}
 		for i, each := range d.selectors {
-			v := sw[i].(*any)
-			row[each.Column().columnName] = *v
+			// sw[i] is the address of the valueToInsert of each (ColumnAccessor)
+			// use reflect version of dereferencing
+			rv := reflect.ValueOf(sw[i])
+			row[each.Column().columnName] = rv.Elem().Interface()
 		}
 		list = append(list, row)
 	}

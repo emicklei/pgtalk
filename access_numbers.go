@@ -62,6 +62,11 @@ func (a Int64Access) TableAlias(alias string) Int64Access {
 	return a
 }
 
+// AppendScannable is part of ColumnAccessor
+func (a Int64Access) AppendScannable(list []any) []any {
+	return append(list, &a.valueToInsert)
+}
+
 // Float64Access can Read a column value (float) and Write a column value and Set a struct field (float64).
 type Float64Access struct {
 	ColumnInfo
@@ -109,4 +114,9 @@ func (a Float64Access) FieldValueToScan(entity any) any {
 func (a Float64Access) TableAlias(alias string) Float64Access {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a
+}
+
+// AppendScannable is part of ColumnAccessor
+func (a Float64Access) AppendScannable(list []any) []any {
+	return append(list, &a.valueToInsert)
 }

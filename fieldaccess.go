@@ -77,3 +77,8 @@ func (a FieldAccess[T]) TableAlias(alias string) FieldAccess[T] {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a
 }
+
+// AppendScannable is part of ColumnAccessor
+func (a FieldAccess[T]) AppendScannable(list []any) []any {
+	return append(list, &a.valueToInsert)
+}

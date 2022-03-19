@@ -34,6 +34,11 @@ func (a BytesAccess) TableAlias(alias string) BytesAccess {
 	return a
 }
 
+// AppendScannable is part of ColumnAccessor
+func (a BytesAccess) AppendScannable(list []any) []any {
+	return append(list, &a.valueToInsert)
+}
+
 type JSONBAccess struct {
 	ColumnInfo
 	valueFieldWriter FieldAccessFunc
@@ -68,4 +73,9 @@ func (a JSONBAccess) Extract(path string) SQLExpression {
 func (a JSONBAccess) TableAlias(alias string) JSONBAccess {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a
+}
+
+// AppendScannable is part of ColumnAccessor
+func (a JSONBAccess) AppendScannable(list []any) []any {
+	return append(list, &a.valueToInsert)
 }

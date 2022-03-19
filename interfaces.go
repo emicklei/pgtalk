@@ -22,6 +22,9 @@ type ColumnAccessor interface {
 	Column() ColumnInfo
 	// FieldValueToScan returns the address of the value of the field in the entity
 	FieldValueToScan(entity any) any
+	// AppendScannable collects values for scanning by a result Row
+	// Cannot use ValueToInsert because that looses type information such that the Scanner will use default mapping
+	AppendScannable(list []any) []any
 }
 
 type SQLWriter interface {

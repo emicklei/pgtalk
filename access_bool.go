@@ -32,3 +32,8 @@ func (a BooleanAccess) TableAlias(alias string) BooleanAccess {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a
 }
+
+// AppendScannable is part of ColumnAccessor
+func (a BooleanAccess) AppendScannable(list []any) []any {
+	return append(list, &a.valueToInsert)
+}
