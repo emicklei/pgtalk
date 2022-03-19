@@ -26,7 +26,7 @@ func (a TimeAccess) Set(v time.Time) TimeAccess {
 
 func (a TimeAccess) Column() ColumnInfo { return a.ColumnInfo }
 
-func (a TimeAccess) FieldToScan(entity any) any {
+func (a TimeAccess) FieldValueToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
 

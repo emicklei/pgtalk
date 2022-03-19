@@ -21,7 +21,7 @@ func NewFieldAccess[T any](
 
 func (a FieldAccess[T]) Column() ColumnInfo { return a.ColumnInfo }
 
-func (a FieldAccess[T]) FieldToScan(entity any) any {
+func (a FieldAccess[T]) FieldValueToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
 

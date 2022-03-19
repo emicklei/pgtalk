@@ -34,7 +34,7 @@ func (i *ResultIterator[T]) Next() (*T, error) {
 	for _, each := range list {
 		for _, other := range i.selectors {
 			if other.Column().tableAttributeNumber == each.TableAttributeNumber {
-				toScan = append(toScan, other.FieldToScan(entity))
+				toScan = append(toScan, other.FieldValueToScan(entity))
 			}
 		}
 	}

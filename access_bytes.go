@@ -16,7 +16,7 @@ func NewBytesAccess(info ColumnInfo,
 
 func (a BytesAccess) Column() ColumnInfo { return a.ColumnInfo }
 
-func (a BytesAccess) FieldToScan(entity any) any {
+func (a BytesAccess) FieldValueToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
 
@@ -54,7 +54,7 @@ func (a JSONBAccess) ValueToInsert() any {
 	return a.valueToInsert
 }
 
-func (a JSONBAccess) FieldToScan(entity any) any {
+func (a JSONBAccess) FieldValueToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
 

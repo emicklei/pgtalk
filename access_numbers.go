@@ -25,7 +25,7 @@ func (a Int64Access) BetweenAnd(begin int64, end int64) BetweenAnd {
 	return MakeBetweenAnd(a, valuePrinter{begin}, valuePrinter{end})
 }
 
-func (a Int64Access) FieldToScan(entity any) any {
+func (a Int64Access) FieldValueToScan(entity any) any {
 	return a.fieldWriter(entity)
 }
 
@@ -102,7 +102,7 @@ func (a Float64Access) Compare(op string, float64OrFloat64Access any) binaryExpr
 	panic("float64 or Float64Access expected")
 }
 
-func (a Float64Access) FieldToScan(entity any) any {
+func (a Float64Access) FieldValueToScan(entity any) any {
 	return a.fieldWriter(entity)
 }
 

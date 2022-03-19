@@ -33,6 +33,18 @@ func TestCustomExpression(t *testing.T) {
 	t.Log(pgtalk.SQL(q))
 }
 
+func TestSelectMaps(t *testing.T) {
+	createAThing(t)
+	q := things.Select(things.ID, things.Ttext)
+	list, err := q.ExecIntoMaps(context.Background(), testConnect)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, each := range list {
+		t.Log(each)
+	}
+}
+
 func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {
 	if got, want := len(things.Columns()), 5; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
@@ -40,26 +52,8 @@ func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {
 }
 
 func TestManageThing(t *testing.T) {
-	// CREATE
 	ctx := context.Background()
-	id := uuid.New()
-	t.Log(id.String())
-	create := things.Insert(
-		things.ID.Set(convert.UUID(id)),
-		things.Tdate.Set(convert.TimeToDate(time.Now())),
-		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
-		things.Tjson.Set([]byte(`{"key":"value"}`)),
-		things.Ttext.Set(convert.StringToText("hello")),
-	)
-	tx, err := testConnect.Begin(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
-	_ = create.Exec(ctx, testConnect)
-	err = tx.Commit(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
+	id := createAThing(t)
 	// READ
 	{
 		read := things.Select(things.ID, things.Tdate, things.Ttimestamp, things.Tjson).Where(things.ID.Equals(convert.UUID(id)))
@@ -74,7 +68,7 @@ func TestManageThing(t *testing.T) {
 	{
 		update := things.Update(things.Tdate.Set(pgtype.Date{Status: pgtype.Null})).Where(things.ID.Equals(convert.UUID(id)))
 		t.Log(pgtalk.SQL(update))
-		tx, err = testConnect.Begin(ctx)
+		tx, err := testConnect.Begin(ctx)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -97,6 +91,30 @@ func TestManageThing(t *testing.T) {
 			t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 		}
 	}
+}
+
+func createAThing(t *testing.T) uuid.UUID {
+	// CREATE
+	ctx := context.Background()
+	id := uuid.New()
+	t.Log(id.String())
+	create := things.Insert(
+		things.ID.Set(convert.UUID(id)),
+		things.Tdate.Set(convert.TimeToDate(time.Now())),
+		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
+		things.Tjson.Set([]byte(`{"key":"value"}`)),
+		things.Ttext.Set(convert.StringToText("hello")),
+	)
+	tx, err := testConnect.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = create.Exec(ctx, testConnect)
+	err = tx.Commit(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return id
 }
 
 func TestJSONB(t *testing.T) {

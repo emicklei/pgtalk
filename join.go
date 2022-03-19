@@ -134,11 +134,11 @@ func (i *JoinResultIterator) Next(left any, right any) error {
 	sw := []any{}
 	// left
 	for _, each := range i.leftSet.selectAccessors() {
-		sw = append(sw, each.FieldToScan(left))
+		sw = append(sw, each.FieldValueToScan(left))
 	}
 	// right
 	for _, each := range i.rightSet.selectAccessors() {
-		sw = append(sw, each.FieldToScan(right))
+		sw = append(sw, each.FieldValueToScan(right))
 	}
 	return i.rows.Scan(sw...)
 }
@@ -262,7 +262,7 @@ func (i *MultiJoinResultIterator) Next(models ...any) error {
 	// all sets
 	for m, eachSet := range i.querySets {
 		for _, each := range eachSet.selectAccessors() {
-			sw = append(sw, each.FieldToScan(models[m]))
+			sw = append(sw, each.FieldValueToScan(models[m]))
 		}
 	}
 	return i.rows.Scan(sw...)

@@ -144,12 +144,32 @@ func (d QuerySet[T]) Exec(ctx context.Context, conn Querier) (list []*T, err err
 		entity := new(T)
 		sw := []any{}
 		for _, each := range d.selectors {
-			sw = append(sw, each.FieldToScan(entity))
+			sw = append(sw, each.FieldValueToScan(entity))
 		}
 		if err := rows.Scan(sw...); err != nil {
 			return list, err
 		}
 		list = append(list, entity)
+	}
+	return
+}
+
+func (d QuerySet[T]) ExecIntoMaps(ctx context.Context, conn Querier) (list []map[string]any, err error) {
+	rows, err := conn.Query(ctx, SQL(d))
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		values, err := rows.Values()
+		if err != nil {
+			return list, err
+		}
+		row := map[string]any{}
+		for i, each := range d.selectors {
+			row[each.Column().columnName] = values[i]
+		}
+		list = append(list, row)
 	}
 	return
 }

@@ -24,7 +24,7 @@ func (a BooleanAccess) Equals(b bool) SQLExpression {
 	return MakeBinaryOperator(a, "=", valuePrinter{b})
 }
 
-func (a BooleanAccess) FieldToScan(entity any) any {
+func (a BooleanAccess) FieldValueToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
 

@@ -20,8 +20,8 @@ type ColumnAccessor interface {
 	Name() string
 	ValueToInsert() any
 	Column() ColumnInfo
-	// FieldToScan returns the address of the value of the field in the entity
-	FieldToScan(entity any) any
+	// FieldValueToScan returns the address of the value of the field in the entity
+	FieldValueToScan(entity any) any
 }
 
 type SQLWriter interface {

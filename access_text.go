@@ -40,7 +40,7 @@ func (a TextAccess) Compare(op string, stringOrTextAccess any) binaryExpression 
 	panic("string or TextAcces expected")
 }
 
-func (a TextAccess) FieldToScan(entity any) any {
+func (a TextAccess) FieldValueToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
 
