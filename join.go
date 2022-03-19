@@ -127,11 +127,11 @@ func (i *JoinResultIterator) Err() error {
 	return i.rows.Err()
 }
 
-func (i *JoinResultIterator) Next(left interface{}, right interface{}) error {
+func (i *JoinResultIterator) Next(left any, right any) error {
 	if i.queryError != nil {
 		return i.queryError
 	}
-	sw := []interface{}{}
+	sw := []any{}
 	// left
 	for _, each := range i.leftSet.selectAccessors() {
 		sw = append(sw, each.FieldToScan(left))
@@ -242,7 +242,7 @@ func (i *MultiJoinResultIterator) HasNext() bool {
 	return false
 }
 
-func (i *MultiJoinResultIterator) Next(models ...interface{}) error {
+func (i *MultiJoinResultIterator) Next(models ...any) error {
 	if i.queryError != nil {
 		return i.queryError
 	}
@@ -258,7 +258,7 @@ func (i *MultiJoinResultIterator) Next(models ...interface{}) error {
 		return fmt.Errorf("number of models [%d] does not match select count [%d]", mc, qc)
 	}
 	// TODO how to check model types?
-	sw := []interface{}{}
+	sw := []any{}
 	// all sets
 	for m, eachSet := range i.querySets {
 		for _, each := range eachSet.selectAccessors() {

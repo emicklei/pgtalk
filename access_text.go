@@ -19,15 +19,15 @@ func (a TextAccess) Set(v string) TextAccess {
 	return a
 }
 
-func (a TextAccess) ValueToInsert() interface{} {
+func (a TextAccess) ValueToInsert() any {
 	return a.valueToInsert
 }
 
-func (a TextAccess) Equals(stringOrTextAccess interface{}) binaryExpression {
+func (a TextAccess) Equals(stringOrTextAccess any) binaryExpression {
 	return a.Compare("=", stringOrTextAccess)
 }
 
-func (a TextAccess) Compare(op string, stringOrTextAccess interface{}) binaryExpression {
+func (a TextAccess) Compare(op string, stringOrTextAccess any) binaryExpression {
 	if !strings.Contains(validComparisonOperators, op) {
 		panic("invalid comparison operator:" + op)
 	}
@@ -49,7 +49,7 @@ func (a TextAccess) Like(pattern string) binaryExpression {
 }
 
 func (a TextAccess) In(values ...string) binaryExpression {
-	vs := make([]interface{}, len(values))
+	vs := make([]any, len(values))
 	for i := 0; i < len(values); i++ {
 		vs[i] = values[i]
 	}

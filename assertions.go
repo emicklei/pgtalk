@@ -28,7 +28,7 @@ type ValueConversionError struct {
 	got, want string
 }
 
-func NewValueConversionError(got interface{}, want string) error {
+func NewValueConversionError(got any, want string) error {
 	return ValueConversionError{fmt.Sprintf("%T", got), want}
 }
 

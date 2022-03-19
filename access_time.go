@@ -15,7 +15,7 @@ func NewTimeAccess(info ColumnInfo,
 	return TimeAccess{ColumnInfo: info, valueFieldWriter: valueWriter}
 }
 
-func (a TimeAccess) ValueToInsert() interface{} {
+func (a TimeAccess) ValueToInsert() any {
 	return a.valueToInsert
 }
 

@@ -29,7 +29,7 @@ func (a Int64Access) FieldToScan(entity any) any {
 	return a.fieldWriter(entity)
 }
 
-func (a Int64Access) ValueToInsert() interface{} {
+func (a Int64Access) ValueToInsert() any {
 	return a.valueToInsert
 }
 
@@ -38,7 +38,7 @@ func (a Int64Access) Set(v int64) Int64Access {
 	return a
 }
 
-func (a Int64Access) Equals(intOrInt64Access interface{}) binaryExpression {
+func (a Int64Access) Equals(intOrInt64Access any) binaryExpression {
 	if i, ok := intOrInt64Access.(int); ok {
 		return MakeBinaryOperator(a, "=", valuePrinter{i})
 	}
@@ -66,7 +66,7 @@ func (a Int64Access) TableAlias(alias string) Int64Access {
 type Float64Access struct {
 	ColumnInfo
 	fieldWriter         FieldAccessFunc
-	nullableFieldWriter func(dest interface{}, f pgtype.Float8)
+	nullableFieldWriter func(dest any, f pgtype.Float8)
 	valueToInsert       float64
 }
 
@@ -74,7 +74,7 @@ func NewFloat64Access(info ColumnInfo, writer FieldAccessFunc) Float64Access {
 	return Float64Access{ColumnInfo: info, fieldWriter: writer}
 }
 
-func (a Float64Access) ValueToInsert() interface{} {
+func (a Float64Access) ValueToInsert() any {
 	return a.ValueToInsert
 }
 
@@ -85,11 +85,11 @@ func (a Float64Access) Set(v float64) Float64Access {
 
 func (a Float64Access) Column() ColumnInfo { return a.ColumnInfo }
 
-func (a Float64Access) Equals(float64OrFloat64Access interface{}) binaryExpression {
+func (a Float64Access) Equals(float64OrFloat64Access any) binaryExpression {
 	return a.Compare("=", float64OrFloat64Access)
 }
 
-func (a Float64Access) Compare(op string, float64OrFloat64Access interface{}) binaryExpression {
+func (a Float64Access) Compare(op string, float64OrFloat64Access any) binaryExpression {
 	if !strings.Contains(validComparisonOperators, op) {
 		panic("invalid comparison operator:" + op)
 	}

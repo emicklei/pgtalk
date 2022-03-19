@@ -142,7 +142,7 @@ func (d QuerySet[T]) Exec(ctx context.Context, conn Querier) (list []*T, err err
 	defer rows.Close()
 	for rows.Next() {
 		entity := new(T)
-		sw := []interface{}{}
+		sw := []any{}
 		for _, each := range d.selectors {
 			sw = append(sw, each.FieldToScan(entity))
 		}

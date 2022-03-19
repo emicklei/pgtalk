@@ -14,10 +14,10 @@ import (
 var EmptyColumnAccessor = []ColumnAccessor{}
 
 type valuePrinter struct {
-	v interface{}
+	v any
 }
 
-func MakeValuePrinter(v interface{}) valuePrinter { return valuePrinter{v: v} }
+func MakeValuePrinter(v any) valuePrinter { return valuePrinter{v: v} }
 
 func (p valuePrinter) SQLOn(w WriteContext) {
 	if e, ok := p.v.(SQLWriter); ok {
@@ -55,7 +55,7 @@ func encodeUUID(src [16]byte) string {
 }
 
 type valuesPrinter struct {
-	vs []interface{}
+	vs []any
 }
 
 func (p valuesPrinter) SQLOn(w WriteContext) {
@@ -101,7 +101,7 @@ func writeAccessOn(list []ColumnAccessor, w WriteContext) {
 
 const HideNilValues = true
 
-func StringWithFields(v interface{}, includePresent bool) string {
+func StringWithFields(v any, includePresent bool) string {
 	vt := reflect.TypeOf(v)
 	if vt.Kind() == reflect.Ptr {
 		vt = vt.Elem()
@@ -121,7 +121,7 @@ func StringWithFields(v interface{}, includePresent bool) string {
 		if fv.IsZero() {
 			continue
 		}
-		var fi interface{}
+		var fi any
 		// check fields that have pointer type
 		if fv.Kind() == reflect.Pointer {
 			fi = fv.Elem().Interface()

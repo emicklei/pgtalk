@@ -31,12 +31,12 @@ func (a FieldAccess[T]) Set(v T) FieldAccess[T] {
 	return a
 }
 
-func (a FieldAccess[T]) ValueToInsert() interface{} {
+func (a FieldAccess[T]) ValueToInsert() any {
 	return a.valueToInsert
 }
 
 // Equals returns a SQLExpression
-func (a FieldAccess[T]) Equals(operand interface{}) binaryExpression {
+func (a FieldAccess[T]) Equals(operand any) binaryExpression {
 	if fat, ok := operand.(FieldAccess[T]); ok {
 		return MakeBinaryOperator(a, "=", fat)
 	}
@@ -47,7 +47,7 @@ func (a FieldAccess[T]) Equals(operand interface{}) binaryExpression {
 }
 
 // Less returns a SQLExpression
-func (a FieldAccess[T]) LessThan(operand interface{}) binaryExpression {
+func (a FieldAccess[T]) LessThan(operand any) binaryExpression {
 	if fat, ok := operand.(FieldAccess[T]); ok {
 		return MakeBinaryOperator(a, "<", fat)
 	}
@@ -59,7 +59,7 @@ func (a FieldAccess[T]) LessThan(operand interface{}) binaryExpression {
 }
 
 func (a FieldAccess[T]) In(values ...any) binaryExpression {
-	vs := make([]interface{}, len(values))
+	vs := make([]any, len(values))
 	for i := 0; i < len(values); i++ {
 		vs[i] = values[i]
 	}

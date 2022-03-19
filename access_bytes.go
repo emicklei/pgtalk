@@ -20,7 +20,7 @@ func (a BytesAccess) FieldToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
 
-func (a BytesAccess) ValueToInsert() interface{} {
+func (a BytesAccess) ValueToInsert() any {
 	return a.valueToInsert
 }
 
@@ -50,7 +50,7 @@ func (a JSONBAccess) Set(s []byte) JSONBAccess {
 	return a
 }
 
-func (a JSONBAccess) ValueToInsert() interface{} {
+func (a JSONBAccess) ValueToInsert() any {
 	return a.valueToInsert
 }
 

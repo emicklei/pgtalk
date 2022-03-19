@@ -13,12 +13,12 @@ var assertEnabled = false
 // Use this for running your test code.
 func EnableAssert() { assertEnabled = true }
 
-type NewEntityFunc func() interface{}
+type NewEntityFunc func() any
 
 type ColumnAccessor interface {
 	SQLWriter
 	Name() string
-	ValueToInsert() interface{}
+	ValueToInsert() any
 	Column() ColumnInfo
 	// FieldToScan returns the address of the value of the field in the entity
 	FieldToScan(entity any) any
@@ -45,7 +45,7 @@ type querySet interface {
 }
 
 type Querier interface {
-	Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error)
+	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
 }
 
 type FieldAccessFunc = func(entity any) any

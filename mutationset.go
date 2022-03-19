@@ -106,8 +106,8 @@ func (m MutationSet[T]) Exec(ctx context.Context, conn Querier) *ResultIterator[
 }
 
 // ValuesToInsert returns the parameters values for the mutation query.
-func (m MutationSet[T]) ValuesToInsert() []interface{} {
-	args := make([]interface{}, len(m.selectors))
+func (m MutationSet[T]) ValuesToInsert() []any {
+	args := make([]any, len(m.selectors))
 	for i, each := range m.selectors {
 		args[i] = each.ValueToInsert()
 	}

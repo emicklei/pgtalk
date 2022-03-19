@@ -16,7 +16,7 @@ func (a BooleanAccess) Set(v bool) BooleanAccess {
 	a.valueToInsert = v
 	return a
 }
-func (a BooleanAccess) ValueToInsert() interface{} {
+func (a BooleanAccess) ValueToInsert() any {
 	return a.valueToInsert
 }
 
