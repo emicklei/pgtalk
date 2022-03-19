@@ -35,13 +35,19 @@ func TestCustomExpression(t *testing.T) {
 
 func TestSelectMaps(t *testing.T) {
 	createAThing(t)
-	q := things.Select(things.ID, things.Ttext)
+	q := things.Select(things.ID, things.Ttext, things.Tdate)
 	list, err := q.ExecIntoMaps(context.Background(), testConnect)
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, each := range list {
-		t.Log(each)
+		id := each["id"].([16]uint8)
+		t.Logf("%v (%T)", id, id)
+		txt := each["ttext"].(string)
+		t.Logf("%v (%T)", txt, txt)
+		// skip nil check
+		dt := each["tdate"].(time.Time)
+		t.Logf("%v (%T)", dt, dt)
 	}
 }
 
@@ -97,7 +103,6 @@ func createAThing(t *testing.T) uuid.UUID {
 	// CREATE
 	ctx := context.Background()
 	id := uuid.New()
-	t.Log(id.String())
 	create := things.Insert(
 		things.ID.Set(convert.UUID(id)),
 		things.Tdate.Set(convert.TimeToDate(time.Now())),

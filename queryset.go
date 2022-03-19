@@ -161,13 +161,18 @@ func (d QuerySet[T]) ExecIntoMaps(ctx context.Context, conn Querier) (list []map
 	}
 	defer rows.Close()
 	for rows.Next() {
-		values, err := rows.Values()
-		if err != nil {
+		sw := []any{}
+		for _, each := range d.selectors {
+			v := each.ValueToInsert()
+			sw = append(sw, &v)
+		}
+		if err := rows.Scan(sw...); err != nil {
 			return list, err
 		}
 		row := map[string]any{}
 		for i, each := range d.selectors {
-			row[each.Column().columnName] = values[i]
+			v := sw[i].(*any)
+			row[each.Column().columnName] = *v
 		}
 		list = append(list, row)
 	}
