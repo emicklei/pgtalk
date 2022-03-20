@@ -37,3 +37,9 @@ func (a BooleanAccess) TableAlias(alias string) BooleanAccess {
 func (a BooleanAccess) AppendScannable(list []any) []any {
 	return append(list, &a.valueToInsert)
 }
+
+// Get returns the value for its columnName from a map (row).
+func (a BooleanAccess) Get(values map[string]any) (any, bool) {
+	v, ok := values[a.columnName]
+	return v, ok
+}

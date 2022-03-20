@@ -39,3 +39,9 @@ func (a TimeAccess) TableAlias(alias string) TimeAccess {
 func (a TimeAccess) AppendScannable(list []any) []any {
 	return append(list, &a.valueToInsert)
 }
+
+// Get returns the value for its columnName from a map (row).
+func (a TimeAccess) Get(values map[string]any) (any, bool) {
+	v, ok := values[a.columnName]
+	return v, ok
+}

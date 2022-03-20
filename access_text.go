@@ -67,3 +67,9 @@ func (a TextAccess) TableAlias(alias string) TextAccess {
 func (a TextAccess) AppendScannable(list []any) []any {
 	return append(list, &a.valueToInsert)
 }
+
+// Get returns the value for its columnName from a map (row).
+func (a TextAccess) Get(values map[string]any) (any, bool) {
+	v, ok := values[a.columnName]
+	return v, ok
+}
