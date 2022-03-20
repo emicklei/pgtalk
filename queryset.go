@@ -156,21 +156,25 @@ func (d QuerySet[T]) Exec(ctx context.Context, conn Querier) (list []*T, err err
 }
 
 func (d QuerySet[T]) ExecIntoMaps(ctx context.Context, conn Querier) (list []map[string]any, err error) {
-	rows, err := conn.Query(ctx, SQL(d))
+	return execIntoMaps(ctx, conn, SQL(d), d.selectors)
+}
+
+func execIntoMaps(ctx context.Context, conn Querier, query string, selectors []ColumnAccessor) (list []map[string]any, err error) {
+	rows, err := conn.Query(ctx, query)
 	if err != nil {
 		return
 	}
 	defer rows.Close()
 	for rows.Next() {
 		sw := []any{} // sw holds addresses to the valueToInsert
-		for _, each := range d.selectors {
+		for _, each := range selectors {
 			sw = each.AppendScannable(sw)
 		}
 		if err := rows.Scan(sw...); err != nil {
 			return list, err
 		}
 		row := map[string]any{}
-		for i, each := range d.selectors {
+		for i, each := range selectors {
 			// sw[i] is the address of the valueToInsert of each (ColumnAccessor)
 			// use reflect version of dereferencing
 			rv := reflect.ValueOf(sw[i])

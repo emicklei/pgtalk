@@ -28,9 +28,21 @@ func TestGetColumn(t *testing.T) {
 }
 
 func TestCustomExpression(t *testing.T) {
-	// select id, ttext || ttext from (select t1.id, t1.ttext from things t1) t2
-	q := things.Select(things.ID, things.Ttext).Collect(things.ID, things.Ttext.Concat(things.Ttext))
+	createAThing(t)
+	q := things.Select(things.ID, things.Ttext).Collect(things.ID, things.Ttext.Concat("cc", things.Ttext))
 	t.Log(pgtalk.SQL(q))
+	list, err := q.ExecIntoMaps(context.Background(), testConnect)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, each := range list {
+		v, _ := things.ID.Get(each)
+		id := v.(pgtype.UUID)
+		t.Logf("%v (%T)", id.Bytes, id)
+
+		cc := each["cc"]
+		t.Logf("%v (%T)", cc, cc)
+	}
 }
 
 func TestSelectMaps(t *testing.T) {
