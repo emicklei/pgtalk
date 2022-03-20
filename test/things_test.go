@@ -30,17 +30,18 @@ func TestGetColumn(t *testing.T) {
 func TestCustomExpression(t *testing.T) {
 	createAThing(t)
 	q := things.Select(things.ID, things.Ttext).Collect(things.ID, things.Ttext.Concat("cc", things.Ttext))
-	t.Log(pgtalk.SQL(q))
+	if got, want := pgtalk.SQL(q), "SELECT bag.id,(bag.ttext || bag.ttext) AS cc FROM (SELECT t1.id,t1.ttext FROM public.things t1) AS bag"; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
 	list, err := q.ExecIntoMaps(context.Background(), testConnect)
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, each := range list {
-		v, _ := things.ID.Get(each)
-		id := v.(pgtype.UUID)
+		id := things.ID.Get(each).(pgtype.UUID)
 		t.Logf("%v (%T)", id.Bytes, id)
 
-		cc := each["cc"]
+		cc := each["cc"].(string)
 		t.Logf("%v (%T)", cc, cc)
 	}
 }
@@ -53,16 +54,13 @@ func TestSelectMaps(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, each := range list {
-		v, _ := things.ID.Get(each)
-		id := v.(pgtype.UUID)
+		id := things.ID.Get(each).(pgtype.UUID)
 		t.Logf("%v (%T)", id.Bytes, id)
 
-		v, _ = things.Ttext.Get(each)
-		txt := v.(pgtype.Text)
+		txt := things.Ttext.Get(each).(pgtype.Text)
 		t.Logf("%v (%T)", txt.String, txt)
 
-		v, _ = things.Tdate.Get(each)
-		dt := v.(pgtype.Date)
+		dt := things.Tdate.Get(each).(pgtype.Date)
 		t.Logf("%v (%T)", dt.Time, dt)
 	}
 }

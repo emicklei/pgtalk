@@ -32,9 +32,13 @@ func (a FieldAccess[T]) Set(v T) FieldAccess[T] {
 }
 
 // Get returns the value for its columnName from a map (row).
-func (a FieldAccess[T]) Get(values map[string]any) (any, bool) {
+func (a FieldAccess[T]) Get(values map[string]any) any {
 	v, ok := values[a.columnName]
-	return v, ok
+	if !ok {
+		var none T
+		return none
+	}
+	return v
 }
 
 func (a FieldAccess[T]) ValueToInsert() any {

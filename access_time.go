@@ -41,7 +41,10 @@ func (a TimeAccess) AppendScannable(list []any) []any {
 }
 
 // Get returns the value for its columnName from a map (row).
-func (a TimeAccess) Get(values map[string]any) (any, bool) {
+func (a TimeAccess) Get(values map[string]any) any {
 	v, ok := values[a.columnName]
-	return v, ok
+	if !ok {
+		return time.Time{}
+	}
+	return v
 }

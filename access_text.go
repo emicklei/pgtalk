@@ -2,6 +2,8 @@ package pgtalk
 
 import (
 	"strings"
+
+	"github.com/jackc/pgtype"
 )
 
 type TextAccess struct {
@@ -69,7 +71,10 @@ func (a TextAccess) AppendScannable(list []any) []any {
 }
 
 // Get returns the value for its columnName from a map (row).
-func (a TextAccess) Get(values map[string]any) (any, bool) {
+func (a TextAccess) Get(values map[string]any) any {
 	v, ok := values[a.columnName]
-	return v, ok
+	if !ok {
+		return pgtype.Text{}
+	}
+	return v
 }

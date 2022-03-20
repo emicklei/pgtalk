@@ -61,7 +61,10 @@ func (a Float64Access) AppendScannable(list []any) []any {
 }
 
 // Get returns the value for its columnName from a map (row).
-func (a Float64Access) Get(values map[string]any) (any, bool) {
+func (a Float64Access) Get(values map[string]any) any {
 	v, ok := values[a.columnName]
-	return v, ok
+	if !ok {
+		return float64(0.0)
+	}
+	return v
 }

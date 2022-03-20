@@ -26,7 +26,9 @@ type ColumnAccessor interface {
 	// Cannot use ValueToInsert because that looses type information such that the Scanner will use default mapping
 	AppendScannable(list []any) []any
 	// Get accesses the value from a map.
-	Get(values map[string]any) (any, bool)
+	// (unfortunately, Go methods cannot have additional type parameters:
+	// Get[V](values map[string]any) V )
+	Get(values map[string]any) any
 }
 
 type SQLWriter interface {

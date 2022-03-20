@@ -74,7 +74,10 @@ func (c ComputedColumn) AppendScannable(list []any) []any {
 }
 
 // Get accesses the value from a map.
-func (c ComputedColumn) Get(values map[string]any) (any, bool) {
+func (c ComputedColumn) Get(values map[string]any) any {
 	v, ok := values[c.ResultName]
-	return v, ok
+	if !ok {
+		return nil
+	}
+	return v
 }
