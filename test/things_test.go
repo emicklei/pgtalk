@@ -29,8 +29,8 @@ func TestGetColumn(t *testing.T) {
 
 func TestCustomExpression(t *testing.T) {
 	createAThing(t)
-	q := things.Select(things.ID, things.Ttext).Collect(things.ID, things.Ttext.Concat("cc", things.Ttext))
-	if got, want := pgtalk.SQL(q), "SELECT bag.id,(bag.ttext || bag.ttext) AS cc FROM (SELECT t1.id,t1.ttext FROM public.things t1) AS bag"; got != want {
+	q := things.Collect(things.ID, things.Ttext.Concat("cc", things.Ttext))
+	if got, want := pgtalk.SQL(q), "SELECT t1.id,(t1.ttext || t1.ttext) AS cc FROM public.things t1"; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 	list, err := q.ExecIntoMaps(context.Background(), testConnect)

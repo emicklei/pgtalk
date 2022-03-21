@@ -9,32 +9,27 @@ import (
 
 type UntypedQuerySet struct {
 	expressions []ColumnAccessor
-	set         SQLWriter
+	tableInfo   TableInfo
+}
+
+func NewUntypedQuerySet(tableInfo TableInfo, expr []ColumnAccessor) UntypedQuerySet {
+	return UntypedQuerySet{expressions: expr, tableInfo: tableInfo}
 }
 
 func (c UntypedQuerySet) SQLOn(w WriteContext) {
 	fmt.Fprintf(w, "SELECT ")
-	subW := w.WithAlias("things", "bag")
 	for i, each := range c.expressions {
 		if i > 0 {
 			fmt.Fprint(w, ",")
 		}
-		each.SQLOn(subW)
+		each.SQLOn(w)
 	}
-	fmt.Fprintf(w, " FROM (")
-	c.set.SQLOn(w)
-	fmt.Fprintf(w, ") AS bag")
+	fmt.Fprintf(w, " FROM ")
+	c.tableInfo.SQLOn(w)
 }
 
 func (c UntypedQuerySet) ExecIntoMaps(ctx context.Context, conn Querier) (list []map[string]any, err error) {
 	return execIntoMaps(ctx, conn, SQL(c), c.expressions)
-}
-
-func (d QuerySet[T]) Collect(expressions ...ColumnAccessor) UntypedQuerySet {
-	return UntypedQuerySet{
-		set:         d,
-		expressions: expressions,
-	}
 }
 
 func (a FieldAccess[T]) Concat(resultName string, ex SQLExpression) ColumnAccessor {

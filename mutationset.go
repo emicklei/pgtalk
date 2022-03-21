@@ -49,7 +49,7 @@ func (m MutationSet[T]) SQLOn(w WriteContext) {
 	}
 	if m.operationType == MutationDelete {
 		fmt.Fprint(w, "DELETE FROM ")
-		m.tableInfo.SQLOn(m.tableInfo, w)
+		m.tableInfo.SQLOn(w)
 		if m.condition != EmptyCondition {
 			fmt.Fprint(w, " WHERE ")
 			m.condition.SQLOn(w)
@@ -62,7 +62,7 @@ func (m MutationSet[T]) SQLOn(w WriteContext) {
 	}
 	if m.operationType == MutationUpdate {
 		fmt.Fprint(w, "UPDATE ")
-		m.tableInfo.SQLOn(m.tableInfo, w)
+		m.tableInfo.SQLOn(w)
 		fmt.Fprint(w, " SET ")
 		m.setSectionOn(w)
 		if m.condition != EmptyCondition {
