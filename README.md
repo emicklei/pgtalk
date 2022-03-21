@@ -1,5 +1,6 @@
 # pgtalk
 
+[![Build Status](https://api.travis-ci.com/emicklei/pgtalk.svg?branch=master)](https://travis-ci.com/github/emicklei/pgtalk)
 [![GoDoc](https://pkg.go.dev/badge/github.com/emicklei/pgtalk)](https://pkg.go.dev/github.com/emicklei/pgtalk)
 
 More type safe SQL query building and execution using Go code generated (pgtalk-gen) from PostgreSQL table definitions.
