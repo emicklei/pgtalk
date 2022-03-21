@@ -26,7 +26,8 @@ func TestMain(m *testing.M) {
 	conn, err := pgx.Connect(context.Background(), connectionString)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
+		println("no database available so tests in this package are skipped")
+		os.Exit(0)
 	}
 	testConnect = conn
 	if err := ensureTables(conn); err != nil {
