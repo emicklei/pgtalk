@@ -18,6 +18,8 @@ type Thing struct {
 	Ttimestamp pgtype.Timestamp // ttimestamp : timestamp without time zone
 	Tjson      pgtype.JSONB     // tjson : jsonb
 	Ttext      pgtype.Text      // ttext : text
+	// for storing custom field expression result values
+	_expressionResults map[string]any
 }
 
 var (
@@ -87,6 +89,23 @@ func (e *Thing) Setters() (list []p.ColumnAccessor) {
 // String returns the debug string for *Thing with all non-nil field values.
 func (e *Thing) String() string {
 	return p.StringWithFields(e, p.HideNilValues)
+}
+
+func (e *Thing) AddExpressionResult(key string, value any) {
+	if e._expressionResults == nil {
+		// lazy initialize
+		e._expressionResults = map[string]any{}
+	}
+	e._expressionResults[key]=value
+}
+
+func (e *Thing) GetExpressionResult(key string) any {
+	v, ok := e._expressionResults[key]
+	if !ok {
+		return nil
+	}
+	pv := v.(*any)
+	return *pv
 }
 
 // Columns returns the ColumnAccessor list for the given column names.

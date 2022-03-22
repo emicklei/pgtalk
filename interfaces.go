@@ -56,3 +56,7 @@ type Querier interface {
 }
 
 type FieldAccessFunc = func(entity any) any
+
+type ExpressionValueHolder interface {
+	AddExpressionResult(key string, value any)
+}

@@ -25,7 +25,7 @@ type QuerySet[T any] struct {
 
 func MakeQuerySet[T any](tableInfo TableInfo, selectors []ColumnAccessor) QuerySet[T] {
 	if assertEnabled {
-		assertEachAccessorHasTableInfo(selectors, tableInfo)
+		//	assertEachAccessorHasTableInfo(selectors, tableInfo)
 	}
 	return QuerySet[T]{
 		tableInfo: tableInfo,

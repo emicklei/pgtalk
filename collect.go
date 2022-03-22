@@ -3,6 +3,7 @@ package pgtalk
 import (
 	"context"
 	"fmt"
+	"io"
 )
 
 // Work in Progress
@@ -33,7 +34,7 @@ func (c UntypedQuerySet) ExecIntoMaps(ctx context.Context, conn Querier) (list [
 }
 
 func (a FieldAccess[T]) Concat(resultName string, ex SQLExpression) ColumnAccessor {
-	return ComputedColumn{
+	return &ComputedField{
 		ResultName: resultName,
 		Expression: binaryExpression{
 			Left:     a,
@@ -42,34 +43,55 @@ func (a FieldAccess[T]) Concat(resultName string, ex SQLExpression) ColumnAccess
 		}}
 }
 
-// ComputedColumn is a ColumnAccessor for read.
-type ComputedColumn struct {
+func FieldSQL(name, sql string) *ComputedField {
+	return &ComputedField{
+		ResultName: name,
+		Expression: ExpressionSource{SQL: sql},
+	}
+}
+
+type ExpressionSource struct {
+	SQL string
+}
+
+// SQLOn is part of SQLWriter
+func (e ExpressionSource) SQLOn(w WriteContext) {
+	io.WriteString(w, e.SQL)
+}
+
+// ComputedField is a ColumnAccessor for read.
+type ComputedField struct {
 	ResultName string
 	Expression SQLExpression
 	Value      any
 }
 
-func (c ComputedColumn) SQLOn(w WriteContext) {
+func (c *ComputedField) SQLOn(w WriteContext) {
 	c.Expression.SQLOn(w)
 	fmt.Fprintf(w, " AS %s", c.ResultName)
 }
-func (c ComputedColumn) Name() string       { return c.ResultName }
-func (c ComputedColumn) ValueToInsert() any { return nil }
-func (c ComputedColumn) Column() ColumnInfo { return ColumnInfo{columnName: c.ResultName} }
+func (c *ComputedField) Name() string       { return c.ResultName }
+func (c *ComputedField) ValueToInsert() any { return nil }
+func (c *ComputedField) Column() ColumnInfo { return ColumnInfo{columnName: c.ResultName} }
 
 // FieldValueToScan returns the address of the value of the field in the entity
-func (c ComputedColumn) FieldValueToScan(entity any) any {
-	return &c.Value
+func (c *ComputedField) FieldValueToScan(entity any) any {
+	addr := &c.Value
+	if h, ok := entity.(ExpressionValueHolder); ok {
+		// side effect to update the entity custom expressions
+		h.AddExpressionResult(c.ResultName, addr)
+	}
+	return addr
 }
 
 // AppendScannable collects values for scanning by a result Row
 // Cannot use ValueToInsert because that looses type information such that the Scanner will use default mapping
-func (c ComputedColumn) AppendScannable(list []any) []any {
+func (c *ComputedField) AppendScannable(list []any) []any {
 	return append(list, &c.Value)
 }
 
 // Get accesses the value from a map.
-func (c ComputedColumn) Get(values map[string]any) any {
+func (c *ComputedField) Get(values map[string]any) any {
 	v, ok := values[c.ResultName]
 	if !ok {
 		return nil

@@ -27,9 +27,27 @@ func TestGetColumn(t *testing.T) {
 	t.Log(ids)
 }
 
+func TestCustomExpressionExtension(t *testing.T) {
+	createAThing(t)
+	q := things.Select(things.ID, pgtalk.FieldSQL("id2", "12 * 24"))
+	if got, want := pgtalk.SQL(q), "SELECT t1.id,12 * 24 AS id2 FROM public.things t1"; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+	list, err := q.Exec(context.Background(), testConnect)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, each := range list {
+		cev := each.GetExpressionResult("id2")
+		if got, want := cev, int32(288); got != want {
+			t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+		}
+	}
+}
+
 func TestCustomExpression(t *testing.T) {
 	createAThing(t)
-	q := things.Collect(things.ID, things.Ttext.Concat("cc", things.Ttext))
+	q := things.Select(things.ID, things.Ttext.Concat("cc", things.Ttext))
 	if got, want := pgtalk.SQL(q), "SELECT t1.id,(t1.ttext || t1.ttext) AS cc FROM public.things t1"; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
