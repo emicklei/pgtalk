@@ -34,10 +34,11 @@ func (i Join) SQLOn(w WriteContext) {
 	wl := i.leftSet.augmentedContext(w)
 	wr := i.rightSet.augmentedContext(w)
 	writeAccessOn(left, wl)
-	if len(left) > 0 {
+	right := i.rightSet.selectAccessors()
+	if len(right) > 0 {
 		fmt.Fprint(wl, ",")
 	}
-	writeAccessOn(i.rightSet.selectAccessors(), wr)
+	writeAccessOn(right, wr)
 	fmt.Fprint(w, " FROM ")
 	i.leftSet.fromSectionOn(wl)
 	writeJoinType(i.joinType, w)
