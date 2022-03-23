@@ -47,37 +47,39 @@ func (q QuerySet[T]) augmentedContext(w WriteContext) WriteContext {
 
 func (q QuerySet[T]) SQLOn(w WriteContext) {
 	w = q.augmentedContext(w)
-	fmt.Fprint(w, "SELECT ")
+	fmt.Fprint(w, "SELECT")
 	if q.distinct {
-		fmt.Fprint(w, "DISTINCT ")
+		fmt.Fprint(w, " DISTINCT\n")
+	} else {
+		fmt.Fprint(w, "\n")
 	}
 	writeAccessOn(q.selectors, w)
-	fmt.Fprint(w, " FROM ")
+	fmt.Fprint(w, "\nFROM ")
 	q.fromSectionOn(w)
 	if _, ok := q.condition.(NoCondition); !ok {
-		fmt.Fprint(w, " WHERE ")
+		fmt.Fprint(w, "\nWHERE ")
 		q.condition.SQLOn(w)
 	}
 	if len(q.groupBy) > 0 {
-		fmt.Fprint(w, " GROUP BY ")
+		fmt.Fprint(w, "\nGROUP BY\n")
 		writeAccessOn(q.groupBy, w)
 	}
 	if q.having != nil {
-		fmt.Fprint(w, " HAVING ")
+		fmt.Fprint(w, "\nHAVING ")
 		q.having.SQLOn(w)
 	}
 	if len(q.orderBy) > 0 {
-		fmt.Fprint(w, " ORDER BY ")
+		fmt.Fprint(w, "\nORDER BY\n")
 		writeAccessOn(q.orderBy, w)
 	}
 	if q.sortOption != "" {
 		fmt.Fprint(w, " ", q.sortOption)
 	}
 	if q.limit > 0 {
-		fmt.Fprintf(w, " LIMIT %d", q.limit)
+		fmt.Fprintf(w, "\nLIMIT %d", q.limit)
 	}
 	if q.offset > 0 {
-		fmt.Fprintf(w, " OFFSET %d", q.offset)
+		fmt.Fprintf(w, "\nOFFSET %d", q.offset)
 	}
 }
 

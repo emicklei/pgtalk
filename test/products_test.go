@@ -17,7 +17,7 @@ func TestSelectProductsWhere(t *testing.T) {
 		Where(products.Code.Equals(convert.StringToText("F42")).
 			And(products.ID.Equals(1))).
 		Limit(1)
-	if got, want := pgtalk.SQL(q), `SELECT p1.id,p1.code FROM public.products p1 WHERE ((p1.code = 'F42') AND (p1.id = 1)) LIMIT 1`; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), `SELECT p1.id, p1.code FROM public.products p1 WHERE ((p1.code = 'F42') AND (p1.id = 1)) LIMIT 1`; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
@@ -36,7 +36,7 @@ func TestSelectAllColumns(t *testing.T) {
 	q := products.
 		Select(products.Columns()...).
 		Limit(2)
-	if got, want := pgtalk.SQL(q), `SELECT p1.id,p1.created_at,p1.updated_at,p1.deleted_at,p1.code,p1.price,p1.category_id FROM public.products p1 LIMIT 2`; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), `SELECT p1.id, p1.created_at, p1.updated_at, p1.deleted_at, p1.code, p1.price, p1.category_id FROM public.products p1 LIMIT 2`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -45,7 +45,7 @@ func TestIn(t *testing.T) {
 	q := products.
 		Select(products.Columns()...).
 		Where(products.Code.In(convert.StringToText("F42"), convert.StringToText("f42")))
-	if got, want := pgtalk.SQL(q), `SELECT p1.id,p1.created_at,p1.updated_at,p1.deleted_at,p1.code,p1.price,p1.category_id FROM public.products p1 WHERE (p1.code IN ('F42','f42'))`; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), `SELECT p1.id, p1.created_at, p1.updated_at, p1.deleted_at, p1.code, p1.price, p1.category_id FROM public.products p1 WHERE (p1.code IN ('F42','f42'))`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -54,7 +54,7 @@ func TestExists(t *testing.T) {
 	q := products.
 		Select(products.ID).
 		Where(categories.Select(categories.ID).Exists())
-	if got, want := pgtalk.SQL(q), `SELECT p1.id FROM public.products p1 WHERE EXISTS (SELECT c1.id FROM public.categories c1)`; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), `SELECT p1.id FROM public.products p1 WHERE EXISTS (SELECT c1.id FROM public.categories c1)`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -63,7 +63,7 @@ func TestInnerJoin(t *testing.T) {
 	q := products.Select(products.Code).Where(products.Code.Equals(convert.StringToText("F42"))).
 		Join(categories.Select(categories.Title)).
 		On(products.ID.Equals(categories.ID))
-	if got, want := pgtalk.SQL(q), `SELECT p1.code,c1.title FROM public.products p1 INNER JOIN public.categories c1 ON (p1.id = c1.id) WHERE (p1.code = 'F42')`; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), `SELECT p1.code, c1.title FROM public.products p1 INNER JOIN public.categories c1 ON (p1.id = c1.id) WHERE (p1.code = 'F42')`; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
@@ -83,7 +83,7 @@ func TestLeftJoin(t *testing.T) {
 	q := products.Select(products.Code).Where(products.Code.Equals(convert.StringToText("F42"))).
 		LeftOuterJoin(categories.Select(categories.Title)).
 		On(products.ID.Equals(categories.ID))
-	if got, want := pgtalk.SQL(q), `SELECT p1.code,c1.title FROM public.products p1 LEFT OUTER JOIN public.categories c1 ON (p1.id = c1.id) WHERE (p1.code = 'F42')`; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), `SELECT p1.code, c1.title FROM public.products p1 LEFT OUTER JOIN public.categories c1 ON (p1.id = c1.id) WHERE (p1.code = 'F42')`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -94,7 +94,7 @@ func TestMultiLeftJoin(t *testing.T) {
 		On(products.CategoryId.Equals(categories.ID)).
 		LeftOuterJoin(categories.Select(categories.Title)).
 		On(products.CategoryId.Equals(categories.ID))
-	if got, want := pgtalk.SQL(q), `SELECT p1.code,c1.title,c1.title FROM public.products p1 LEFT OUTER JOIN public.categories c1 ON (p1.category_id = c1.id) LEFT OUTER JOIN public.categories c1 ON (p1.category_id = c1.id) WHERE (p1.code = 'F42')`; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), `SELECT p1.code, c1.title, c1.title FROM public.products p1 LEFT OUTER JOIN public.categories c1 ON (p1.category_id = c1.id) LEFT OUTER JOIN public.categories c1 ON (p1.category_id = c1.id) WHERE (p1.code = 'F42')`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 		t.Log(diff(got, want))
 	}
@@ -109,10 +109,11 @@ func TestFullSelect(t *testing.T) {
 		OrderBy(products.CategoryId).
 		Ascending().
 		Limit(3)
-	if got, want := pgtalk.SQL(q), `SELECT DISTINCT p1.id,p1.created_at,p1.updated_at,p1.deleted_at,p1.code,p1.price,p1.category_id FROM public.products p1 WHERE ((p1.code > 'A') AND (p1.category_id IS NOT NULL)) GROUP BY p1.category_id ORDER BY p1.category_id ASC LIMIT 3`; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), `SELECT DISTINCT p1.id, p1.created_at, p1.updated_at, p1.deleted_at, p1.code, p1.price, p1.category_id FROM public.products p1 WHERE ((p1.code > 'A') AND (p1.category_id IS NOT NULL)) GROUP BY p1.category_id ORDER BY p1.category_id ASC LIMIT 3`; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
+	//fmt.Println(pgtalk.SQL(q))
 }
 
 func TestProductUpperCode(t *testing.T) {

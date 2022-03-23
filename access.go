@@ -93,8 +93,9 @@ const (
 func writeAccessOn(list []ColumnAccessor, w WriteContext) {
 	for i, each := range list {
 		if i > 0 {
-			io.WriteString(w, ",")
+			io.WriteString(w, ",\n")
 		}
+		io.WriteString(w, "\t")
 		each.SQLOn(w)
 	}
 }

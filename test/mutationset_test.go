@@ -14,7 +14,7 @@ func TestUpdate(t *testing.T) {
 		products.Code.Set(convert.StringToText("test")),
 		products.CategoryId.Set(convert.Int64ToInt8(1))).
 		Where(products.ID.Equals(10))
-	if got, want := pgtalk.SQL(m), `UPDATE public.products p1 SET code = $1,category_id = $2 WHERE (p1.id = 10)`; got != want {
+	if got, want := oneliner(pgtalk.SQL(m)), `UPDATE public.products p1 SET code = $1,category_id = $2 WHERE (p1.id = 10)`; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
@@ -26,7 +26,7 @@ func TestUpdateReturning(t *testing.T) {
 		products.CategoryId.Set(convert.Int64ToInt8(1))).
 		Where(products.ID.Equals(1)).
 		Returning(products.Code)
-	if got, want := pgtalk.SQL(m), `UPDATE public.products p1 SET code = $1,category_id = $2 WHERE (p1.id = 1) RETURNING code`; got != want {
+	if got, want := oneliner(pgtalk.SQL(m)), `UPDATE public.products p1 SET code = $1,category_id = $2 WHERE (p1.id = 1) RETURNING code`; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
@@ -45,7 +45,7 @@ func TestUpdateReturning(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	m := products.Delete().Where(products.ID.Equals(10))
-	if got, want := pgtalk.SQL(m), `DELETE FROM public.products p1 WHERE (p1.id = 10)`; got != want {
+	if got, want := oneliner(pgtalk.SQL(m)), `DELETE FROM public.products p1 WHERE (p1.id = 10)`; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
@@ -56,7 +56,7 @@ func TestInsert(t *testing.T) {
 		products.ID.Set(10),
 		products.Code.Set(convert.StringToText("test")),
 		products.CategoryId.Set(convert.Int64ToInt8(1)))
-	if got, want := pgtalk.SQL(m), `INSERT INTO public.products (id,code,category_id) VALUES ($1,$2,$3)`; got != want {
+	if got, want := oneliner(pgtalk.SQL(m)), `INSERT INTO public.products (id,code,category_id) VALUES ($1,$2,$3)`; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}

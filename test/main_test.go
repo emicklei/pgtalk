@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/emicklei/pgtalk"
@@ -101,4 +102,8 @@ func diff(left, right string) string {
 		}
 	}
 	return b.String()
+}
+
+func oneliner(s string) string {
+	return strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(s, "\t", " "), "\n", " "), "  ", " ")
 }

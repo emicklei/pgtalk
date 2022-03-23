@@ -16,8 +16,8 @@ func TestSelfJoin(t *testing.T) {
 	left := things.Select(things.Tdate)
 	right := things.Select(things.Tdate).TableAlias("other")
 	join := left.Join(right).On(things.ID.Equals(things.ID.TableAlias("other")))
-	sql := pgtalk.SQL(join)
-	if got, want := sql, "SELECT t1.tdate,other.tdate FROM public.things t1 INNER JOIN public.things other ON (t1.id = other.id)"; got != want {
+	sql := oneliner(pgtalk.SQL(join))
+	if got, want := sql, "SELECT t1.tdate, other.tdate FROM public.things t1 INNER JOIN public.things other ON (t1.id = other.id)"; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 }
@@ -30,7 +30,7 @@ func TestGetColumn(t *testing.T) {
 func TestCustomExpressionExtension(t *testing.T) {
 	createAThing(t)
 	q := things.Select(things.ID, pgtalk.FieldSQL("12 * 24", "id2"))
-	if got, want := pgtalk.SQL(q), "SELECT t1.id,12 * 24 AS id2 FROM public.things t1"; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), "SELECT t1.id, 12 * 24 AS id2 FROM public.things t1"; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 	list, err := q.Exec(context.Background(), testConnect)
@@ -48,7 +48,7 @@ func TestCustomExpressionExtension(t *testing.T) {
 func TestCustomExpression(t *testing.T) {
 	createAThing(t)
 	q := things.Select(things.ID, things.Ttext.Concat("cc", things.Ttext))
-	if got, want := pgtalk.SQL(q), "SELECT t1.id,(t1.ttext || t1.ttext) AS cc FROM public.things t1"; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), "SELECT t1.id, (t1.ttext || t1.ttext) AS cc FROM public.things t1"; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 	list, err := q.ExecIntoMaps(context.Background(), testConnect)

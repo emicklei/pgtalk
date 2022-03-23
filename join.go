@@ -29,7 +29,7 @@ type Join struct {
 }
 
 func (i Join) SQLOn(w WriteContext) {
-	fmt.Fprint(w, "SELECT ")
+	fmt.Fprint(w, "SELECT\n")
 	left := i.leftSet.selectAccessors()
 	wl := i.leftSet.augmentedContext(w)
 	wr := i.rightSet.augmentedContext(w)
@@ -39,18 +39,18 @@ func (i Join) SQLOn(w WriteContext) {
 		fmt.Fprint(wl, ",")
 	}
 	writeAccessOn(right, wr)
-	fmt.Fprint(w, " FROM ")
+	fmt.Fprint(w, "\nFROM ")
 	i.leftSet.fromSectionOn(wl)
 	writeJoinType(i.joinType, w)
 	i.rightSet.fromSectionOn(wr)
-	fmt.Fprint(w, " ON ")
+	fmt.Fprint(w, "\nON ")
 	i.condition.SQLOn(w) // TODO which tableInfo to use?
 	if _, ok := i.leftSet.whereCondition().(NoCondition); !ok {
-		fmt.Fprint(wl, " WHERE ")
+		fmt.Fprint(wl, "\nWHERE ")
 		i.leftSet.whereCondition().SQLOn(wl)
 	}
 	if i.limit > 0 {
-		fmt.Fprintf(wl, " LIMIT %d", i.limit)
+		fmt.Fprintf(wl, "\nLIMIT %d", i.limit)
 	}
 	// TODO RightSet where
 }
@@ -58,13 +58,13 @@ func (i Join) SQLOn(w WriteContext) {
 func writeJoinType(t JoinType, w io.Writer) {
 	switch t {
 	case InnerJoinType:
-		fmt.Fprint(w, " INNER JOIN ")
+		fmt.Fprint(w, "\nINNER JOIN ")
 	case LeftOuterJoinType:
-		fmt.Fprint(w, " LEFT OUTER JOIN ")
+		fmt.Fprint(w, "\nLEFT OUTER JOIN ")
 	case RightOuterJoinType:
-		fmt.Fprint(w, " RIGHT OUTER JOIN ")
+		fmt.Fprint(w, "\nRIGHT OUTER JOIN ")
 	case FullOuterJoinType:
-		fmt.Fprint(w, " FULL OUTER JOIN ")
+		fmt.Fprint(w, "\nFULL OUTER JOIN ")
 	}
 }
 

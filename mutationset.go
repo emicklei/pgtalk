@@ -38,24 +38,24 @@ func (m MutationSet[T]) SQLOn(w WriteContext) {
 		fmt.Fprintf(w, "%s.%s", m.tableInfo.Schema, m.tableInfo.Name)
 		fmt.Fprint(w, " (")
 		m.columnsSectionOn(m.selectors, w)
-		fmt.Fprint(w, ") VALUES (")
+		fmt.Fprint(w, ")\nVALUES (")
 		m.valuesSectionOn(w)
 		fmt.Fprint(w, ")")
 		if len(m.returning) > 0 {
-			fmt.Fprint(w, " RETURNING ")
+			fmt.Fprint(w, "\nRETURNING ")
 			m.columnsSectionOn(m.returning, w)
 		}
 		return
 	}
 	if m.operationType == MutationDelete {
-		fmt.Fprint(w, "DELETE FROM ")
+		fmt.Fprint(w, "DELETE FROM\n")
 		m.tableInfo.SQLOn(w)
 		if m.condition != EmptyCondition {
-			fmt.Fprint(w, " WHERE ")
+			fmt.Fprint(w, "\nWHERE ")
 			m.condition.SQLOn(w)
 		}
 		if len(m.returning) > 0 {
-			fmt.Fprint(w, " RETURNING ")
+			fmt.Fprint(w, "\nRETURNING ")
 			m.columnsSectionOn(m.returning, w)
 		}
 		return
@@ -63,14 +63,14 @@ func (m MutationSet[T]) SQLOn(w WriteContext) {
 	if m.operationType == MutationUpdate {
 		fmt.Fprint(w, "UPDATE ")
 		m.tableInfo.SQLOn(w)
-		fmt.Fprint(w, " SET ")
+		fmt.Fprint(w, "\nSET ")
 		m.setSectionOn(w)
 		if m.condition != EmptyCondition {
-			fmt.Fprint(w, " WHERE ")
+			fmt.Fprint(w, "\nWHERE ")
 		}
 		m.condition.SQLOn(w)
 		if len(m.returning) > 0 {
-			fmt.Fprint(w, " RETURNING ")
+			fmt.Fprint(w, "\nRETURNING ")
 			m.columnsSectionOn(m.returning, w)
 		}
 		return
