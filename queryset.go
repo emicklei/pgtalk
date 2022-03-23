@@ -22,9 +22,6 @@ type QuerySet[T any] struct {
 }
 
 func MakeQuerySet[T any](tableInfo TableInfo, selectors []ColumnAccessor) QuerySet[T] {
-	if assertEnabled {
-		//	assertEachAccessorHasTableInfo(selectors, tableInfo)
-	}
 	return QuerySet[T]{
 		tableInfo: tableInfo,
 		selectors: selectors,
@@ -110,16 +107,11 @@ func (q QuerySet[T]) Offset(offset int) QuerySet[T] { q.offset = offset; return 
 // GroupBy is a SQL instruction
 func (q QuerySet[T]) GroupBy(cas ...ColumnAccessor) QuerySet[T] {
 	q.groupBy = cas
-	if assertEnabled {
-		assertEachAccessorIn(cas, q.selectors)
-	}
 	return q
 }
 func (q QuerySet[T]) Having(condition SQLExpression) QuerySet[T] { q.having = condition; return q }
 func (q QuerySet[T]) OrderBy(cas ...ColumnAccessor) QuerySet[T] {
 	q.orderBy = cas
-	if assertEnabled {
-	}
 	return q
 }
 func (q QuerySet[T]) Exists() unaryExpression {

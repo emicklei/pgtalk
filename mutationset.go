@@ -21,9 +21,6 @@ type MutationSet[T any] struct {
 }
 
 func MakeMutationSet[T any](tableInfo TableInfo, selectors []ColumnAccessor, operationType int) MutationSet[T] {
-	if assertEnabled {
-		assertEachAccessorHasTableInfo(selectors, tableInfo)
-	}
 	return MutationSet[T]{
 		tableInfo:     tableInfo,
 		selectors:     selectors,
@@ -83,9 +80,6 @@ func (m MutationSet[T]) Where(condition SQLExpression) MutationSet[T] {
 }
 
 func (m MutationSet[T]) Returning(columns ...ColumnAccessor) MutationSet[T] {
-	if assertEnabled {
-		assertEachAccessorIn(columns, m.tableInfo.Columns)
-	}
 	m.returning = columns
 	return m
 }

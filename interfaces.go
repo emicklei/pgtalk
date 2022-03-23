@@ -7,15 +7,6 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-// assertEnabled, if true then perform extra runtime assertion that may panic
-var assertEnabled = false
-
-// EnableAssert will enable running extra, potentially more expensive, assertion checks.
-// Use this for running your test code.
-func EnableAssert() { assertEnabled = true }
-
-type NewEntityFunc func() any
-
 type ColumnAccessor interface {
 	SQLWriter
 	Name() string
@@ -37,10 +28,6 @@ type SQLWriter interface {
 	SQLOn(w WriteContext)
 }
 
-type SQLer interface {
-	SQL() string
-}
-
 type SQLExpression interface {
 	SQLWriter
 }
@@ -56,12 +43,12 @@ type Querier interface {
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
 }
 
-type Preparer interface {
+type preparer interface {
 	Prepare(ctx context.Context, name, sql string) (sd *pgconn.StatementDescription, err error)
 }
 
 type FieldAccessFunc = func(entity any) any
 
-type ExpressionValueHolder interface {
+type expressionValueHolder interface {
 	AddExpressionResult(key string, value any)
 }

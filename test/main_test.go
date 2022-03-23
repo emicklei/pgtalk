@@ -9,7 +9,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/emicklei/pgtalk"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
 )
@@ -35,7 +34,6 @@ func TestMain(m *testing.M) {
 		fmt.Println("DB WARN:", err)
 	}
 	uuid.EnableRandPool()
-	pgtalk.EnableAssert()
 	code := m.Run()
 	fmt.Println("... db close")
 	conn.Close(context.Background())
