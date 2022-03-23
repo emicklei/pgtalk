@@ -93,9 +93,11 @@ func (i Join) LeftOuterJoin(q querySet) (m MultiJoin) {
 func (i Join) Exec(ctx context.Context, conn Querier) (it JoinResultIterator, err error) {
 	sql := SQL(i)
 	if i.preparedName != "" {
-		_, err := conn.Prepare(ctx, i.preparedName, sql)
-		if err != nil {
-			return JoinResultIterator{queryError: err}, err
+		if p, ok := conn.(Preparer); ok {
+			_, err := p.Prepare(ctx, i.preparedName, sql)
+			if err != nil {
+				return JoinResultIterator{queryError: err}, err
+			}
 		}
 	}
 	rows, err := conn.Query(ctx, sql)
@@ -165,9 +167,11 @@ func (m MultiJoin) LeftOuterJoin(q querySet) MultiJoin {
 func (m MultiJoin) Exec(ctx context.Context, conn Querier) (*MultiJoinResultIterator, error) {
 	sql := SQL(m)
 	if m.preparedName != "" {
-		_, err := conn.Prepare(ctx, m.preparedName, sql)
-		if err != nil {
-			return &MultiJoinResultIterator{queryError: err}, nil
+		if p, ok := conn.(Preparer); ok {
+			_, err := p.Prepare(ctx, m.preparedName, sql)
+			if err != nil {
+				return &MultiJoinResultIterator{queryError: err}, nil
+			}
 		}
 	}
 	rows, err := conn.Query(ctx, sql)

@@ -54,6 +54,9 @@ type querySet interface {
 
 type Querier interface {
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+}
+
+type Preparer interface {
 	Prepare(ctx context.Context, name, sql string) (sd *pgconn.StatementDescription, err error)
 }
 
