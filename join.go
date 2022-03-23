@@ -90,7 +90,7 @@ func (i Join) LeftOuterJoin(q querySet) (m MultiJoin) {
 	return
 }
 
-func (i Join) Exec(ctx context.Context, conn *pgx.Conn) (it JoinResultIterator, err error) {
+func (i Join) Exec(ctx context.Context, conn Querier) (it JoinResultIterator, err error) {
 	sql := SQL(i)
 	if i.preparedName != "" {
 		_, err := conn.Prepare(ctx, i.preparedName, sql)
