@@ -114,3 +114,24 @@ func TestFullSelect(t *testing.T) {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
+
+func TestProductUpperCode(t *testing.T) {
+	createProduct(t)
+	q := products.Select(products.ID, pgtalk.FieldSQL("UPPER(p1.Code)", "upper"))
+	t.Log(pgtalk.SQL(q))
+	list, err := q.Exec(context.Background(), testConnect)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, each := range list {
+		t.Log(each.GetExpressionResult("upper"))
+	}
+}
+
+func createProduct(t *testing.T) {
+	q := products.Insert(products.ID.Set(1234), products.Code.Set(convert.StringToText("test")))
+	it := q.Exec(context.Background(), testConnect)
+	if it.Err() != nil {
+		t.Fatal(it.Err())
+	}
+}

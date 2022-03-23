@@ -65,6 +65,18 @@ or by example
 
 	products, err := q.Exec(aConnection) // products is a []*product.Product
 
+## Abritrary SQL expressions
+
+	q := products.Select(products.ID, pgtalk.FieldSQL("UPPER(p1.Code)", "upper"))
+	// SELECT p1.id,UPPER(p1.Code) AS upper FROM public.products p1
+	list, _ := q.Exec(context.Background(),aConnection)
+	for _, each := range list {
+		upper := each.GetExpressionResult("upper")
+		...
+	}
+
+## Joins
+
 ### Left Outer Join
 
     q :=products.Select(products.Code).Where(products.Code.Equals("F42")).

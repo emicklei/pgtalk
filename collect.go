@@ -43,7 +43,9 @@ func (a FieldAccess[T]) Concat(resultName string, ex SQLExpression) ColumnAccess
 		}}
 }
 
-func FieldSQL(name, sql string) *ComputedField {
+// FieldSQL returns a ColumnAccessor with a customer SQL expressions.
+// The named result will be available in the expressionResults map of the record type.
+func FieldSQL(sql, name string) *ComputedField {
 	return &ComputedField{
 		ResultName: name,
 		Expression: ExpressionSource{SQL: sql},

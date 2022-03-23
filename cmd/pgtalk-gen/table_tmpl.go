@@ -17,6 +17,8 @@ type {{.GoType}} struct {
 {{- range .Fields}}
 	{{.GoName}}	{{.GoType}} // {{.Name}} : {{.DataType}}
 {{- end}}
+	// for storing custom field expression result values
+	expressionResults map[string]any
 }
 
 var (
@@ -99,6 +101,24 @@ func Columns(names ...string) (list []p.ColumnAccessor) {
 	return
 }
 
+// AddExpressionResult puts a value into the custom expression results
+func (e *{{.GoType}}) AddExpressionResult(key string, value any) {
+	if e.expressionResults == nil {
+		// lazy initialize
+		e.expressionResults = map[string]any{}
+	}
+	e.expressionResults[key]=value
+}
+
+// GetExpressionResult gets a value from the custom expression results. Returns nil if absent.
+func (e *{{.GoType}}) GetExpressionResult(key string) any {
+	v, ok := e.expressionResults[key]
+	if !ok {
+		return nil
+	}
+	pv := v.(*any)
+	return *pv
+}
 
 // Select returns a new QuerySet[{{.GoType}}] for fetching column data.
 func Select(cas ...p.ColumnAccessor) p.QuerySet[{{.GoType}}] {

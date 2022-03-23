@@ -19,7 +19,7 @@ type Thing struct {
 	Tjson      pgtype.JSONB     // tjson : jsonb
 	Ttext      pgtype.Text      // ttext : text
 	// for storing custom field expression result values
-	_expressionResults map[string]any
+	expressionResults map[string]any
 }
 
 var (
@@ -91,23 +91,6 @@ func (e *Thing) String() string {
 	return p.StringWithFields(e, p.HideNilValues)
 }
 
-func (e *Thing) AddExpressionResult(key string, value any) {
-	if e._expressionResults == nil {
-		// lazy initialize
-		e._expressionResults = map[string]any{}
-	}
-	e._expressionResults[key]=value
-}
-
-func (e *Thing) GetExpressionResult(key string) any {
-	v, ok := e._expressionResults[key]
-	if !ok {
-		return nil
-	}
-	pv := v.(*any)
-	return *pv
-}
-
 // Columns returns the ColumnAccessor list for the given column names.
 // If the names is empty then return all columns.
 func Columns(names ...string) (list []p.ColumnAccessor) {
@@ -117,7 +100,7 @@ func Columns(names ...string) (list []p.ColumnAccessor) {
 	for _, each := range names {
 		for _, other := range tableInfo.Columns {
 			n := other.Column().Name()
-			if strings.HasPrefix(n, "'") {
+			if strings.HasPrefix(n, "'") { // mixed case names are quoted
 				n = strings.Trim(n, "'")
 			}
 			if n == each {
@@ -126,6 +109,25 @@ func Columns(names ...string) (list []p.ColumnAccessor) {
 		}
 	}
 	return
+}
+
+// AddExpressionResult puts a value into the custom expression results
+func (e *Thing) AddExpressionResult(key string, value any) {
+	if e.expressionResults == nil {
+		// lazy initialize
+		e.expressionResults = map[string]any{}
+	}
+	e.expressionResults[key] = value
+}
+
+// GetExpressionResult gets a value from the custom expression results. Returns nil if absent.
+func (e *Thing) GetExpressionResult(key string) any {
+	v, ok := e.expressionResults[key]
+	if !ok {
+		return nil
+	}
+	pv := v.(*any)
+	return *pv
 }
 
 // Select returns a new QuerySet[Thing] for fetching column data.
