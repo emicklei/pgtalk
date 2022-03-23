@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-
-	"github.com/jackc/pgx/v4"
 )
 
 type QuerySet[T any] struct {
@@ -126,7 +124,7 @@ func (q QuerySet[T]) Exists() unaryExpression {
 	return unaryExpression{Operator: "EXISTS", Operand: q}
 }
 
-func (d QuerySet[T]) Iterate(ctx context.Context, conn *pgx.Conn) (*ResultIterator[T], error) {
+func (d QuerySet[T]) Iterate(ctx context.Context, conn Querier) (*ResultIterator[T], error) {
 	rows, err := conn.Query(ctx, SQL(d))
 	return &ResultIterator[T]{
 		queryError: err,

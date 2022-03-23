@@ -3,6 +3,7 @@ package pgtalk
 import (
 	"context"
 
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 )
 
@@ -53,6 +54,7 @@ type querySet interface {
 
 type Querier interface {
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+	Prepare(ctx context.Context, name, sql string) (sd *pgconn.StatementDescription, err error)
 }
 
 type FieldAccessFunc = func(entity any) any
