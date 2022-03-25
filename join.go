@@ -26,6 +26,7 @@ type Join struct {
 	condition    SQLExpression
 	joinType     JoinType
 	limit        int
+	offset       int
 }
 
 func (i Join) SQLOn(w WriteContext) {
@@ -51,6 +52,9 @@ func (i Join) SQLOn(w WriteContext) {
 	}
 	if i.limit > 0 {
 		fmt.Fprintf(wl, "\nLIMIT %d", i.limit)
+	}
+	if i.offset > 0 {
+		fmt.Fprintf(wl, "\nOFFSET %d", i.offset)
 	}
 	// TODO RightSet where
 }
