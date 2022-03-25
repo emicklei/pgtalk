@@ -87,6 +87,11 @@ func (i Join) Limit(limit int) Join {
 	return i
 }
 
+func (i Join) Offset(offset int) Join {
+	i.offset = offset
+	return i
+}
+
 func (i Join) LeftOuterJoin(q querySet) (m MultiJoin) {
 	m.sets = append(m.sets, i.leftSet, i.rightSet, q)
 	m.joinTypes = append(m.joinTypes, i.joinType, LeftOuterJoinType)
