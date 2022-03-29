@@ -138,11 +138,17 @@ Send me a PR for a missing type available from https://www.postgresql.org/docs/9
 
 ## how to run the generator
 
+The user in the connection string must have the right privileges to read schema information.
+
 	PGTALK_CONN=postgresql://usr:pwd@host:5432/database pgtalk-gen -o yourpackage
 	go fmt ./...
 
 If you want to include and/or exclude table names, use additional flags such as:
 
 	pgtalk-gen -o yourpackage -include "address.*,employee.*" -exclude "org.*"
+
+or views
+
+	pgtalk-gen -views -o yourpackage -include "skills.*"
 
 (c) 2022, http://ernestmicklei.com. MIT License.
