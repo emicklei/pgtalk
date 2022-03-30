@@ -1,50 +1,12 @@
 package pgtalk
 
 import (
-	"context"
 	"fmt"
 	"io"
 )
 
-// Work in Progress
-
-type UntypedQuerySet struct {
-	expressions []ColumnAccessor
-	tableInfo   TableInfo
-}
-
-func NewUntypedQuerySet(tableInfo TableInfo, expr []ColumnAccessor) UntypedQuerySet {
-	return UntypedQuerySet{expressions: expr, tableInfo: tableInfo}
-}
-
-func (c UntypedQuerySet) SQLOn(w WriteContext) {
-	fmt.Fprintf(w, "SELECT ")
-	for i, each := range c.expressions {
-		if i > 0 {
-			fmt.Fprint(w, ",")
-		}
-		each.SQLOn(w)
-	}
-	fmt.Fprintf(w, " FROM ")
-	c.tableInfo.SQLOn(w)
-}
-
-func (c UntypedQuerySet) ExecIntoMaps(ctx context.Context, conn Querier) (list []map[string]any, err error) {
-	return execIntoMaps(ctx, conn, SQL(c), c.expressions)
-}
-
-func (a FieldAccess[T]) Concat(resultName string, ex SQLExpression) ColumnAccessor {
-	return &computedField{
-		ResultName: resultName,
-		Expression: binaryExpression{
-			Left:     a,
-			Operator: "||",
-			Right:    ex,
-		}}
-}
-
-// FieldSQL returns a ColumnAccessor with a customer SQL expressions.
-// The named result will be available in the expressionResults map of the record type.
+// FieldSQL returns a ColumnAccessor with a customer SQL expression.
+// The named result will be available using the GetExpressionResult method of the record type.
 func FieldSQL(sql, name string) *computedField {
 	return &computedField{
 		ResultName: name,

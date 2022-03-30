@@ -46,6 +46,16 @@ func (a FieldAccess[T]) ValueToInsert() any {
 	return a.valueToInsert
 }
 
+func (a FieldAccess[T]) Concat(resultName string, ex SQLExpression) ColumnAccessor {
+	return &computedField{
+		ResultName: resultName,
+		Expression: binaryExpression{
+			Left:     a,
+			Operator: "||",
+			Right:    ex,
+		}}
+}
+
 // Equals returns a SQLExpression
 func (a FieldAccess[T]) Equals(operand any) binaryExpression {
 	if fat, ok := operand.(FieldAccess[T]); ok {

@@ -23,15 +23,3 @@ func assertEachAccessorHasTableInfo(list []ColumnAccessor, tableInfo TableInfo) 
 		}
 	}
 }
-
-type ValueConversionError struct {
-	got, want string
-}
-
-func NewValueConversionError(got any, want string) error {
-	return ValueConversionError{fmt.Sprintf("%T", got), want}
-}
-
-func (e ValueConversionError) Error() string {
-	return fmt.Sprintf("field value conversion error, got %s expected %s", e.got, e.want)
-}
