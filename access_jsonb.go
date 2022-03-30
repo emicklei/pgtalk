@@ -3,7 +3,7 @@ package pgtalk
 type JSONBAccess struct {
 	unimplementedBooleanExpression
 	ColumnInfo
-	valueFieldWriter FieldAccessFunc
+	valueFieldWriter fieldAccessFunc
 	valueToInsert    []byte
 }
 
@@ -29,7 +29,7 @@ func (a JSONBAccess) Column() ColumnInfo { return a.ColumnInfo }
 
 // Extract returns an expresion to get the path, extracted from the JSONB data, as a column
 func (a JSONBAccess) Extract(path string) SQLExpression {
-	return MakeBinaryOperator(a, "->", newLiteralString(path))
+	return makeBinaryOperator(a, "->", newLiteralString(path))
 }
 
 func (a JSONBAccess) TableAlias(alias string) JSONBAccess {

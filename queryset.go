@@ -32,18 +32,18 @@ func MakeQuerySet[T any](tableInfo TableInfo, selectors []ColumnAccessor) QueryS
 // querySet
 func (q QuerySet[T]) selectAccessors() []ColumnAccessor { return q.selectors }
 func (q QuerySet[T]) whereCondition() SQLWriter         { return q.condition }
-func (q QuerySet[T]) fromSectionOn(w WriteContext) {
+func (q QuerySet[T]) fromSectionOn(w writeContext) {
 	fmt.Fprintf(w, "%s.%s %s", q.tableInfo.Schema, q.tableInfo.Name, w.TableAlias(q.tableInfo.Name, q.tableInfo.Alias))
 }
 
-func (q QuerySet[T]) augmentedContext(w WriteContext) WriteContext {
+func (q QuerySet[T]) augmentedContext(w writeContext) writeContext {
 	if q.tableAliasOverride != "" {
 		return w.WithAlias(q.tableInfo.Name, q.tableAliasOverride)
 	}
 	return w
 }
 
-func (q QuerySet[T]) SQLOn(w WriteContext) {
+func (q QuerySet[T]) SQLOn(w writeContext) {
 	w = q.augmentedContext(w)
 	fmt.Fprint(w, "SELECT")
 	if q.distinct {

@@ -33,7 +33,7 @@ func (c ColumnInfo) Name() string {
 	return c.columnName
 }
 
-func (c ColumnInfo) SQLOn(w WriteContext) {
+func (c ColumnInfo) SQLOn(w writeContext) {
 	fmt.Fprintf(w, "%s.%s", w.TableAlias(c.tableInfo.Name, c.tableInfo.Alias), c.Name())
 }
 

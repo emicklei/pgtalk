@@ -14,7 +14,7 @@ type binaryExpression struct {
 	Right    SQLExpression
 }
 
-func (o binaryExpression) SQLOn(w WriteContext) {
+func (o binaryExpression) SQLOn(w writeContext) {
 	fmt.Fprint(w, "(")
 	o.Left.SQLOn(w)
 	fmt.Fprintf(w, " %s ", o.Operator)
@@ -22,7 +22,7 @@ func (o binaryExpression) SQLOn(w WriteContext) {
 	fmt.Fprint(w, ")")
 }
 
-func MakeBinaryOperator(left SQLExpression, operator string, right SQLExpression) binaryExpression {
+func makeBinaryOperator(left SQLExpression, operator string, right SQLExpression) binaryExpression {
 	return binaryExpression{
 		Left:     left,
 		Operator: operator,
@@ -57,18 +57,18 @@ func (o binaryExpression) Like(pattern string) SQLExpression {
 type BetweenAnd struct {
 }
 
-func MakeBetweenAnd(reader ColumnAccessor, begin, end SQLExpression) BetweenAnd { return BetweenAnd{} }
+func makeBetweenAnd(reader ColumnAccessor, begin, end SQLExpression) BetweenAnd { return BetweenAnd{} }
 
 type unaryExpression struct {
 	Operator string
 	Operand  SQLExpression
 }
 
-func MakeUnaryOperator(operator string, operand SQLExpression) unaryExpression {
+func makeUnaryOperator(operator string, operand SQLExpression) unaryExpression {
 	return unaryExpression{Operator: operator, Operand: operand}
 }
 
-func (u unaryExpression) SQLOn(w WriteContext) {
+func (u unaryExpression) SQLOn(w writeContext) {
 	fmt.Fprintf(w, "%s (", u.Operator)
 	u.Operand.SQLOn(w)
 	fmt.Fprint(w, ")")
@@ -89,13 +89,13 @@ func (u unaryExpression) Or(right SQLExpression) SQLExpression {
 	}
 }
 
-type NullCheck struct {
+type nullCheck struct {
 	Operand SQLExpression
 	// IsNot == true -> IS NOT NULL
 	IsNot bool
 }
 
-func (n NullCheck) SQLOn(w WriteContext) {
+func (n nullCheck) SQLOn(w writeContext) {
 	fmt.Fprint(w, "(")
 	n.Operand.SQLOn(w)
 	if n.IsNot {
@@ -105,20 +105,20 @@ func (n NullCheck) SQLOn(w WriteContext) {
 	fmt.Fprint(w, " IS NULL)")
 }
 
-func (n NullCheck) And(right SQLExpression) SQLExpression {
-	return MakeBinaryOperator(n, "AND", right)
+func (n nullCheck) And(right SQLExpression) SQLExpression {
+	return makeBinaryOperator(n, "AND", right)
 }
 
-func (n NullCheck) Or(right SQLExpression) SQLExpression {
-	return MakeBinaryOperator(n, "OR", right)
+func (n nullCheck) Or(right SQLExpression) SQLExpression {
+	return makeBinaryOperator(n, "OR", right)
 }
 
 // IsNotNull returns an expression with the IS NOT NULL condition
-func IsNotNull(e SQLExpression) NullCheck {
-	return NullCheck{Operand: e, IsNot: true}
+func IsNotNull(e SQLExpression) nullCheck {
+	return nullCheck{Operand: e, IsNot: true}
 }
 
 // IsNull returns an expression with the IS NULL condition
-func IsNull(e SQLExpression) NullCheck {
-	return NullCheck{Operand: e, IsNot: false}
+func IsNull(e SQLExpression) nullCheck {
+	return nullCheck{Operand: e, IsNot: false}
 }

@@ -18,9 +18,9 @@ type valuePrinter struct {
 	v any
 }
 
-func MakeValuePrinter(v any) valuePrinter { return valuePrinter{v: v} }
+func makeValuePrinter(v any) valuePrinter { return valuePrinter{v: v} }
 
-func (p valuePrinter) SQLOn(w WriteContext) {
+func (p valuePrinter) SQLOn(w writeContext) {
 	if e, ok := p.v.(SQLWriter); ok {
 		e.SQLOn(w)
 		return
@@ -67,7 +67,7 @@ type valuesPrinter struct {
 	vs []any
 }
 
-func (p valuesPrinter) SQLOn(w WriteContext) {
+func (p valuesPrinter) SQLOn(w writeContext) {
 	fmt.Fprintf(w, "(")
 	for i, each := range p.vs {
 		if i > 0 {
@@ -78,16 +78,16 @@ func (p valuesPrinter) SQLOn(w WriteContext) {
 	fmt.Fprintf(w, ")")
 }
 
-type LiteralString struct {
+type literalString struct {
 	unimplementedBooleanExpression
 	value string
 }
 
-func newLiteralString(s string) LiteralString {
-	return LiteralString{value: s}
+func newLiteralString(s string) literalString {
+	return literalString{value: s}
 }
 
-func (l LiteralString) SQLOn(w WriteContext) {
+func (l literalString) SQLOn(w writeContext) {
 	io.WriteString(w, "'")
 	io.WriteString(w, l.value)
 	io.WriteString(w, "'")
@@ -97,7 +97,7 @@ type NoCondition struct{}
 
 var EmptyCondition SQLExpression = NoCondition{}
 
-func (n NoCondition) SQLOn(w WriteContext) {}
+func (n NoCondition) SQLOn(w writeContext) {}
 
 // And returns the argument as the receiver is a no operation
 func (n NoCondition) And(ex SQLExpression) SQLExpression {
@@ -116,7 +116,7 @@ const (
 	Nullable   = false
 )
 
-func writeAccessOn(list []ColumnAccessor, w WriteContext) {
+func writeAccessOn(list []ColumnAccessor, w writeContext) {
 	for i, each := range list {
 		if i > 0 {
 			io.WriteString(w, ",\n")

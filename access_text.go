@@ -9,11 +9,11 @@ import (
 type TextAccess struct {
 	unimplementedBooleanExpression
 	ColumnInfo
-	valueFieldWriter FieldAccessFunc
+	valueFieldWriter fieldAccessFunc
 	valueToInsert    string
 }
 
-func NewTextAccess(info ColumnInfo, writer FieldAccessFunc) TextAccess {
+func NewTextAccess(info ColumnInfo, writer fieldAccessFunc) TextAccess {
 	return TextAccess{ColumnInfo: info, valueFieldWriter: writer}
 }
 
@@ -35,10 +35,10 @@ func (a TextAccess) Compare(op string, stringOrTextAccess any) binaryExpression 
 		panic("invalid comparison operator:" + op)
 	}
 	if s, ok := stringOrTextAccess.(string); ok {
-		return MakeBinaryOperator(a, op, newLiteralString(s))
+		return makeBinaryOperator(a, op, newLiteralString(s))
 	}
 	if ta, ok := stringOrTextAccess.(TextAccess); ok {
-		return MakeBinaryOperator(a, op, ta)
+		return makeBinaryOperator(a, op, ta)
 	}
 	panic("string or TextAcces expected")
 }
@@ -48,7 +48,7 @@ func (a TextAccess) FieldValueToScan(entity any) any {
 }
 
 func (a TextAccess) Like(pattern string) binaryExpression {
-	return MakeBinaryOperator(a, "LIKE", newLiteralString(pattern))
+	return makeBinaryOperator(a, "LIKE", newLiteralString(pattern))
 }
 
 func (a TextAccess) In(values ...string) binaryExpression {
@@ -56,7 +56,7 @@ func (a TextAccess) In(values ...string) binaryExpression {
 	for i := 0; i < len(values); i++ {
 		vs[i] = values[i]
 	}
-	return MakeBinaryOperator(a, "IN", valuesPrinter{vs: vs})
+	return makeBinaryOperator(a, "IN", valuesPrinter{vs: vs})
 }
 
 func (a TextAccess) Column() ColumnInfo { return a.ColumnInfo }

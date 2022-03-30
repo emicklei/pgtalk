@@ -6,12 +6,12 @@ import (
 
 type TimeAccess struct {
 	ColumnInfo
-	valueFieldWriter FieldAccessFunc
+	valueFieldWriter fieldAccessFunc
 	valueToInsert    time.Time
 }
 
 func NewTimeAccess(info ColumnInfo,
-	valueWriter FieldAccessFunc) TimeAccess {
+	valueWriter fieldAccessFunc) TimeAccess {
 	return TimeAccess{ColumnInfo: info, valueFieldWriter: valueWriter}
 }
 

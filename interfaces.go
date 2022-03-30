@@ -25,7 +25,7 @@ type ColumnAccessor interface {
 
 type SQLWriter interface {
 	// SQLOn writes a valid SQL on a Writer in a context
-	SQLOn(w WriteContext)
+	SQLOn(w writeContext)
 }
 
 type SQLExpression interface {
@@ -35,10 +35,10 @@ type SQLExpression interface {
 }
 
 type querySet interface {
-	fromSectionOn(w WriteContext)
+	fromSectionOn(w writeContext)
 	selectAccessors() []ColumnAccessor
 	whereCondition() SQLWriter
-	augmentedContext(w WriteContext) WriteContext
+	augmentedContext(w writeContext) writeContext
 }
 
 type Querier interface {
@@ -49,7 +49,7 @@ type preparer interface {
 	Prepare(ctx context.Context, name, sql string) (sd *pgconn.StatementDescription, err error)
 }
 
-type FieldAccessFunc = func(entity any) any
+type fieldAccessFunc = func(entity any) any
 
 type expressionValueHolder interface {
 	AddExpressionResult(key string, value any)

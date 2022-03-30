@@ -8,7 +8,7 @@ import (
 type FieldAccess[T any] struct {
 	unimplementedBooleanExpression
 	ColumnInfo
-	valueFieldWriter FieldAccessFunc
+	valueFieldWriter fieldAccessFunc
 	valueToInsert    T
 }
 
@@ -59,21 +59,21 @@ func (a FieldAccess[T]) Concat(resultName string, ex SQLExpression) ColumnAccess
 // Equals returns a SQLExpression
 func (a FieldAccess[T]) Equals(operand any) binaryExpression {
 	if fat, ok := operand.(FieldAccess[T]); ok {
-		return MakeBinaryOperator(a, "=", fat)
+		return makeBinaryOperator(a, "=", fat)
 	}
 	if t, ok := operand.(T); ok {
-		return MakeBinaryOperator(a, "=", valuePrinter{v: t})
+		return makeBinaryOperator(a, "=", valuePrinter{v: t})
 	}
-	return MakeBinaryOperator(a, "=", valuePrinter{v: operand})
+	return makeBinaryOperator(a, "=", valuePrinter{v: operand})
 }
 
 // Less returns a SQLExpression
 func (a FieldAccess[T]) LessThan(operand any) binaryExpression {
 	if fat, ok := operand.(FieldAccess[T]); ok {
-		return MakeBinaryOperator(a, "<", fat)
+		return makeBinaryOperator(a, "<", fat)
 	}
 	if t, ok := operand.(T); ok {
-		return MakeBinaryOperator(a, "<", valuePrinter{v: t})
+		return makeBinaryOperator(a, "<", valuePrinter{v: t})
 	}
 	var t T
 	panic("expected a " + fmt.Sprintf("%T", t) + " got a " + fmt.Sprintf("%T", operand))
@@ -84,14 +84,14 @@ func (a FieldAccess[T]) In(values ...any) binaryExpression {
 	for i := 0; i < len(values); i++ {
 		vs[i] = values[i]
 	}
-	return MakeBinaryOperator(a, "IN", valuesPrinter{vs: vs})
+	return makeBinaryOperator(a, "IN", valuesPrinter{vs: vs})
 }
 
 func (a FieldAccess[T]) Compare(operator string, operand any) binaryExpression {
 	if !strings.Contains(validComparisonOperators, operator) {
 		panic("invalid comparison operator:" + operator)
 	}
-	return MakeBinaryOperator(a, operator, valuePrinter{v: operand})
+	return makeBinaryOperator(a, operator, valuePrinter{v: operand})
 }
 
 func (a FieldAccess[T]) TableAlias(alias string) FieldAccess[T] {

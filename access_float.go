@@ -10,12 +10,12 @@ import (
 type Float64Access struct {
 	unimplementedBooleanExpression
 	ColumnInfo
-	fieldWriter         FieldAccessFunc
+	fieldWriter         fieldAccessFunc
 	nullableFieldWriter func(dest any, f pgtype.Float8)
 	valueToInsert       float64
 }
 
-func NewFloat64Access(info ColumnInfo, writer FieldAccessFunc) Float64Access {
+func NewFloat64Access(info ColumnInfo, writer fieldAccessFunc) Float64Access {
 	return Float64Access{ColumnInfo: info, fieldWriter: writer}
 }
 
@@ -39,10 +39,10 @@ func (a Float64Access) Compare(op string, float64OrFloat64Access any) binaryExpr
 		panic("invalid comparison operator:" + op)
 	}
 	if f, ok := float64OrFloat64Access.(float64); ok {
-		return MakeBinaryOperator(a, op, valuePrinter{v: f})
+		return makeBinaryOperator(a, op, valuePrinter{v: f})
 	}
 	if ta, ok := float64OrFloat64Access.(Float64Access); ok {
-		return MakeBinaryOperator(a, op, ta)
+		return makeBinaryOperator(a, op, ta)
 	}
 	panic("float64 or Float64Access expected")
 }

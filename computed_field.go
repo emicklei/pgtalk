@@ -20,7 +20,7 @@ type expressionSource struct {
 }
 
 // SQLOn is part of SQLWriter
-func (e expressionSource) SQLOn(w WriteContext) {
+func (e expressionSource) SQLOn(w writeContext) {
 	io.WriteString(w, e.SQL)
 }
 
@@ -31,7 +31,7 @@ type computedField struct {
 	Value      any
 }
 
-func (c *computedField) SQLOn(w WriteContext) {
+func (c *computedField) SQLOn(w writeContext) {
 	c.Expression.SQLOn(w)
 	fmt.Fprintf(w, " AS %s", c.ResultName)
 }
