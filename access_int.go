@@ -6,6 +6,7 @@ import (
 
 // Int64Access can Read a column value (int8) and Write a column value and Set a struct field (int64).
 type Int64Access struct {
+	unimplementedBooleanExpression
 	ColumnInfo
 	fieldWriter   FieldAccessFunc
 	valueToInsert int64
@@ -20,7 +21,7 @@ func NewInt64Access(
 }
 
 func (a Int64Access) BetweenAnd(begin int64, end int64) BetweenAnd {
-	return MakeBetweenAnd(a, valuePrinter{begin}, valuePrinter{end})
+	return MakeBetweenAnd(a, valuePrinter{v: begin}, valuePrinter{v: end})
 }
 
 func (a Int64Access) FieldValueToScan(entity any) any {
@@ -38,7 +39,7 @@ func (a Int64Access) Set(v int64) Int64Access {
 
 func (a Int64Access) Equals(intOrInt64Access any) binaryExpression {
 	if i, ok := intOrInt64Access.(int); ok {
-		return MakeBinaryOperator(a, "=", valuePrinter{i})
+		return MakeBinaryOperator(a, "=", valuePrinter{v: i})
 	}
 	if ia, ok := intOrInt64Access.(Int64Access); ok {
 		return MakeBinaryOperator(a, "=", ia)
@@ -50,7 +51,7 @@ func (a Int64Access) Compare(op string, i int) binaryExpression {
 	if !strings.Contains(validComparisonOperators, op) {
 		panic("invalid comparison operator:" + op)
 	}
-	return MakeBinaryOperator(a, op, valuePrinter{i})
+	return MakeBinaryOperator(a, op, valuePrinter{v: i})
 }
 
 func (a Int64Access) Column() ColumnInfo { return a.ColumnInfo }

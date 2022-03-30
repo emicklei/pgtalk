@@ -8,6 +8,7 @@ import (
 
 // Float64Access can Read a column value (float) and Write a column value and Set a struct field (float64).
 type Float64Access struct {
+	unimplementedBooleanExpression
 	ColumnInfo
 	fieldWriter         FieldAccessFunc
 	nullableFieldWriter func(dest any, f pgtype.Float8)
@@ -38,7 +39,7 @@ func (a Float64Access) Compare(op string, float64OrFloat64Access any) binaryExpr
 		panic("invalid comparison operator:" + op)
 	}
 	if f, ok := float64OrFloat64Access.(float64); ok {
-		return MakeBinaryOperator(a, op, valuePrinter{f})
+		return MakeBinaryOperator(a, op, valuePrinter{v: f})
 	}
 	if ta, ok := float64OrFloat64Access.(Float64Access); ok {
 		return MakeBinaryOperator(a, op, ta)

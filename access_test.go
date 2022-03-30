@@ -5,7 +5,7 @@ import (
 )
 
 func TestLiteral_String(t *testing.T) {
-	l := LiteralString("literal")
+	l := newLiteralString("literal")
 	ls := testSQL(l)
 	if got, want := ls, "'literal'"; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)

@@ -53,6 +53,7 @@ func FieldSQL(sql, name string) *computedField {
 }
 
 type expressionSource struct {
+	unimplementedBooleanExpression
 	SQL string
 }
 

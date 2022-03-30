@@ -7,6 +7,7 @@ import (
 )
 
 type QuerySet[T any] struct {
+	unimplementedBooleanExpression
 	preparedName       string
 	tableInfo          TableInfo
 	tableAliasOverride string

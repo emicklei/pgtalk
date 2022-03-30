@@ -1,6 +1,7 @@
 package pgtalk
 
 type BooleanAccess struct {
+	unimplementedBooleanExpression
 	ColumnInfo
 	valueFieldWriter FieldAccessFunc
 	valueToInsert    bool
@@ -20,8 +21,12 @@ func (a BooleanAccess) ValueToInsert() any {
 	return a.valueToInsert
 }
 
+func (a BooleanAccess) And(e SQLExpression) SQLExpression {
+	return MakeBinaryOperator(a, "AND", e)
+}
+
 func (a BooleanAccess) Equals(b bool) SQLExpression {
-	return MakeBinaryOperator(a, "=", valuePrinter{b})
+	return MakeBinaryOperator(a, "=", valuePrinter{v: b})
 }
 
 func (a BooleanAccess) FieldValueToScan(entity any) any {

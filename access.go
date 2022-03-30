@@ -14,6 +14,7 @@ import (
 var EmptyColumnAccessor = []ColumnAccessor{}
 
 type valuePrinter struct {
+	unimplementedBooleanExpression
 	v any
 }
 
@@ -43,6 +44,13 @@ func (p valuePrinter) SQLOn(w WriteContext) {
 	fmt.Fprintf(w, "%v", p.v)
 }
 
+type unimplementedBooleanExpression struct{}
+
+func (unimplementedBooleanExpression) And(e SQLExpression) SQLExpression { panic("unsupported And") }
+func (unimplementedBooleanExpression) Or(e SQLExpression) SQLExpression  { panic("unsupported Or") }
+
+//func (unimplementedBooleanExpression) Like(s string) SQLExpression       { panic("unsupported Like") }
+
 // hack
 func toJSON(m json.Marshaler) string {
 	data, _ := m.MarshalJSON()
@@ -55,6 +63,7 @@ func encodeUUID(src [16]byte) string {
 }
 
 type valuesPrinter struct {
+	unimplementedBooleanExpression
 	vs []any
 }
 
@@ -64,24 +73,41 @@ func (p valuesPrinter) SQLOn(w WriteContext) {
 		if i > 0 {
 			fmt.Fprintf(w, ",")
 		}
-		valuePrinter{each}.SQLOn(w)
+		valuePrinter{v: each}.SQLOn(w)
 	}
 	fmt.Fprintf(w, ")")
 }
 
-type LiteralString string
+type LiteralString struct {
+	unimplementedBooleanExpression
+	value string
+}
+
+func newLiteralString(s string) LiteralString {
+	return LiteralString{value: s}
+}
 
 func (l LiteralString) SQLOn(w WriteContext) {
 	io.WriteString(w, "'")
-	io.WriteString(w, string(l))
+	io.WriteString(w, l.value)
 	io.WriteString(w, "'")
 }
 
 type NoCondition struct{}
 
-var EmptyCondition = NoCondition{}
+var EmptyCondition SQLExpression = NoCondition{}
 
 func (n NoCondition) SQLOn(w WriteContext) {}
+
+// And returns the argument as the receiver is a no operation
+func (n NoCondition) And(ex SQLExpression) SQLExpression {
+	return ex
+}
+
+// And returns the argument as the receiver is a no operation
+func (n NoCondition) Or(ex SQLExpression) SQLExpression {
+	return ex
+}
 
 const (
 	IsPrimary  = true

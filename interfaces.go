@@ -30,6 +30,8 @@ type SQLWriter interface {
 
 type SQLExpression interface {
 	SQLWriter
+	And(expr SQLExpression) SQLExpression
+	Or(expr SQLExpression) SQLExpression
 }
 
 type querySet interface {
