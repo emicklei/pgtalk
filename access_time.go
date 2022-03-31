@@ -4,44 +4,44 @@ import (
 	"time"
 )
 
-type TimeAccess struct {
+type timeAccess struct {
 	ColumnInfo
 	valueFieldWriter fieldAccessFunc
 	valueToInsert    time.Time
 }
 
 func NewTimeAccess(info ColumnInfo,
-	valueWriter fieldAccessFunc) TimeAccess {
-	return TimeAccess{ColumnInfo: info, valueFieldWriter: valueWriter}
+	valueWriter fieldAccessFunc) timeAccess {
+	return timeAccess{ColumnInfo: info, valueFieldWriter: valueWriter}
 }
 
-func (a TimeAccess) ValueToInsert() any {
+func (a timeAccess) ValueToInsert() any {
 	return a.valueToInsert
 }
 
-func (a TimeAccess) Set(v time.Time) TimeAccess {
+func (a timeAccess) Set(v time.Time) timeAccess {
 	a.valueToInsert = v
 	return a
 }
 
-func (a TimeAccess) Column() ColumnInfo { return a.ColumnInfo }
+func (a timeAccess) Column() ColumnInfo { return a.ColumnInfo }
 
-func (a TimeAccess) FieldValueToScan(entity any) any {
+func (a timeAccess) FieldValueToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
 
-func (a TimeAccess) TableAlias(alias string) TimeAccess {
+func (a timeAccess) TableAlias(alias string) timeAccess {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a
 }
 
 // AppendScannable is part of ColumnAccessor
-func (a TimeAccess) AppendScannable(list []any) []any {
+func (a timeAccess) AppendScannable(list []any) []any {
 	return append(list, &a.valueToInsert)
 }
 
 // Get returns the value for its columnName from a map (row).
-func (a TimeAccess) Get(values map[string]any) any {
+func (a timeAccess) Get(values map[string]any) any {
 	v, ok := values[a.columnName]
 	if !ok {
 		return time.Time{}

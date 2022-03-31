@@ -90,13 +90,13 @@ func (m MutationSet[T]) On() MutationSet[T] {
 }
 
 // Pre: must be run inside transaction
-func (m MutationSet[T]) Exec(ctx context.Context, conn Querier) *ResultIterator[T] {
+func (m MutationSet[T]) Exec(ctx context.Context, conn querier) *resultIterator[T] {
 	query := SQL(m)
 	rows, err := conn.Query(ctx, query, m.ValuesToInsert()...)
 	if err == nil && !m.canProduceResults() {
 		rows.Close()
 	}
-	return &ResultIterator[T]{queryError: err, rows: rows, selectors: m.returning}
+	return &resultIterator[T]{queryError: err, rows: rows, selectors: m.returning}
 }
 
 // ValuesToInsert returns the parameters values for the mutation query.

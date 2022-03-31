@@ -54,7 +54,7 @@ func (q QuerySet[T]) SQLOn(w writeContext) {
 	writeAccessOn(q.selectors, w)
 	fmt.Fprint(w, "\nFROM ")
 	q.fromSectionOn(w)
-	if _, ok := q.condition.(NoCondition); !ok {
+	if _, ok := q.condition.(noCondition); !ok {
 		fmt.Fprint(w, "\nWHERE ")
 		q.condition.SQLOn(w)
 	}
@@ -119,16 +119,16 @@ func (q QuerySet[T]) Exists() unaryExpression {
 	return unaryExpression{Operator: "EXISTS", Operand: q}
 }
 
-func (d QuerySet[T]) Iterate(ctx context.Context, conn Querier) (*ResultIterator[T], error) {
+func (d QuerySet[T]) Iterate(ctx context.Context, conn querier) (*resultIterator[T], error) {
 	rows, err := conn.Query(ctx, SQL(d))
-	return &ResultIterator[T]{
+	return &resultIterator[T]{
 		queryError: err,
 		rows:       rows,
 		selectors:  d.selectors,
 	}, err
 }
 
-func (d QuerySet[T]) Exec(ctx context.Context, conn Querier) (list []*T, err error) {
+func (d QuerySet[T]) Exec(ctx context.Context, conn querier) (list []*T, err error) {
 	rows, err := conn.Query(ctx, SQL(d))
 	if err != nil {
 		return
@@ -148,11 +148,11 @@ func (d QuerySet[T]) Exec(ctx context.Context, conn Querier) (list []*T, err err
 	return
 }
 
-func (d QuerySet[T]) ExecIntoMaps(ctx context.Context, conn Querier) (list []map[string]any, err error) {
+func (d QuerySet[T]) ExecIntoMaps(ctx context.Context, conn querier) (list []map[string]any, err error) {
 	return execIntoMaps(ctx, conn, SQL(d), d.selectors)
 }
 
-func execIntoMaps(ctx context.Context, conn Querier, query string, selectors []ColumnAccessor) (list []map[string]any, err error) {
+func execIntoMaps(ctx context.Context, conn querier, query string, selectors []ColumnAccessor) (list []map[string]any, err error) {
 	rows, err := conn.Query(ctx, query)
 	if err != nil {
 		return
@@ -178,34 +178,34 @@ func execIntoMaps(ctx context.Context, conn Querier, query string, selectors []C
 	return
 }
 
-func (d QuerySet[T]) Join(otherQuerySet querySet) Join {
-	return Join{
+func (d QuerySet[T]) Join(otherQuerySet querySet) join {
+	return join{
 		leftSet:  d,
 		rightSet: otherQuerySet,
-		joinType: InnerJoinType,
+		joinType: innerJoinType,
 	}
 }
 
-func (d QuerySet[T]) LeftOuterJoin(otherQuerySet querySet) Join {
-	return Join{
+func (d QuerySet[T]) LeftOuterJoin(otherQuerySet querySet) join {
+	return join{
 		leftSet:  d,
 		rightSet: otherQuerySet,
-		joinType: LeftOuterJoinType,
+		joinType: leftOuterJoinType,
 	}
 }
 
-func (d QuerySet[T]) RightJoin(otherQuerySet querySet) Join {
-	return Join{
+func (d QuerySet[T]) RightJoin(otherQuerySet querySet) join {
+	return join{
 		leftSet:  d,
 		rightSet: otherQuerySet,
-		joinType: RightOuterJoinType,
+		joinType: rightOuterJoinType,
 	}
 }
 
-func (d QuerySet[T]) FullJoin(otherQuerySet querySet) Join {
-	return Join{
+func (d QuerySet[T]) FullJoin(otherQuerySet querySet) join {
+	return join{
 		leftSet:  d,
 		rightSet: otherQuerySet,
-		joinType: FullOuterJoinType,
+		joinType: fullOuterJoinType,
 	}
 }

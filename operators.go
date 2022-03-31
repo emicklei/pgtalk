@@ -54,10 +54,10 @@ func (o binaryExpression) Like(pattern string) SQLExpression {
 	}
 }
 
-type BetweenAnd struct {
+type betweenAnd struct {
 }
 
-func makeBetweenAnd(reader ColumnAccessor, begin, end SQLExpression) BetweenAnd { return BetweenAnd{} }
+func makeBetweenAnd(reader ColumnAccessor, begin, end SQLExpression) betweenAnd { return betweenAnd{} }
 
 type unaryExpression struct {
 	Operator string

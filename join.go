@@ -8,28 +8,28 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
-type JoinType int
+type joinType int
 
 const (
-	InnerJoinType JoinType = iota
-	LeftOuterJoinType
-	RightOuterJoinType
-	FullOuterJoinType
+	innerJoinType joinType = iota
+	leftOuterJoinType
+	rightOuterJoinType
+	fullOuterJoinType
 )
 
-type Join struct {
+type join struct {
 	preparedName string
 	leftSet      querySet
 	rightSet     querySet
 	onLeft       ColumnAccessor
 	onRight      ColumnAccessor
 	condition    SQLExpression
-	joinType     JoinType
+	joinType     joinType
 	limit        int
 	offset       int
 }
 
-func (i Join) SQLOn(w writeContext) {
+func (i join) SQLOn(w writeContext) {
 	fmt.Fprint(w, "SELECT\n")
 	left := i.leftSet.selectAccessors()
 	wl := i.leftSet.augmentedContext(w)
@@ -46,7 +46,7 @@ func (i Join) SQLOn(w writeContext) {
 	i.rightSet.fromSectionOn(wr)
 	fmt.Fprint(w, "\nON ")
 	i.condition.SQLOn(w) // TODO which tableInfo to use?
-	if _, ok := i.leftSet.whereCondition().(NoCondition); !ok {
+	if _, ok := i.leftSet.whereCondition().(noCondition); !ok {
 		fmt.Fprint(wl, "\nWHERE ")
 		i.leftSet.whereCondition().SQLOn(wl)
 	}
@@ -59,68 +59,68 @@ func (i Join) SQLOn(w writeContext) {
 	// TODO RightSet where
 }
 
-func writeJoinType(t JoinType, w io.Writer) {
+func writeJoinType(t joinType, w io.Writer) {
 	switch t {
-	case InnerJoinType:
+	case innerJoinType:
 		fmt.Fprint(w, "\nINNER JOIN ")
-	case LeftOuterJoinType:
+	case leftOuterJoinType:
 		fmt.Fprint(w, "\nLEFT OUTER JOIN ")
-	case RightOuterJoinType:
+	case rightOuterJoinType:
 		fmt.Fprint(w, "\nRIGHT OUTER JOIN ")
-	case FullOuterJoinType:
+	case fullOuterJoinType:
 		fmt.Fprint(w, "\nFULL OUTER JOIN ")
 	}
 }
 
-func (i Join) Named(preparedName string) Join {
+func (i join) Named(preparedName string) join {
 	i.preparedName = preparedName
 	return i
 }
 
-func (i Join) On(condition SQLExpression) Join {
+func (i join) On(condition SQLExpression) join {
 	i.condition = condition
 	return i
 }
 
-func (i Join) Limit(limit int) Join {
+func (i join) Limit(limit int) join {
 	i.limit = limit
 	return i
 }
 
-func (i Join) Offset(offset int) Join {
+func (i join) Offset(offset int) join {
 	i.offset = offset
 	return i
 }
 
-func (i Join) LeftOuterJoin(q querySet) (m MultiJoin) {
+func (i join) LeftOuterJoin(q querySet) (m multiJoin) {
 	m.sets = append(m.sets, i.leftSet, i.rightSet, q)
-	m.joinTypes = append(m.joinTypes, i.joinType, LeftOuterJoinType)
+	m.joinTypes = append(m.joinTypes, i.joinType, leftOuterJoinType)
 	m.conditions = append(m.conditions, i.condition)
 	return
 }
 
-func (i Join) Exec(ctx context.Context, conn Querier) (it JoinResultIterator, err error) {
+func (i join) Exec(ctx context.Context, conn querier) (it joinResultIterator, err error) {
 	sql := SQL(i)
 	if i.preparedName != "" {
 		if p, ok := conn.(preparer); ok {
 			_, err := p.Prepare(ctx, i.preparedName, sql)
 			if err != nil {
-				return JoinResultIterator{queryError: err}, err
+				return joinResultIterator{queryError: err}, err
 			}
 		}
 	}
 	rows, err := conn.Query(ctx, sql)
-	return JoinResultIterator{queryError: err, leftSet: i.leftSet, rightSet: i.rightSet, rows: rows}, nil
+	return joinResultIterator{queryError: err, leftSet: i.leftSet, rightSet: i.rightSet, rows: rows}, nil
 }
 
-type JoinResultIterator struct {
+type joinResultIterator struct {
 	queryError error
 	leftSet    querySet
 	rightSet   querySet
 	rows       pgx.Rows
 }
 
-func (i *JoinResultIterator) HasNext() bool {
+func (i *joinResultIterator) HasNext() bool {
 	if i.queryError != nil {
 		return false
 	}
@@ -132,14 +132,14 @@ func (i *JoinResultIterator) HasNext() bool {
 	return false
 }
 
-func (i *JoinResultIterator) Err() error {
+func (i *joinResultIterator) Err() error {
 	if i.queryError != nil {
 		return i.queryError
 	}
 	return i.rows.Err()
 }
 
-func (i *JoinResultIterator) Next(left any, right any) error {
+func (i *joinResultIterator) Next(left any, right any) error {
 	if i.queryError != nil {
 		return i.queryError
 	}
@@ -155,36 +155,36 @@ func (i *JoinResultIterator) Next(left any, right any) error {
 	return i.rows.Scan(sw...)
 }
 
-type MultiJoin struct {
+type multiJoin struct {
 	preparedName string
 	sets         []querySet
-	joinTypes    []JoinType
+	joinTypes    []joinType
 	conditions   []SQLExpression
 }
 
-func (m MultiJoin) On(condition SQLExpression) MultiJoin {
+func (m multiJoin) On(condition SQLExpression) multiJoin {
 	m.conditions = append(m.conditions, condition)
 	return m
 }
 
-func (m MultiJoin) LeftOuterJoin(q querySet) MultiJoin {
+func (m multiJoin) LeftOuterJoin(q querySet) multiJoin {
 	m.sets = append(m.sets, q)
-	m.joinTypes = append(m.joinTypes, LeftOuterJoinType)
+	m.joinTypes = append(m.joinTypes, leftOuterJoinType)
 	return m
 }
 
-func (m MultiJoin) Exec(ctx context.Context, conn Querier) (*MultiJoinResultIterator, error) {
+func (m multiJoin) Exec(ctx context.Context, conn querier) (*multiJoinResultIterator, error) {
 	sql := SQL(m)
 	if m.preparedName != "" {
 		if p, ok := conn.(preparer); ok {
 			_, err := p.Prepare(ctx, m.preparedName, sql)
 			if err != nil {
-				return &MultiJoinResultIterator{queryError: err}, nil
+				return &multiJoinResultIterator{queryError: err}, nil
 			}
 		}
 	}
 	rows, err := conn.Query(ctx, sql)
-	return &MultiJoinResultIterator{queryError: err, querySets: m.sets, rows: rows}, nil
+	return &multiJoinResultIterator{queryError: err, querySets: m.sets, rows: rows}, nil
 }
 
 type tableWhere struct {
@@ -192,7 +192,7 @@ type tableWhere struct {
 	tableInfo  TableInfo
 }
 
-func (m MultiJoin) SQLOn(w writeContext) {
+func (m multiJoin) SQLOn(w writeContext) {
 	fmt.Fprint(w, "SELECT ")
 	for i, each := range m.sets {
 		if i > 0 && len(each.selectAccessors()) > 0 {
@@ -231,20 +231,20 @@ func (m MultiJoin) SQLOn(w writeContext) {
 	}
 }
 
-type MultiJoinResultIterator struct {
+type multiJoinResultIterator struct {
 	queryError error
 	querySets  []querySet
 	rows       pgx.Rows
 }
 
-func (i *MultiJoinResultIterator) Err() error {
+func (i *multiJoinResultIterator) Err() error {
 	if i.queryError != nil {
 		return i.queryError
 	}
 	return i.rows.Err()
 }
 
-func (i *MultiJoinResultIterator) HasNext() bool {
+func (i *multiJoinResultIterator) HasNext() bool {
 	if i.queryError != nil {
 		return false
 	}
@@ -256,7 +256,7 @@ func (i *MultiJoinResultIterator) HasNext() bool {
 	return false
 }
 
-func (i *MultiJoinResultIterator) Next(models ...any) error {
+func (i *multiJoinResultIterator) Next(models ...any) error {
 	if i.queryError != nil {
 		return i.queryError
 	}

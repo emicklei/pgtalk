@@ -1,6 +1,6 @@
 package pgtalk
 
-type JSONBAccess struct {
+type jsonBAccess struct {
 	unimplementedBooleanExpression
 	ColumnInfo
 	valueFieldWriter fieldAccessFunc
@@ -8,42 +8,42 @@ type JSONBAccess struct {
 }
 
 func NewJSONBAccess(info ColumnInfo,
-	valueWriter func(dest any) any) JSONBAccess {
-	return JSONBAccess{ColumnInfo: info, valueFieldWriter: valueWriter}
+	valueWriter func(dest any) any) jsonBAccess {
+	return jsonBAccess{ColumnInfo: info, valueFieldWriter: valueWriter}
 }
 
-func (a JSONBAccess) Set(s []byte) JSONBAccess {
+func (a jsonBAccess) Set(s []byte) jsonBAccess {
 	a.valueToInsert = s
 	return a
 }
 
-func (a JSONBAccess) ValueToInsert() any {
+func (a jsonBAccess) ValueToInsert() any {
 	return a.valueToInsert
 }
 
-func (a JSONBAccess) FieldValueToScan(entity any) any {
+func (a jsonBAccess) FieldValueToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
 
-func (a JSONBAccess) Column() ColumnInfo { return a.ColumnInfo }
+func (a jsonBAccess) Column() ColumnInfo { return a.ColumnInfo }
 
 // Extract returns an expresion to get the path, extracted from the JSONB data, as a column
-func (a JSONBAccess) Extract(path string) SQLExpression {
+func (a jsonBAccess) Extract(path string) SQLExpression {
 	return makeBinaryOperator(a, "->", newLiteralString(path))
 }
 
-func (a JSONBAccess) TableAlias(alias string) JSONBAccess {
+func (a jsonBAccess) TableAlias(alias string) jsonBAccess {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a
 }
 
 // AppendScannable is part of ColumnAccessor
-func (a JSONBAccess) AppendScannable(list []any) []any {
+func (a jsonBAccess) AppendScannable(list []any) []any {
 	return append(list, &a.valueToInsert)
 }
 
 // Get returns the value for its columnName from a map (row).
-func (a JSONBAccess) Get(values map[string]any) any {
+func (a jsonBAccess) Get(values map[string]any) any {
 	v, ok := values[a.columnName]
 	if !ok {
 		return []byte{}

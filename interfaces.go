@@ -41,7 +41,7 @@ type querySet interface {
 	augmentedContext(w writeContext) writeContext
 }
 
-type Querier interface {
+type querier interface {
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
 }
 

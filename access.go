@@ -93,19 +93,19 @@ func (l literalString) SQLOn(w writeContext) {
 	io.WriteString(w, "'")
 }
 
-type NoCondition struct{}
+type noCondition struct{}
 
-var EmptyCondition SQLExpression = NoCondition{}
+var EmptyCondition SQLExpression = noCondition{}
 
-func (n NoCondition) SQLOn(w writeContext) {}
+func (n noCondition) SQLOn(w writeContext) {}
 
 // And returns the argument as the receiver is a no operation
-func (n NoCondition) And(ex SQLExpression) SQLExpression {
+func (n noCondition) And(ex SQLExpression) SQLExpression {
 	return ex
 }
 
 // And returns the argument as the receiver is a no operation
-func (n NoCondition) Or(ex SQLExpression) SQLExpression {
+func (n noCondition) Or(ex SQLExpression) SQLExpression {
 	return ex
 }
 
