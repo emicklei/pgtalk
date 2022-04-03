@@ -77,6 +77,17 @@ or by example
 		...
 	}
 
+## Using Query arguments
+
+	q := products.Select(products.Code)
+	q , arg := q.NewArgument("F42") // also returns the updated query with knowledge about the argument
+	q = q.Where(products.Code.Equals(arg))
+
+	// SELECT p1.code FROM public.products p1 WHERE (p1.code = $1)
+
+	// with $1 = "F42"
+
+
 ## Joins
 
 ### Left Outer Join
