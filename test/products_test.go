@@ -63,8 +63,7 @@ func TestInnerJoin(t *testing.T) {
 	createCategory(t, 23)
 	createProduct(t, 12, 23)
 
-	ps := pgtalk.NewParameterSet()
-	par := ps.NewParameter("F42")
+	par := pgtalk.NewParameter("F42")
 
 	q := products.Select(products.Code)
 	j := q.Where(products.Code.Equals(par)).
@@ -79,12 +78,12 @@ func TestInnerJoin(t *testing.T) {
 	if testConnect == nil {
 		return
 	}
-	it, err := j.Exec(context.Background(), testConnect, ps.Parameters()...)
+	it, err := j.Exec(context.Background(), testConnect, par)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !it.HasNext() {
-		t.Fail()
+	if got, want := pgtalk.SQL(par), "$1"; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 	for it.HasNext() {
 		p := new(products.Product)

@@ -52,8 +52,7 @@ func TestDelete(t *testing.T) {
 }
 
 func TestDeleteWithParameter(t *testing.T) {
-	ps := pgtalk.NewParameterSet()
-	par := ps.NewParameter(10)
+	par := pgtalk.NewParameter(10)
 
 	m := products.Delete().Where(products.ID.Equals(par))
 	if got, want := oneliner(pgtalk.SQL(m)), `DELETE FROM public.products p1 WHERE (p1.id = ?)`; got != want {

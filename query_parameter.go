@@ -2,42 +2,34 @@ package pgtalk
 
 import "fmt"
 
+// QueryParameter capture any value as a parameter to use in a SQL query or mutation.
 type QueryParameter struct {
 	unimplementedBooleanExpression
-	index      int
-	setIndex   int
 	queryIndex int
 	value      any
 }
 
 func (a QueryParameter) SQLOn(w writeContext) {
-	if a.index == 0 {
+	if a.queryIndex == 0 {
 		fmt.Fprint(w, "?")
 		return
 	}
-	fmt.Fprintf(w, "$%d", a.index)
+	fmt.Fprintf(w, "$%d", a.queryIndex)
 }
 
-func argumentValues(list []QueryParameter) (values []any) {
+// argumentValues returns the values for each parameter.
+// it has the intended side-effect to update the query index of each parameter.
+func argumentValues(list []*QueryParameter) (values []any) {
 	if len(list) == 0 {
 		return
 	}
-	for _, each := range list {
+	for i, each := range list {
+		each.queryIndex = i + 1 // starts at 1
 		values = append(values, each.value)
 	}
 	return values
 }
 
-type ParameterSet struct {
-	parameters []QueryParameter
-}
-
-func NewParameterSet() *ParameterSet { return &ParameterSet{} }
-
-func (s *ParameterSet) NewParameter(value any) QueryParameter {
-	p := QueryParameter{value: value, setIndex: len(s.parameters) + 1} // start at 1
-	s.parameters = append(s.parameters, p)
-	return p
-}
-
-func (s *ParameterSet) Parameters() []QueryParameter { return s.parameters }
+// TODO can we use type parameterization here?
+//func NewParameter[T any](value T) *QueryParameter[T] { return &QueryParameter{value: value} }
+func NewParameter(value any) *QueryParameter { return &QueryParameter{value: value} }

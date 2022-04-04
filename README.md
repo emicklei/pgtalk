@@ -76,16 +76,13 @@ or by example
 		...
 	}
 
-## Using Query parameters
+## Using Query parameter
 
-	q := products.Select(products.Code)
-	q , arg := q.NewParameter("F42") // also returns the updated query with knowledge about the parameter
-	q = q.Where(products.Code.Equals(arg))
+	p := NewParameter("F42")
+	q := products.Select(products.Code).Where(products.Code.Equals(arg))
 
 	// SELECT p1.code FROM public.products p1 WHERE (p1.code = $1)
-
 	// with $1 = "F42"
-
 
 ## Joins
 

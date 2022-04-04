@@ -26,8 +26,8 @@ func (a textAccess) ValueToInsert() any {
 	return a.valueToInsert
 }
 
-func (a textAccess) Equals(stringOrTextAccess any) binaryExpression {
-	return a.Compare("=", stringOrTextAccess)
+func (a textAccess) Equals(textLike any) binaryExpression {
+	return a.Compare("=", textLike)
 }
 
 func (a textAccess) Compare(op string, stringOrTextAccess any) binaryExpression {
@@ -39,6 +39,9 @@ func (a textAccess) Compare(op string, stringOrTextAccess any) binaryExpression 
 	}
 	if ta, ok := stringOrTextAccess.(textAccess); ok {
 		return makeBinaryOperator(a, op, ta)
+	}
+	if p, ok := stringOrTextAccess.(*QueryParameter); ok {
+		return makeBinaryOperator(a, op, p)
 	}
 	panic("string or TextAcces expected")
 }

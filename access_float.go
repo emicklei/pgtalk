@@ -44,12 +44,12 @@ func (a float64Access) Compare(op string, isFloatLike any) binaryExpression {
 	if ta, ok := isFloatLike.(float64Access); ok {
 		return makeBinaryOperator(a, op, ta)
 	}
-	if qa, ok := isFloatLike.(QueryParameter); ok {
+	if qa, ok := isFloatLike.(*QueryParameter); ok {
 		if _, ok := qa.value.(float64); ok {
 			return makeBinaryOperator(a, op, qa)
 		}
 	}
-	panic("float64, Float64Access or QueryArgument expected")
+	panic("float64, Float64Access or *QueryArgument[float64] expected")
 }
 
 func (a float64Access) FieldValueToScan(entity any) any {

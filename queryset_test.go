@@ -28,8 +28,7 @@ func oneliner(s string) string {
 func TestQueryWithParameter(t *testing.T) {
 	q := MakeQuerySet[poly](polyTable, polyTable.Columns)
 
-	s := NewParameterSet()
-	i42 := s.NewParameter(42)
+	i42 := NewParameter(42)
 
 	q.selectors = []ColumnAccessor{polyFUUID}
 	q = q.Where(polyFUUID.Equals(i42))
@@ -37,5 +36,5 @@ func TestQueryWithParameter(t *testing.T) {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 	mock := newMockConnection(t)
-	q.Exec(mock.ctx(), mock, s.Parameters()...)
+	q.Exec(mock.ctx(), mock, i42)
 }

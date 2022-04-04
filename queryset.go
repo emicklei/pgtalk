@@ -120,8 +120,9 @@ func (q QuerySet[T]) Exists() unaryExpression {
 	return unaryExpression{Operator: "EXISTS", Operand: q}
 }
 
-func (d QuerySet[T]) Iterate(ctx context.Context, conn querier, parameters ...QueryParameter) (*resultIterator[T], error) {
-	rows, err := conn.Query(ctx, SQL(d), argumentValues(parameters)...)
+func (d QuerySet[T]) Iterate(ctx context.Context, conn querier, parameters ...*QueryParameter) (*resultIterator[T], error) {
+	params := argumentValues(parameters)
+	rows, err := conn.Query(ctx, SQL(d), params...)
 	return &resultIterator[T]{
 		queryError: err,
 		rows:       rows,
@@ -129,8 +130,9 @@ func (d QuerySet[T]) Iterate(ctx context.Context, conn querier, parameters ...Qu
 	}, err
 }
 
-func (d QuerySet[T]) Exec(ctx context.Context, conn querier, parameters ...QueryParameter) (list []*T, err error) {
-	rows, err := conn.Query(ctx, SQL(d), argumentValues(parameters)...)
+func (d QuerySet[T]) Exec(ctx context.Context, conn querier, parameters ...*QueryParameter) (list []*T, err error) {
+	params := argumentValues(parameters)
+	rows, err := conn.Query(ctx, SQL(d), params...)
 	if err != nil {
 		return
 	}
@@ -149,12 +151,13 @@ func (d QuerySet[T]) Exec(ctx context.Context, conn querier, parameters ...Query
 	return
 }
 
-func (d QuerySet[T]) ExecIntoMaps(ctx context.Context, conn querier, parameters ...QueryParameter) (list []map[string]any, err error) {
+func (d QuerySet[T]) ExecIntoMaps(ctx context.Context, conn querier, parameters ...*QueryParameter) (list []map[string]any, err error) {
 	return execIntoMaps(ctx, conn, SQL(d), d.selectors, parameters...)
 }
 
-func execIntoMaps(ctx context.Context, conn querier, query string, selectors []ColumnAccessor, parameters ...QueryParameter) (list []map[string]any, err error) {
-	rows, err := conn.Query(ctx, query, argumentValues(parameters)...)
+func execIntoMaps(ctx context.Context, conn querier, query string, selectors []ColumnAccessor, parameters ...*QueryParameter) (list []map[string]any, err error) {
+	params := argumentValues(parameters)
+	rows, err := conn.Query(ctx, query, params...)
 	if err != nil {
 		return
 	}

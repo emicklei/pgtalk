@@ -90,9 +90,12 @@ func (m MutationSet[T]) On() MutationSet[T] {
 }
 
 // Pre: must be run inside transaction
-func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...QueryParameter) *resultIterator[T] {
+func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...*QueryParameter) *resultIterator[T] {
+	// first collect parameters with query indices
+	params := m.valuesToInsert(parameters)
+	// then compose SQL
 	query := SQL(m)
-	rows, err := conn.Query(ctx, query, m.valuesToInsert(parameters)...)
+	rows, err := conn.Query(ctx, query, params...)
 	if err == nil && !m.canProduceResults() {
 		rows.Close()
 	}
@@ -101,13 +104,16 @@ func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...Qu
 
 // valuesToInsert returns the parameters values for the mutation query.
 // These are composed of all selectors and query arguments.
-func (m MutationSet[T]) valuesToInsert(params []QueryParameter) []any {
+func (m MutationSet[T]) valuesToInsert(params []*QueryParameter) []any {
 	args := make([]any, len(m.selectors)+len(params))
 	for i, each := range m.selectors {
 		args[i] = each.ValueToInsert()
 	}
 	for i, each := range params {
-		args[len(m.selectors)+i] = each.value
+		argIndex := len(m.selectors) + i
+		// update queryIndex
+		each.queryIndex = argIndex + 1
+		args[argIndex] = each.value
 	}
 	return args
 }

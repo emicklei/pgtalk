@@ -43,8 +43,7 @@ func TestInsertWithQueryArgument(t *testing.T) {
 	toUpdate := []ColumnAccessor{}
 	toUpdate = append(toUpdate, polyFFloat.Set(42.0))
 
-	ps := NewParameterSet()
-	v12 := ps.NewParameter(12.0)
+	v12 := NewParameter(12.0)
 
 	m := MakeMutationSet[poly](polyTable, toUpdate, MutationUpdate).Where(polyFFloat.Equals(v12))
 	if got, want := oneliner(SQL(m)), "UPDATE public.polies p1 SET ffloat = $1 WHERE (p1.ffloat = ?)"; got != want {
