@@ -2,13 +2,14 @@ package pgtalk
 
 import "fmt"
 
-// QueryParameter capture any value as a parameter to use in a SQL query or mutation.
+// QueryParameter captures any value as a parameter to use in a SQL query or mutation.
 type QueryParameter struct {
 	unimplementedBooleanExpression
 	queryIndex int
 	value      any
 }
 
+// SQLOn is part of SQLWriter
 func (a QueryParameter) SQLOn(w writeContext) {
 	if a.queryIndex == 0 {
 		fmt.Fprint(w, "?")

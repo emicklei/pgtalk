@@ -47,7 +47,7 @@ func (a int64Access) Equals(intLike any) binaryExpression {
 	if p, ok := intLike.(*QueryParameter); ok {
 		return makeBinaryOperator(a, "=", p)
 	}
-	panic("int or Int64Access expected")
+	panic("int or Int64Access or *QueryParameter expected")
 }
 
 func (a int64Access) Compare(op string, i int) binaryExpression {
