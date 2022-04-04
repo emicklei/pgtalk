@@ -44,7 +44,7 @@ func (a float64Access) Compare(op string, isFloatLike any) binaryExpression {
 	if ta, ok := isFloatLike.(float64Access); ok {
 		return makeBinaryOperator(a, op, ta)
 	}
-	if qa, ok := isFloatLike.(QueryArgument); ok {
+	if qa, ok := isFloatLike.(QueryParameter); ok {
 		if _, ok := qa.value.(float64); ok {
 			return makeBinaryOperator(a, op, qa)
 		}

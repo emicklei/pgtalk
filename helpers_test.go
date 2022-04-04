@@ -17,13 +17,16 @@ var (
 		func(dest any) any { return &dest.(*poly).FFloat })
 	polyFUUID = NewFieldAccess[pgtype.UUID](MakeColumnInfo(polyTable, "fuuid", NotPrimary, Nullable, 1),
 		func(dest any) any { return &dest.(*poly).FUUID })
+	polyFString = NewTextAccess(MakeColumnInfo(polyTable, "fstring", NotPrimary, Nullable, 1),
+		func(dest any) any { return &dest.(*poly).FString })
 	polyColumns = append([]ColumnAccessor{}, polyFTime, polyFFloat)
 )
 
 type poly struct {
-	FTime  time.Time
-	FFloat float64
-	FBool  bool
+	FTime   time.Time
+	FFloat  float64
+	FBool   bool
+	FString string
 	// pgtypes
 	FUUID pgtype.UUID
 }

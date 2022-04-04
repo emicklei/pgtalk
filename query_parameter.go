@@ -2,17 +2,17 @@ package pgtalk
 
 import "fmt"
 
-type QueryArgument struct {
+type QueryParameter struct {
 	unimplementedBooleanExpression
 	index int
 	value any
 }
 
-func (a QueryArgument) SQLOn(w writeContext) {
+func (a QueryParameter) SQLOn(w writeContext) {
 	fmt.Fprintf(w, "$%d", a.index)
 }
 
-func argumentValues(list []QueryArgument) (values []any) {
+func argumentValues(list []QueryParameter) (values []any) {
 	if len(list) == 0 {
 		return
 	}

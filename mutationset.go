@@ -13,12 +13,12 @@ const (
 )
 
 type MutationSet[T any] struct {
-	tableInfo      TableInfo
-	selectors      []ColumnAccessor
-	condition      SQLExpression
-	returning      []ColumnAccessor
-	operationType  int
-	queryArguments []QueryArgument
+	tableInfo       TableInfo
+	selectors       []ColumnAccessor
+	condition       SQLExpression
+	returning       []ColumnAccessor
+	operationType   int
+	queryParameters []QueryParameter
 }
 
 func MakeMutationSet[T any](tableInfo TableInfo, selectors []ColumnAccessor, operationType int) MutationSet[T] {
@@ -85,11 +85,11 @@ func (m MutationSet[T]) Returning(columns ...ColumnAccessor) MutationSet[T] {
 	return m
 }
 
-// NewArgument adds a new QueryArgument and returns the updated MutationSet
-func (m MutationSet[T]) NewArgument(value any) (MutationSet[T], QueryArgument) {
-	nextIndex := len(m.selectors) + len(m.queryArguments) + 1
-	arg := QueryArgument{value: value, index: nextIndex}
-	m.queryArguments = append(m.queryArguments, arg)
+// NewParameter adds a new QueryParameter and returns the updated MutationSet
+func (m MutationSet[T]) NewParameter(value any) (MutationSet[T], QueryParameter) {
+	nextIndex := len(m.selectors) + len(m.queryParameters) + 1
+	arg := QueryParameter{value: value, index: nextIndex}
+	m.queryParameters = append(m.queryParameters, arg)
 	return m, arg
 }
 
@@ -111,11 +111,11 @@ func (m MutationSet[T]) Exec(ctx context.Context, conn querier) *resultIterator[
 // ValuesToInsert returns the parameters values for the mutation query.
 // These are composed of all selectors and query arguments.
 func (m MutationSet[T]) ValuesToInsert() []any {
-	args := make([]any, len(m.selectors)+len(m.queryArguments))
+	args := make([]any, len(m.selectors)+len(m.queryParameters))
 	for i, each := range m.selectors {
 		args[i] = each.ValueToInsert()
 	}
-	for i, each := range m.queryArguments {
+	for i, each := range m.queryParameters {
 		args[len(m.selectors)+i] = each.value
 	}
 	return args

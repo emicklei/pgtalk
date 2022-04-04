@@ -139,7 +139,7 @@ func createProduct(t *testing.T) {
 
 func TestF42AsArgument(t *testing.T) {
 	q := products.Select(products.Code)
-	q, arg := q.NewArgument("F42")
+	q, arg := q.NewParameter("F42")
 	q = q.Where(products.Code.Equals(arg))
 	t.Log(oneliner(pgtalk.SQL(q)))
 }

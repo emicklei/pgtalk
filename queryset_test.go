@@ -28,10 +28,10 @@ func oneliner(s string) string {
 func TestQueryWithArguments(t *testing.T) {
 	q := MakeQuerySet[poly](polyTable, polyTable.Columns)
 	q.selectors = []ColumnAccessor{polyFUUID}
-	q, arg := q.NewArgument(42)
+	q, arg := q.NewParameter(42)
 	q = q.Where(polyFUUID.Equals(arg))
 	fmt.Println(oneliner(SQL(q)))
-	if got, want := len(q.queryArguments), 1; got != want {
+	if got, want := len(q.queryParameters), 1; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }

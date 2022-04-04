@@ -20,7 +20,7 @@ type QuerySet[T any] struct {
 	having             SQLExpression
 	orderBy            []ColumnAccessor
 	sortOption         string
-	queryArguments     []QueryArgument
+	queryParameters    []QueryParameter
 }
 
 func MakeQuerySet[T any](tableInfo TableInfo, selectors []ColumnAccessor) QuerySet[T] {
@@ -117,10 +117,10 @@ func (q QuerySet[T]) OrderBy(cas ...ColumnAccessor) QuerySet[T] {
 	return q
 }
 
-// NewArgument returns a new QueryArgument and the updated QuerySet.
-func (q QuerySet[T]) NewArgument(value any) (QuerySet[T], QueryArgument) {
-	v := QueryArgument{value: value, index: len(q.queryArguments) + 1} // start with 1
-	q.queryArguments = append(q.queryArguments, v)
+// NewParameter returns a new QueryParameter and the updated QuerySet.
+func (q QuerySet[T]) NewParameter(value any) (QuerySet[T], QueryParameter) {
+	v := QueryParameter{value: value, index: len(q.queryParameters) + 1} // start with 1
+	q.queryParameters = append(q.queryParameters, v)
 	return q, v
 }
 
@@ -129,7 +129,7 @@ func (q QuerySet[T]) Exists() unaryExpression {
 }
 
 func (d QuerySet[T]) Iterate(ctx context.Context, conn querier) (*resultIterator[T], error) {
-	rows, err := conn.Query(ctx, SQL(d), argumentValues(d.queryArguments)...)
+	rows, err := conn.Query(ctx, SQL(d), argumentValues(d.queryParameters)...)
 	return &resultIterator[T]{
 		queryError: err,
 		rows:       rows,
@@ -138,7 +138,7 @@ func (d QuerySet[T]) Iterate(ctx context.Context, conn querier) (*resultIterator
 }
 
 func (d QuerySet[T]) Exec(ctx context.Context, conn querier) (list []*T, err error) {
-	rows, err := conn.Query(ctx, SQL(d), argumentValues(d.queryArguments)...)
+	rows, err := conn.Query(ctx, SQL(d), argumentValues(d.queryParameters)...)
 	if err != nil {
 		return
 	}
@@ -158,10 +158,10 @@ func (d QuerySet[T]) Exec(ctx context.Context, conn querier) (list []*T, err err
 }
 
 func (d QuerySet[T]) ExecIntoMaps(ctx context.Context, conn querier) (list []map[string]any, err error) {
-	return execIntoMaps(ctx, conn, SQL(d), d.selectors, d.queryArguments)
+	return execIntoMaps(ctx, conn, SQL(d), d.selectors, d.queryParameters)
 }
 
-func execIntoMaps(ctx context.Context, conn querier, query string, selectors []ColumnAccessor, arguments []QueryArgument) (list []map[string]any, err error) {
+func execIntoMaps(ctx context.Context, conn querier, query string, selectors []ColumnAccessor, arguments []QueryParameter) (list []map[string]any, err error) {
 	rows, err := conn.Query(ctx, query, argumentValues(arguments)...)
 	if err != nil {
 		return

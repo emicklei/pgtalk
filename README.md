@@ -4,9 +4,8 @@
 [![GoDoc](https://pkg.go.dev/badge/github.com/emicklei/pgtalk)](https://pkg.go.dev/github.com/emicklei/pgtalk)
 
 More type safe SQL query building and execution using Go code generated (pgtalk-gen) from PostgreSQL table definitions.
-
-## generics
-
+After code generation, you get a Go type for each table or view with functions to create a QuerySet or MutationSet value.
+Except for query exectution, all operations on a QuerySet or MutationSet will return a copy of that value.
 This package requires Go SDK version 1.18+ because it uses type parameterization.
 
 ## examples
@@ -77,10 +76,10 @@ or by example
 		...
 	}
 
-## Using Query arguments
+## Using Query parameters
 
 	q := products.Select(products.Code)
-	q , arg := q.NewArgument("F42") // also returns the updated query with knowledge about the argument
+	q , arg := q.NewParameter("F42") // also returns the updated query with knowledge about the parameter
 	q = q.Where(products.Code.Equals(arg))
 
 	// SELECT p1.code FROM public.products p1 WHERE (p1.code = $1)
