@@ -77,6 +77,10 @@ func Int64ToInt8(i int64) pgtype.Int8 {
 	return pgtype.Int8{Int: i, Status: pgtype.Present}
 }
 
+func Int8(i int) pgtype.Int8 {
+	return Int64ToInt8(int64(i))
+}
+
 func ByteSliceToJSONB(d []byte) pgtype.JSONB {
 	return pgtype.JSONB{Bytes: d, Status: pgtype.Present}
 }
