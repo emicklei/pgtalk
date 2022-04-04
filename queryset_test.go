@@ -25,13 +25,17 @@ func oneliner(s string) string {
 	return strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(s, "\t", " "), "\n", " "), "  ", " ")
 }
 
-func TestQueryWithArguments(t *testing.T) {
+func TestQueryWithParameter(t *testing.T) {
 	q := MakeQuerySet[poly](polyTable, polyTable.Columns)
+
+	s := NewParameterSet()
+	i42 := s.NewParameter(42)
+
 	q.selectors = []ColumnAccessor{polyFUUID}
-	q, arg := q.NewParameter(42)
-	q = q.Where(polyFUUID.Equals(arg))
-	fmt.Println(oneliner(SQL(q)))
-	if got, want := len(q.queryParameters), 1; got != want {
-		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	q = q.Where(polyFUUID.Equals(i42))
+	if got, want := oneliner(SQL(q)), "SELECT p1.fuuid FROM public.polies p1 WHERE (p1.fuuid = ?)"; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
+	mock := newMockConnection(t)
+	q.Exec(mock.ctx(), mock, s.Parameters()...)
 }

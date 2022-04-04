@@ -13,12 +13,11 @@ const (
 )
 
 type MutationSet[T any] struct {
-	tableInfo       TableInfo
-	selectors       []ColumnAccessor
-	condition       SQLExpression
-	returning       []ColumnAccessor
-	operationType   int
-	queryParameters []QueryParameter
+	tableInfo     TableInfo
+	selectors     []ColumnAccessor
+	condition     SQLExpression
+	returning     []ColumnAccessor
+	operationType int
 }
 
 func MakeMutationSet[T any](tableInfo TableInfo, selectors []ColumnAccessor, operationType int) MutationSet[T] {
@@ -85,37 +84,29 @@ func (m MutationSet[T]) Returning(columns ...ColumnAccessor) MutationSet[T] {
 	return m
 }
 
-// NewParameter adds a new QueryParameter and returns the updated MutationSet
-func (m MutationSet[T]) NewParameter(value any) (MutationSet[T], QueryParameter) {
-	nextIndex := len(m.selectors) + len(m.queryParameters) + 1
-	arg := QueryParameter{value: value, index: nextIndex}
-	m.queryParameters = append(m.queryParameters, arg)
-	return m, arg
-}
-
 // todo
 func (m MutationSet[T]) On() MutationSet[T] {
 	return m
 }
 
 // Pre: must be run inside transaction
-func (m MutationSet[T]) Exec(ctx context.Context, conn querier) *resultIterator[T] {
+func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...QueryParameter) *resultIterator[T] {
 	query := SQL(m)
-	rows, err := conn.Query(ctx, query, m.ValuesToInsert()...)
+	rows, err := conn.Query(ctx, query, m.valuesToInsert(parameters)...)
 	if err == nil && !m.canProduceResults() {
 		rows.Close()
 	}
 	return &resultIterator[T]{queryError: err, rows: rows, selectors: m.returning}
 }
 
-// ValuesToInsert returns the parameters values for the mutation query.
+// valuesToInsert returns the parameters values for the mutation query.
 // These are composed of all selectors and query arguments.
-func (m MutationSet[T]) ValuesToInsert() []any {
-	args := make([]any, len(m.selectors)+len(m.queryParameters))
+func (m MutationSet[T]) valuesToInsert(params []QueryParameter) []any {
+	args := make([]any, len(m.selectors)+len(params))
 	for i, each := range m.selectors {
 		args[i] = each.ValueToInsert()
 	}
-	for i, each := range m.queryParameters {
+	for i, each := range params {
 		args[len(m.selectors)+i] = each.value
 	}
 	return args

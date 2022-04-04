@@ -62,21 +62,29 @@ func TestExists(t *testing.T) {
 func TestInnerJoin(t *testing.T) {
 	createCategory(t, 23)
 	createProduct(t, 12, 23)
+
+	ps := pgtalk.NewParameterSet()
+	par := ps.NewParameter("F42")
+
 	q := products.Select(products.Code)
-	q, par := q.NewParameter("F42")
 	j := q.Where(products.Code.Equals(par)).
 		Join(categories.Select(categories.Title)).
 		On(products.CategoryId.Equals(categories.ID))
-	if got, want := oneliner(pgtalk.SQL(j)), `SELECT p1.code, c1.title FROM public.products p1 INNER JOIN public.categories c1 ON (p1.category_id = c1.id) WHERE (p1.code = $1)`; got != want {
+	sql := oneliner(pgtalk.SQL(j))
+	if got, want := sql, `SELECT p1.code, c1.title FROM public.products p1 INNER JOIN public.categories c1 ON (p1.category_id = c1.id) WHERE (p1.code = ?)`; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
+	t.Log(sql)
 	if testConnect == nil {
 		return
 	}
-	it, err := j.Exec(context.Background(), testConnect)
+	it, err := j.Exec(context.Background(), testConnect, ps.Parameters()...)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if !it.HasNext() {
+		t.Fail()
 	}
 	for it.HasNext() {
 		p := new(products.Product)
@@ -169,11 +177,4 @@ func createCategory(t *testing.T, id int64) {
 	if err := tx.Commit(ctx); err != nil {
 		t.Fatal(err)
 	}
-}
-
-func TestF42AsArgument(t *testing.T) {
-	q := products.Select(products.Code)
-	q, arg := q.NewParameter("F42")
-	q = q.Where(products.Code.Equals(arg))
-	t.Log(oneliner(pgtalk.SQL(q)))
 }

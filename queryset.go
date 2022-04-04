@@ -20,7 +20,6 @@ type QuerySet[T any] struct {
 	having             SQLExpression
 	orderBy            []ColumnAccessor
 	sortOption         string
-	queryParameters    []QueryParameter
 }
 
 func MakeQuerySet[T any](tableInfo TableInfo, selectors []ColumnAccessor) QuerySet[T] {
@@ -117,19 +116,12 @@ func (q QuerySet[T]) OrderBy(cas ...ColumnAccessor) QuerySet[T] {
 	return q
 }
 
-// NewParameter returns a new QueryParameter and the updated QuerySet.
-func (q QuerySet[T]) NewParameter(value any) (QuerySet[T], QueryParameter) {
-	v := QueryParameter{value: value, index: len(q.queryParameters) + 1} // start with 1
-	q.queryParameters = append(q.queryParameters, v)
-	return q, v
-}
-
 func (q QuerySet[T]) Exists() unaryExpression {
 	return unaryExpression{Operator: "EXISTS", Operand: q}
 }
 
-func (d QuerySet[T]) Iterate(ctx context.Context, conn querier) (*resultIterator[T], error) {
-	rows, err := conn.Query(ctx, SQL(d), argumentValues(d.queryParameters)...)
+func (d QuerySet[T]) Iterate(ctx context.Context, conn querier, parameters ...QueryParameter) (*resultIterator[T], error) {
+	rows, err := conn.Query(ctx, SQL(d), argumentValues(parameters)...)
 	return &resultIterator[T]{
 		queryError: err,
 		rows:       rows,
@@ -137,8 +129,8 @@ func (d QuerySet[T]) Iterate(ctx context.Context, conn querier) (*resultIterator
 	}, err
 }
 
-func (d QuerySet[T]) Exec(ctx context.Context, conn querier) (list []*T, err error) {
-	rows, err := conn.Query(ctx, SQL(d), argumentValues(d.queryParameters)...)
+func (d QuerySet[T]) Exec(ctx context.Context, conn querier, parameters ...QueryParameter) (list []*T, err error) {
+	rows, err := conn.Query(ctx, SQL(d), argumentValues(parameters)...)
 	if err != nil {
 		return
 	}
@@ -157,12 +149,12 @@ func (d QuerySet[T]) Exec(ctx context.Context, conn querier) (list []*T, err err
 	return
 }
 
-func (d QuerySet[T]) ExecIntoMaps(ctx context.Context, conn querier) (list []map[string]any, err error) {
-	return execIntoMaps(ctx, conn, SQL(d), d.selectors, d.queryParameters)
+func (d QuerySet[T]) ExecIntoMaps(ctx context.Context, conn querier, parameters ...QueryParameter) (list []map[string]any, err error) {
+	return execIntoMaps(ctx, conn, SQL(d), d.selectors, parameters...)
 }
 
-func execIntoMaps(ctx context.Context, conn querier, query string, selectors []ColumnAccessor, arguments []QueryParameter) (list []map[string]any, err error) {
-	rows, err := conn.Query(ctx, query, argumentValues(arguments)...)
+func execIntoMaps(ctx context.Context, conn querier, query string, selectors []ColumnAccessor, parameters ...QueryParameter) (list []map[string]any, err error) {
+	rows, err := conn.Query(ctx, query, argumentValues(parameters)...)
 	if err != nil {
 		return
 	}
