@@ -190,9 +190,6 @@ func TestJSONB(t *testing.T) {
 	}
 	r := m.Exec(ctx, testConnect)
 	if err := r.Err(); err != nil {
-		for i, each := range m.ValuesToInsert() {
-			t.Logf("%d:%v", i, each)
-		}
 		t.Log(pgtalk.SQL(m))
 		t.Fatal(err)
 	}

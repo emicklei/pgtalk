@@ -64,6 +64,11 @@ func (a FieldAccess[T]) Equals(operand any) binaryExpression {
 	if t, ok := operand.(T); ok {
 		return makeBinaryOperator(a, "=", valuePrinter{v: t})
 	}
+	if anyp, ok := operand.(*QueryParameter); ok {
+		if _, ok := anyp.value.(T); ok {
+			return makeBinaryOperator(a, "=", anyp) // use parameter, not its value
+		}
+	}
 	return makeBinaryOperator(a, "=", valuePrinter{v: operand})
 }
 

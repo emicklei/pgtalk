@@ -99,7 +99,8 @@ func (i join) LeftOuterJoin(q querySet) (m multiJoin) {
 	return
 }
 
-func (i join) Exec(ctx context.Context, conn querier) (it joinResultIterator, err error) {
+func (i join) Exec(ctx context.Context, conn querier, parameters ...*QueryParameter) (it joinResultIterator, err error) {
+	params := argumentValues(parameters)
 	sql := SQL(i)
 	if i.preparedName != "" {
 		if p, ok := conn.(preparer); ok {
@@ -109,7 +110,7 @@ func (i join) Exec(ctx context.Context, conn querier) (it joinResultIterator, er
 			}
 		}
 	}
-	rows, err := conn.Query(ctx, sql)
+	rows, err := conn.Query(ctx, sql, params...)
 	return joinResultIterator{queryError: err, leftSet: i.leftSet, rightSet: i.rightSet, rows: rows}, nil
 }
 

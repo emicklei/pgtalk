@@ -51,6 +51,16 @@ func TestDelete(t *testing.T) {
 	}
 }
 
+func TestDeleteWithParameter(t *testing.T) {
+	par := pgtalk.NewParameter(10)
+
+	m := products.Delete().Where(products.ID.Equals(par))
+	if got, want := oneliner(pgtalk.SQL(m)), `DELETE FROM public.products p1 WHERE (p1.id = ?)`; got != want {
+		t.Log(diff(got, want))
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
+
 func TestInsert(t *testing.T) {
 	m := products.Insert(
 		products.ID.Set(10),

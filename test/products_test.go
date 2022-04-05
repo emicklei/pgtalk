@@ -60,22 +60,36 @@ func TestExists(t *testing.T) {
 }
 
 func TestInnerJoin(t *testing.T) {
-	q := products.Select(products.Code).Where(products.Code.Equals(convert.StringToText("F42"))).
+	createCategory(t, 23)
+	createProduct(t, 12, 23)
+
+	par := pgtalk.NewParameter("F42")
+
+	q := products.Select(products.Code)
+	j := q.Where(products.Code.Equals(par)).
 		Join(categories.Select(categories.Title)).
-		On(products.ID.Equals(categories.ID))
-	if got, want := oneliner(pgtalk.SQL(q)), `SELECT p1.code, c1.title FROM public.products p1 INNER JOIN public.categories c1 ON (p1.id = c1.id) WHERE (p1.code = 'F42')`; got != want {
+		On(products.CategoryId.Equals(categories.ID))
+	sql := oneliner(pgtalk.SQL(j))
+	if got, want := sql, `SELECT p1.code, c1.title FROM public.products p1 INNER JOIN public.categories c1 ON (p1.category_id = c1.id) WHERE (p1.code = ?)`; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
+	t.Log(sql)
 	if testConnect == nil {
 		return
 	}
-	it, _ := q.Exec(context.Background(), testConnect)
+	it, err := j.Exec(context.Background(), testConnect, par)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := pgtalk.SQL(par), "$1"; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
 	for it.HasNext() {
 		p := new(products.Product)
 		c := new(categories.Category)
 		_ = it.Next(p, c)
-		t.Logf("%#v,%#v", p.Code, c.Title)
+		t.Logf("%s,%s\n", p.String(), c.String())
 	}
 }
 
@@ -117,7 +131,7 @@ func TestFullSelect(t *testing.T) {
 }
 
 func TestProductUpperCode(t *testing.T) {
-	createProduct(t)
+	createProduct(t, 1234, 1)
 	q := products.Select(products.ID, pgtalk.FieldSQL("UPPER(p1.Code)", "upper"))
 	t.Log(pgtalk.SQL(q))
 	list, err := q.Exec(context.Background(), testConnect)
@@ -129,10 +143,37 @@ func TestProductUpperCode(t *testing.T) {
 	}
 }
 
-func createProduct(t *testing.T) {
-	q := products.Insert(products.ID.Set(1234), products.Code.Set(convert.StringToText("test")))
+func createProduct(t *testing.T, id int64, categoryId int64) {
+	q := products.Insert(
+		products.ID.Set(id),
+		products.Code.Set(convert.StringToText("F42")),
+		products.CategoryId.Set(convert.Int64ToInt8(categoryId)))
+	ctx := context.Background()
+	tx, err := testConnect.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	it := q.Exec(ctx, testConnect)
+	if it.Err() != nil {
+		t.Fatal(it.Err())
+	}
+	if err := tx.Commit(ctx); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func createCategory(t *testing.T, id int64) {
+	q := categories.Insert(categories.ID.Set(id), categories.Title.Set(convert.StringToText("one")))
+	ctx := context.Background()
+	tx, err := testConnect.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
 	it := q.Exec(context.Background(), testConnect)
 	if it.Err() != nil {
 		t.Fatal(it.Err())
+	}
+	if err := tx.Commit(ctx); err != nil {
+		t.Fatal(err)
 	}
 }

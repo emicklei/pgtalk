@@ -37,14 +37,17 @@ func (a int64Access) Set(v int64) int64Access {
 	return a
 }
 
-func (a int64Access) Equals(intOrInt64Access any) binaryExpression {
-	if i, ok := intOrInt64Access.(int); ok {
+func (a int64Access) Equals(intLike any) binaryExpression {
+	if i, ok := intLike.(int); ok {
 		return makeBinaryOperator(a, "=", valuePrinter{v: i})
 	}
-	if ia, ok := intOrInt64Access.(int64Access); ok {
+	if ia, ok := intLike.(int64Access); ok {
 		return makeBinaryOperator(a, "=", ia)
 	}
-	panic("int or Int64Access expected")
+	if p, ok := intLike.(*QueryParameter); ok {
+		return makeBinaryOperator(a, "=", p)
+	}
+	panic("int or Int64Access or *QueryParameter expected")
 }
 
 func (a int64Access) Compare(op string, i int) binaryExpression {

@@ -30,21 +30,26 @@ func (a float64Access) Set(v float64) float64Access {
 
 func (a float64Access) Column() ColumnInfo { return a.ColumnInfo }
 
-func (a float64Access) Equals(float64OrFloat64Access any) binaryExpression {
-	return a.Compare("=", float64OrFloat64Access)
+func (a float64Access) Equals(isFloatLike any) binaryExpression {
+	return a.Compare("=", isFloatLike)
 }
 
-func (a float64Access) Compare(op string, float64OrFloat64Access any) binaryExpression {
+func (a float64Access) Compare(op string, isFloatLike any) binaryExpression {
 	if !strings.Contains(validComparisonOperators, op) {
 		panic("invalid comparison operator:" + op)
 	}
-	if f, ok := float64OrFloat64Access.(float64); ok {
+	if f, ok := isFloatLike.(float64); ok {
 		return makeBinaryOperator(a, op, valuePrinter{v: f})
 	}
-	if ta, ok := float64OrFloat64Access.(float64Access); ok {
+	if ta, ok := isFloatLike.(float64Access); ok {
 		return makeBinaryOperator(a, op, ta)
 	}
-	panic("float64 or Float64Access expected")
+	if qa, ok := isFloatLike.(*QueryParameter); ok {
+		if _, ok := qa.value.(float64); ok {
+			return makeBinaryOperator(a, op, qa)
+		}
+	}
+	panic("float64, Float64Access or *QueryArgument[float64] expected")
 }
 
 func (a float64Access) FieldValueToScan(entity any) any {
