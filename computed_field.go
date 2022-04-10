@@ -5,9 +5,9 @@ import (
 	"io"
 )
 
-// FieldSQL returns a ColumnAccessor with a customer SQL expression.
+//  SQLAs returns a ColumnAccessor with a customer SQL expression.
 // The named result will be available using the GetExpressionResult method of the record type.
-func FieldSQL(sql, name string) *computedField {
+func SQLAs(sql, name string) *computedField {
 	return &computedField{
 		ResultName: name,
 		Expression: expressionSource{SQL: sql},

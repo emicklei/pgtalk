@@ -29,7 +29,7 @@ func TestGetColumn(t *testing.T) {
 
 func TestCustomExpressionExtension(t *testing.T) {
 	createAThing(t)
-	q := things.Select(things.ID, pgtalk.FieldSQL("12 * 24", "id2"))
+	q := things.Select(things.ID, pgtalk.SQLAs("12 * 24", "id2"))
 	if got, want := oneliner(pgtalk.SQL(q)), "SELECT t1.id, 12 * 24 AS id2 FROM public.things t1"; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}

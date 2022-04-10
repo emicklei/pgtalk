@@ -66,7 +66,7 @@ or by example
 
 ### Arbitrary SQL expressions
 
-	q := products.Select(products.ID, pgtalk.FieldSQL("UPPER(p1.Code)", "upper"))
+	q := products.Select(products.ID, pgtalk. SQLAs("UPPER(p1.Code)", "upper"))
 	
 	// SELECT p1.id,UPPER(p1.Code) AS upper FROM public.products p1
 	
