@@ -132,7 +132,7 @@ func TestFullSelect(t *testing.T) {
 
 func TestProductUpperCode(t *testing.T) {
 	createProduct(t, 1234, 1)
-	q := products.Select(products.ID, pgtalk.FieldSQL("UPPER(p1.Code)", "upper"))
+	q := products.Select(products.ID, pgtalk.SQLAs("UPPER(p1.Code)", "upper"))
 	t.Log(pgtalk.SQL(q))
 	list, err := q.Exec(context.Background(), testConnect)
 	if err != nil {
