@@ -14,7 +14,7 @@ var (
 	oTarget          = flag.String("o", ".", "target directory")
 	oSchema          = flag.String("s", "public", "source database schema")
 	oViews           = flag.Bool("views", false, "generated from views, default is false = use tables")
-	oVerbose         = flag.Bool("v", true, "use verbose logging")
+	oVerbose         = flag.Bool("v", false, "use verbose logging")
 	oIncludePatterns = flag.String("include", ".*", "comma separated list of regexp for tables to include")
 	oExludePatterns  = flag.String("exclude", "", "comma separated list of regexp for tables to exclude")
 )

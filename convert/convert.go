@@ -88,3 +88,11 @@ func ByteSliceToJSONB(d []byte) pgtype.JSONB {
 func Bool(b bool) pgtype.Bool {
 	return pgtype.Bool{Bool: b}
 }
+
+func DateToTimePtr(d pgtype.Date) *time.Time {
+	if d.Status == pgtype.Present {
+		t := d.Time
+		return &t
+	}
+	return nil
+}
