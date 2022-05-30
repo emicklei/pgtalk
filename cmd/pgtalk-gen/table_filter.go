@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"strings"
@@ -16,12 +17,18 @@ func NewTableFilter(includes, excludes string) TableFilter {
 	exc := strings.Split(excludes, ",")
 	for _, each := range inc {
 		entry := strings.TrimSpace(each)
+		if !strings.Contains(entry, "*") {
+			entry = fmt.Sprintf("^%s$", entry)
+		}
 		if len(entry) > 0 {
 			f.includes = append(f.includes, regexp.MustCompile(entry))
 		}
 	}
 	for _, each := range exc {
 		entry := strings.TrimSpace(each)
+		if !strings.Contains(entry, "*") {
+			entry = fmt.Sprintf("^%s$", entry)
+		}
 		if len(entry) > 0 {
 			f.excludes = append(f.excludes, regexp.MustCompile(entry))
 		}
@@ -40,14 +47,18 @@ func (f TableFilter) Includes(name string) bool {
 			}
 		}
 		if !included {
-			log.Println("[skip] filters does not include:", name, f.includes)
+			if *oVerbose {
+				log.Println("[skip] filters does not include:", name, f.includes)
+			}
 			return false
 		}
 	}
 	// must not be in excludes
 	for _, each := range f.excludes {
 		if each.MatchString(name) {
-			log.Println("[skip] filters does exclude:", name, f.excludes)
+			if *oVerbose {
+				log.Println("[skip] filters does exclude:", name, f.excludes)
+			}
 			return false
 		}
 	}
