@@ -34,6 +34,8 @@ type poly struct {
 	FString string
 	// pgtypes
 	FUUID pgtype.UUID
+	// for storing custom field expression result values
+	expressionResults map[string]any
 }
 
 func diff(left, right string) string {

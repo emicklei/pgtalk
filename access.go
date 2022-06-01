@@ -144,6 +144,9 @@ func StringWithFields(v any, includePresent bool) string {
 	fmt.Fprint(b, "{")
 	for i := 0; i < vt.NumField(); i++ {
 		f := vt.Field(i)
+		if !f.IsExported() {
+			continue
+		}
 		fv := rv.Field(i)
 		if fv.IsZero() {
 			continue

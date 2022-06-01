@@ -29,3 +29,11 @@ func TestStringWithNonNilFields_pointerpoly(t *testing.T) {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
+
+func TestGetStringOfPoly(t *testing.T) {
+	th := new(poly)
+	th.expressionResults = map[string]any{
+		"k": 42,
+	}
+	t.Log(StringWithFields(th, HideNilValues))
+}
