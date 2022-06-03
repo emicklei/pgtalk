@@ -10,7 +10,7 @@ type QueryParameter struct {
 }
 
 // SQLOn is part of SQLWriter
-func (a QueryParameter) SQLOn(w writeContext) {
+func (a QueryParameter) SQLOn(w WriteContext) {
 	if a.queryIndex == 0 {
 		fmt.Fprint(w, "?")
 		return
@@ -32,5 +32,5 @@ func argumentValues(list []*QueryParameter) (values []any) {
 }
 
 // TODO can we use type parameterization here?
-//func NewParameter[T any](value T) *QueryParameter[T] { return &QueryParameter{value: value} }
+// func NewParameter[T any](value T) *QueryParameter[T] { return &QueryParameter{value: value} }
 func NewParameter(value any) *QueryParameter { return &QueryParameter{value: value} }

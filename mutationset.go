@@ -29,7 +29,7 @@ func MakeMutationSet[T any](tableInfo TableInfo, selectors []ColumnAccessor, ope
 }
 
 // SQLOn returns the full SQL mutation query
-func (m MutationSet[T]) SQLOn(w writeContext) {
+func (m MutationSet[T]) SQLOn(w WriteContext) {
 	if m.operationType == MutationInsert {
 		fmt.Fprint(w, "INSERT INTO ")
 		fmt.Fprintf(w, "%s.%s", m.tableInfo.Schema, m.tableInfo.Name)

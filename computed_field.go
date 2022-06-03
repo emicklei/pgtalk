@@ -5,7 +5,8 @@ import (
 	"io"
 )
 
-//  SQLAs returns a ColumnAccessor with a customer SQL expression.
+//	SQLAs returns a ColumnAccessor with a customer SQL expression.
+//
 // The named result will be available using the GetExpressionResult method of the record type.
 func SQLAs(sql, name string) *computedField {
 	return &computedField{
@@ -20,7 +21,7 @@ type expressionSource struct {
 }
 
 // SQLOn is part of SQLWriter
-func (e expressionSource) SQLOn(w writeContext) {
+func (e expressionSource) SQLOn(w WriteContext) {
 	io.WriteString(w, e.SQL)
 }
 
@@ -31,7 +32,7 @@ type computedField struct {
 	Value      any
 }
 
-func (c *computedField) SQLOn(w writeContext) {
+func (c *computedField) SQLOn(w WriteContext) {
 	c.Expression.SQLOn(w)
 	fmt.Fprintf(w, " AS %s", c.ResultName)
 }

@@ -14,7 +14,7 @@ type binaryExpression struct {
 	Right    SQLExpression
 }
 
-func (o binaryExpression) SQLOn(w writeContext) {
+func (o binaryExpression) SQLOn(w WriteContext) {
 	fmt.Fprint(w, "(")
 	o.Left.SQLOn(w)
 	fmt.Fprintf(w, " %s ", o.Operator)
@@ -68,7 +68,7 @@ func makeUnaryOperator(operator string, operand SQLExpression) unaryExpression {
 	return unaryExpression{Operator: operator, Operand: operand}
 }
 
-func (u unaryExpression) SQLOn(w writeContext) {
+func (u unaryExpression) SQLOn(w WriteContext) {
 	fmt.Fprintf(w, "%s (", u.Operator)
 	u.Operand.SQLOn(w)
 	fmt.Fprint(w, ")")
@@ -95,7 +95,7 @@ type nullCheck struct {
 	IsNot bool
 }
 
-func (n nullCheck) SQLOn(w writeContext) {
+func (n nullCheck) SQLOn(w WriteContext) {
 	fmt.Fprint(w, "(")
 	n.Operand.SQLOn(w)
 	if n.IsNot {

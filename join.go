@@ -29,7 +29,7 @@ type join struct {
 	offset       int
 }
 
-func (i join) SQLOn(w writeContext) {
+func (i join) SQLOn(w WriteContext) {
 	fmt.Fprint(w, "SELECT\n")
 	left := i.leftSet.selectAccessors()
 	wl := i.leftSet.augmentedContext(w)
@@ -193,7 +193,7 @@ type tableWhere struct {
 	tableInfo  TableInfo
 }
 
-func (m multiJoin) SQLOn(w writeContext) {
+func (m multiJoin) SQLOn(w WriteContext) {
 	fmt.Fprint(w, "SELECT ")
 	for i, each := range m.sets {
 		if i > 0 && len(each.selectAccessors()) > 0 {

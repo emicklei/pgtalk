@@ -25,7 +25,7 @@ type ColumnAccessor interface {
 
 type SQLWriter interface {
 	// SQLOn writes a valid SQL on a Writer in a context
-	SQLOn(w writeContext)
+	SQLOn(w WriteContext)
 }
 
 type SQLExpression interface {
@@ -35,10 +35,10 @@ type SQLExpression interface {
 }
 
 type querySet interface {
-	fromSectionOn(w writeContext)
+	fromSectionOn(w WriteContext)
 	selectAccessors() []ColumnAccessor
 	whereCondition() SQLWriter
-	augmentedContext(w writeContext) writeContext
+	augmentedContext(w WriteContext) WriteContext
 }
 
 type querier interface {
