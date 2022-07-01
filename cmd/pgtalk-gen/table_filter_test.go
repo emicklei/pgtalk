@@ -12,7 +12,7 @@ func TestTableFilter_IncludeAll(t *testing.T) {
 }
 
 func TestTableFilter_Mix(t *testing.T) {
-	f := NewTableFilter("a.*,br.*,help", "ar.*")
+	f := NewTableFilter("a.*,br.*,help,xxxxde.*", "ar.*")
 	if got, want := f.Includes("alfred"), true; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
@@ -26,6 +26,9 @@ func TestTableFilter_Mix(t *testing.T) {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 	if got, want := f.Includes("help"), true; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+	if got, want := !f.Includes("deno"), true; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }

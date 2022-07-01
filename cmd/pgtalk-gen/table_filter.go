@@ -48,7 +48,7 @@ func (f TableFilter) Includes(name string) bool {
 		}
 		if !included {
 			if *oVerbose {
-				log.Println("[skip] filters does not include:", name, f.includes)
+				log.Println("[skip] filters does not include:", name)
 			}
 			return false
 		}
@@ -57,7 +57,7 @@ func (f TableFilter) Includes(name string) bool {
 	for _, each := range f.excludes {
 		if each.MatchString(name) {
 			if *oVerbose {
-				log.Println("[skip] filters does exclude:", name, f.excludes)
+				log.Println("[skip] filters does exclude:", name)
 			}
 			return false
 		}

@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	oDryrun          = flag.Bool("dry", false, "do not generate, report only")
 	oTarget          = flag.String("o", ".", "target directory")
 	oSchema          = flag.String("s", "public", "source database schema")
 	oViews           = flag.Bool("views", false, "generated from views, default is false = use tables")
@@ -48,7 +49,11 @@ func main() {
 	filter := NewTableFilter(*oIncludePatterns, *oExludePatterns)
 	for _, each := range all {
 		if filter.Includes(each.Name) {
-			generateFromTable(each, *oViews)
+			if *oDryrun {
+				log.Println("[DRYRUN] would generate", each.Name)
+			} else {
+				generateFromTable(each, *oViews)
+			}
 		}
 	}
 }
