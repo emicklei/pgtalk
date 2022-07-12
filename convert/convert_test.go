@@ -1,6 +1,7 @@
 package convert
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/jackc/pgtype"
@@ -18,4 +19,10 @@ func TestUUIDToString(t *testing.T) {
 	if got, want := UUIDToString(i), ""; got != want {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
+}
+
+func TestBigFloatToNumeric(t *testing.T) {
+	bf := big.NewFloat(3.14159265359)
+	num := BigFloatToNumeric(*bf)
+	t.Log(num) // TODO check
 }

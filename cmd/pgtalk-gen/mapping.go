@@ -78,13 +78,13 @@ var pgMappings = map[string]mapping{
 		newAccessFuncCall:   "NewFieldAccess[pgtype.UUID]",
 	},
 	"numeric": {
-		goFieldType: "float64",
-		newFuncCall: "NewFloat64Access",
+		goFieldType: "big.Float",
+		newFuncCall: "NewBigFloatAccess",
 
-		nullableValueFieldName: "Float",
-		convertFuncName:        "Float64ToFloat8",
-		nullableGoFieldType:    "pgtype.Float8",
-		newAccessFuncCall:      "NewFieldAccess[pgtype.Float8]",
+		nullableValueFieldName: "Float", // ?
+		convertFuncName:        "BigFloatToNumeric",
+		nullableGoFieldType:    "pgtype.Numeric",
+		newAccessFuncCall:      "NewFieldAccess[pgtype.Numeric]",
 	},
 	"point": {
 		nullableGoFieldType: "pgtype.Point",

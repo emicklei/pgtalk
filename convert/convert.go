@@ -3,6 +3,7 @@ package convert
 import (
 	"encoding/hex"
 	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/google/uuid"
@@ -95,4 +96,19 @@ func DateToTimePtr(d pgtype.Date) *time.Time {
 		return &t
 	}
 	return nil
+}
+
+func Float64ToFloat8(f float64) pgtype.Float8 {
+	return pgtype.Float8{
+		Status: pgtype.Present,
+		Float:  f,
+	}
+}
+
+// TODO
+func BigFloatToNumeric(f big.Float) pgtype.Numeric {
+	return pgtype.Numeric{
+		Status: pgtype.Present,
+		Int:    nil,
+	}
 }
