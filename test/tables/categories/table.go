@@ -7,6 +7,7 @@ import (
 	p "github.com/emicklei/pgtalk"
 	c "github.com/emicklei/pgtalk/convert"
 	"github.com/jackc/pgtype"
+	numeric "github.com/jackc/pgtype/ext/shopspring-numeric"
 	"strings"
 	"time"
 )
@@ -30,6 +31,7 @@ var (
 	_         = c.UUID // for the occasional unused import from convert
 	_         = time.Now
 	_         = pgtype.Empty // for the occasional unused import from pgtype
+	_         = numeric.Numeric{}
 	tableInfo = p.TableInfo{Schema: "public", Name: "categories", Alias: "c1"}
 )
 

@@ -53,7 +53,9 @@ func ensureTables(conn *pgx.Conn) error {
 		tDate date,
 		tTimestamp timestamp without time zone,
 		TJSON jsonb,
-		tText text
+		tText text,
+		tNumeric numeric,
+		tDecimal decimal
 	);
 	drop table IF EXISTS products;
 	create table products(

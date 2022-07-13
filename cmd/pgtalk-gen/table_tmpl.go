@@ -10,7 +10,7 @@ import (
 	"time"
 	"strings"
 	"github.com/jackc/pgtype"
-	"math/big"
+	numeric "github.com/jackc/pgtype/ext/shopspring-numeric" 
 )
 
 // {{.GoType}} is generated from the {{.Schema}}.{{.TableName}} table.
@@ -32,7 +32,7 @@ var (
 	_ = c.UUID // for the occasional unused import from convert
 	_ = time.Now 
 	_ = pgtype.Empty // for the occasional unused import from pgtype
-	_ = big.Exact
+	_ = numeric.Numeric{}
 	tableInfo = p.TableInfo{Schema: "{{.Schema}}", Name: "{{.TableName}}", Alias: "{{.TableAlias}}" }
 )
 

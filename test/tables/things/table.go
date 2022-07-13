@@ -7,6 +7,7 @@ import (
 	p "github.com/emicklei/pgtalk"
 	c "github.com/emicklei/pgtalk/convert"
 	"github.com/jackc/pgtype"
+	numeric "github.com/jackc/pgtype/ext/shopspring-numeric"
 	"strings"
 	"time"
 )
@@ -18,6 +19,8 @@ type Thing struct {
 	Ttimestamp pgtype.Timestamp // ttimestamp : timestamp without time zone
 	Tjson      pgtype.JSONB     // tjson : jsonb
 	Ttext      pgtype.Text      // ttext : text
+	Tnumeric   numeric.Numeric  // tnumeric : numeric
+	Tdecimal   numeric.Numeric  // tdecimal : numeric
 	// for storing custom field expression result values
 	expressionResults map[string]any
 }
@@ -38,16 +41,23 @@ var (
 	// Ttext represents the column "ttext" of with type "text", nullable:true, primary:false
 	Ttext = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "ttext", p.NotPrimary, p.Nullable, 5),
 		func(dest any) any { return &dest.(*Thing).Ttext })
+	// Tnumeric represents the column "tnumeric" of with type "numeric", nullable:true, primary:false
+	Tnumeric = p.NewFieldAccess[numeric.Numeric](p.MakeColumnInfo(tableInfo, "tnumeric", p.NotPrimary, p.Nullable, 6),
+		func(dest any) any { return &dest.(*Thing).Tnumeric })
+	// Tdecimal represents the column "tdecimal" of with type "numeric", nullable:true, primary:false
+	Tdecimal = p.NewFieldAccess[numeric.Numeric](p.MakeColumnInfo(tableInfo, "tdecimal", p.NotPrimary, p.Nullable, 7),
+		func(dest any) any { return &dest.(*Thing).Tdecimal })
 	// package private
 	_         = c.UUID // for the occasional unused import from convert
 	_         = time.Now
 	_         = pgtype.Empty // for the occasional unused import from pgtype
+	_         = numeric.Numeric{}
 	tableInfo = p.TableInfo{Schema: "public", Name: "things", Alias: "t1"}
 )
 
 func init() {
 	// after var initialization (to prevent cycle) we need to update the tableInfo to set all columns
-	tableInfo.Columns = []p.ColumnAccessor{ID, Tdate, Ttimestamp, Tjson, Ttext}
+	tableInfo.Columns = []p.ColumnAccessor{ID, Tdate, Ttimestamp, Tjson, Ttext, Tnumeric, Tdecimal}
 }
 
 // SetID sets the value to the field value and returns the receiver.
@@ -64,6 +74,12 @@ func (e *Thing) SetTjson(v []byte) *Thing { e.Tjson = c.ByteSliceToJSONB(v); ret
 
 // SetTtext sets the value to the field value and returns the receiver.
 func (e *Thing) SetTtext(v string) *Thing { e.Ttext = c.StringToText(v); return e }
+
+// SetTnumeric sets the value to the field value and returns the receiver.
+func (e *Thing) SetTnumeric(v numeric.Numeric) *Thing { e.Tnumeric = v; return e }
+
+// SetTdecimal sets the value to the field value and returns the receiver.
+func (e *Thing) SetTdecimal(v numeric.Numeric) *Thing { e.Tdecimal = v; return e }
 
 // Setters returns the list of changes to a Thing for which updates/inserts need to be processed.
 // Can be used in Insert,Update,Select. Cannot be used to set null values for columns.
@@ -82,6 +98,12 @@ func (e *Thing) Setters() (list []p.ColumnAccessor) {
 	}
 	if e.Ttext.Status == pgtype.Present {
 		list = append(list, Ttext.Set(e.Ttext))
+	}
+	if e.Tnumeric.Status == pgtype.Present {
+		list = append(list, Tnumeric.Set(e.Tnumeric))
+	}
+	if e.Tdecimal.Status == pgtype.Present {
+		list = append(list, Tdecimal.Set(e.Tdecimal))
 	}
 	return
 }

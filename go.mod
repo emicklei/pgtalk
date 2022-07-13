@@ -14,6 +14,8 @@ require (
 
 require github.com/jackc/pgtype v1.10.0
 
+require github.com/shopspring/decimal v1.2.0 // indirect
+
 require (
 	github.com/google/uuid v1.3.0
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect

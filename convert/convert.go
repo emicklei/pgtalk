@@ -3,7 +3,6 @@ package convert
 import (
 	"encoding/hex"
 	"fmt"
-	"math/big"
 	"time"
 
 	"github.com/google/uuid"
@@ -105,10 +104,4 @@ func Float64ToFloat8(f float64) pgtype.Float8 {
 	}
 }
 
-// TODO
-func BigFloatToNumeric(f big.Float) pgtype.Numeric {
-	return pgtype.Numeric{
-		Status: pgtype.Present,
-		Int:    nil,
-	}
-}
+// https://github.com/jackc/pgx/wiki/Numeric-and-decimal-support

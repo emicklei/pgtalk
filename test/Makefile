@@ -8,6 +8,6 @@ test:
 
 gen:
 	cd ../cmd/pgtalk-gen && go install
-	PGTALK_CONN=postgres://postgres:pgtalk@localhost:5432/pgtalk pgtalk-gen -o .
+	PGTALK_CONN=postgres://postgres:pgtalk@localhost:5432/pgtalk pgtalk-gen -v -o . -include things,products,categories
 	# TODO
 	/Users/emicklei/sdk/gotip/bin/gofmt -w .
