@@ -2,6 +2,9 @@ package pgtalk
 
 import (
 	"testing"
+
+	"github.com/emicklei/pgtalk/convert"
+	"github.com/jackc/pgtype"
 )
 
 func TestLiteral_String(t *testing.T) {
@@ -36,4 +39,14 @@ func TestGetStringOfPoly(t *testing.T) {
 		"k": 42,
 	}
 	t.Log(StringWithFields(th, HideNilValues))
+}
+
+func TestUUID_IN_SQL(t *testing.T) {
+	a := NewFieldAccess[pgtype.UUID](ColumnInfo{ti, "col", false, false, false, 1}, nil)
+	ids := []any{
+		convert.StringToUUID("b344a1918d0cbd1542de669644dd1bfd"),
+	}
+	ex := a.In(ids...)
+	sql := SQL(ex)
+	t.Log(sql)
 }
