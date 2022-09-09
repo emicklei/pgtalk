@@ -38,6 +38,15 @@ var pgMappings = map[string]mapping{
 		nullableGoFieldType:    "pgtype.Date",
 		newAccessFuncCall:      "NewFieldAccess[pgtype.Date]",
 	},
+	"citext": {
+		goFieldType: "string",
+		newFuncCall: "NewTextAccess",
+
+		nullableValueFieldName: "String",
+		convertFuncName:        "StringToText",
+		nullableGoFieldType:    "pgtype.Text",
+		newAccessFuncCall:      "NewFieldAccess[pgtype.Text]",
+	},
 	"text": {
 		goFieldType: "string",
 		newFuncCall: "NewTextAccess",
