@@ -47,6 +47,15 @@ var pgMappings = map[string]mapping{
 		nullableGoFieldType:    "pgtype.Text",
 		newAccessFuncCall:      "NewFieldAccess[pgtype.Text]",
 	},
+	"character varying": {
+		goFieldType: "string",
+		newFuncCall: "NewTextAccess",
+
+		nullableValueFieldName: "String",
+		convertFuncName:        "StringToText",
+		nullableGoFieldType:    "pgtype.Text",
+		newAccessFuncCall:      "NewFieldAccess[pgtype.Text]",
+	},
 	"bigint": {
 		goFieldType: "int64",
 		newFuncCall: "NewInt64Access",

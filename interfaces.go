@@ -54,3 +54,10 @@ type fieldAccessFunc = func(entity any) any
 type expressionValueHolder interface {
 	AddExpressionResult(key string, value any)
 }
+
+// ResultIterator is returned from executing a Query (or Mutation).
+type ResultIterator[T any] interface {
+	Err() error
+	HasNext() bool
+	Next() (*T, error)
+}
