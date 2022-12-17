@@ -59,7 +59,7 @@ type expressionValueHolder interface {
 type ResultIterator[T any] interface {
 	// Close closes the rows of the iterator, making the connection ready for use again. It is safe
 	// to call Close after rows is already closed.
-	// Close is typically called when the query or mutation is not expected to return results.
+	// Close is called implicitly when no return results are expected.
 	Close()
 	// Err returns the Query error if any
 	Err() error
