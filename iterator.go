@@ -17,7 +17,10 @@ func (i *resultIterator[T]) Close() {
 }
 
 func (i *resultIterator[T]) Err() error {
-	return i.queryError
+	if i.queryError != nil {
+		return i.queryError
+	}
+	return i.rows.Err()
 }
 
 func (i *resultIterator[T]) HasNext() bool {
