@@ -90,7 +90,7 @@ func (m MutationSet[T]) On() MutationSet[T] {
 }
 
 // Pre: must be run inside transaction
-func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...*QueryParameter) *resultIterator[T] {
+func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...*QueryParameter) ResultIterator[T] {
 	// first collect parameters with query indices
 	params := m.valuesToInsert(parameters)
 	// then compose SQL

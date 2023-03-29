@@ -1,7 +1,7 @@
 package pgtalk
 
 import (
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 )
 
 type resultIterator[T any] struct {
@@ -10,8 +10,17 @@ type resultIterator[T any] struct {
 	selectors  []ColumnAccessor
 }
 
+// Close closes the rows, making the connection ready for use again. It is safe
+// to call Close after rows is already closed.
+func (i *resultIterator[T]) Close() {
+	i.rows.Close()
+}
+
 func (i *resultIterator[T]) Err() error {
-	return i.queryError
+	if i.queryError != nil {
+		return i.queryError
+	}
+	return i.rows.Err()
 }
 
 func (i *resultIterator[T]) HasNext() bool {
@@ -21,7 +30,7 @@ func (i *resultIterator[T]) HasNext() bool {
 	if i.rows.Next() {
 		return true
 	}
-	// is Next returns false we can close the rows
+	// if Next returns false we can close the rows
 	i.rows.Close()
 	return false
 }

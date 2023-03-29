@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/emicklei/pgtalk/convert"
 	"github.com/jackc/pgtype"
 )
 
@@ -158,7 +159,12 @@ func StringWithFields(v any, includePresent bool) string {
 		} else {
 			fi = fv.Interface()
 		}
-		fmt.Fprintf(b, "%s:%v ", f.Name, fi)
+		// StringWithFields is for debugging purposes so we try to display the xxx-xxx-xxx representation of a UUID
+		if uid, ok := fi.(pgtype.UUID); ok {
+			fmt.Fprintf(b, "%s:%s ", f.Name, convert.UUIDToString(uid))
+		} else {
+			fmt.Fprintf(b, "%s:%v ", f.Name, fi)
+		}
 	}
 	fmt.Fprint(b, "}")
 	return b.String()

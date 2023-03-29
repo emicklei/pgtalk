@@ -14,7 +14,7 @@ import (
 
 // Product is generated from the public.products table.
 type Product struct {
-	ID         int64              // id : integer
+	ID         int32              // id : integer
 	CreatedAt  pgtype.Timestamptz // created_at : timestamp with time zone
 	UpdatedAt  pgtype.Timestamptz // updated_at : timestamp with time zone
 	DeletedAt  pgtype.Timestamptz // deleted_at : timestamp with time zone
@@ -27,7 +27,7 @@ type Product struct {
 
 var (
 	// ID represents the column "id" of with type "integer", nullable:false, primary:true
-	ID = p.NewInt64Access(p.MakeColumnInfo(tableInfo, "id", p.IsPrimary, p.NotNull, 1),
+	ID = p.NewInt32Access(p.MakeColumnInfo(tableInfo, "id", p.IsPrimary, p.NotNull, 1),
 		func(dest any) any { return &dest.(*Product).ID })
 	// CreatedAt represents the column "created_at" of with type "timestamp with time zone", nullable:true, primary:false
 	CreatedAt = p.NewFieldAccess[pgtype.Timestamptz](p.MakeColumnInfo(tableInfo, "created_at", p.NotPrimary, p.Nullable, 2),
@@ -61,7 +61,7 @@ func init() {
 }
 
 // SetID sets the value to the field value and returns the receiver.
-func (e *Product) SetID(v int64) *Product { e.ID = v; return e }
+func (e *Product) SetID(v int32) *Product { e.ID = v; return e }
 
 // SetCreatedAt sets the value to the field value and returns the receiver.
 func (e *Product) SetCreatedAt(v time.Time) *Product { e.CreatedAt = c.TimeToTimestamptz(v); return e }

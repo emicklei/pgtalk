@@ -10,6 +10,7 @@ type mapping struct {
 	newAccessFuncCall      string // to create the accessor
 }
 
+// https://www.postgresql.org/docs/9.1/datatype-numeric.html
 var pgMappings = map[string]mapping{
 	"timestamp with time zone": {
 		goFieldType: "time.Time",
@@ -56,6 +57,15 @@ var pgMappings = map[string]mapping{
 		nullableGoFieldType:    "pgtype.Text",
 		newAccessFuncCall:      "NewFieldAccess[pgtype.Text]",
 	},
+	"character varying": {
+		goFieldType: "string",
+		newFuncCall: "NewTextAccess",
+
+		nullableValueFieldName: "String",
+		convertFuncName:        "StringToText",
+		nullableGoFieldType:    "pgtype.Text",
+		newAccessFuncCall:      "NewFieldAccess[pgtype.Text]",
+	},
 	"bigint": {
 		goFieldType: "int64",
 		newFuncCall: "NewInt64Access",
@@ -66,13 +76,13 @@ var pgMappings = map[string]mapping{
 		newAccessFuncCall:      "NewFieldAccess[pgtype.Int8]",
 	},
 	"integer": {
-		goFieldType: "int64",
-		newFuncCall: "NewInt64Access",
+		goFieldType: "int32",
+		newFuncCall: "NewInt32Access",
 
 		nullableValueFieldName: "Int",
-		convertFuncName:        "Int64ToInt8",
-		nullableGoFieldType:    "pgtype.Int8",
-		newAccessFuncCall:      "NewFieldAccess[pgtype.Int8]",
+		convertFuncName:        "Int32ToInt4",
+		nullableGoFieldType:    "pgtype.Int4",
+		newAccessFuncCall:      "NewFieldAccess[pgtype.Int4]",
 	},
 	"jsonb": {
 		nullableValueFieldName: "Bytes",

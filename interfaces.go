@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 )
 
 type ColumnAccessor interface {
@@ -53,4 +53,18 @@ type fieldAccessFunc = func(entity any) any
 
 type expressionValueHolder interface {
 	AddExpressionResult(key string, value any)
+}
+
+// ResultIterator is returned from executing a Query (or Mutation).
+type ResultIterator[T any] interface {
+	// Close closes the rows of the iterator, making the connection ready for use again. It is safe
+	// to call Close after rows is already closed.
+	// Close is called implicitly when no return results are expected.
+	Close()
+	// Err returns the Query error if any
+	Err() error
+	// HasNext returns true if a more results are available. If not then Close is called implicitly.
+	HasNext() bool
+	// Next returns the next row populated in a T.
+	Next() (*T, error)
 }
