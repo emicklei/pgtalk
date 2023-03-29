@@ -1,7 +1,7 @@
 package pgtalk
 
 import (
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 )
 
 type resultIterator[T any] struct {

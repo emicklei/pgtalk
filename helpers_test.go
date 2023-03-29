@@ -8,10 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgconn"
-	"github.com/jackc/pgproto3/v2"
 	"github.com/jackc/pgtype"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 var (
@@ -77,9 +76,10 @@ type fakeRows struct {
 
 func (f fakeRows) Close()                        {}
 func (f fakeRows) Err() error                    { return nil }
+func (f fakeRows) Conn() *pgx.Conn               { return nil }
 func (f fakeRows) CommandTag() pgconn.CommandTag { return pgconn.CommandTag{} }
-func (f fakeRows) FieldDescriptions() []pgproto3.FieldDescription {
-	return []pgproto3.FieldDescription{}
+func (f fakeRows) FieldDescriptions() []pgconn.FieldDescription {
+	return []pgconn.FieldDescription{}
 }
 func (f fakeRows) Next() bool { return false }
 func (f fakeRows) Scan(dest ...interface{}) error {

@@ -14,7 +14,7 @@ import (
 
 // Category is generated from the public.categories table.
 type Category struct {
-	ID    int64       // id : integer
+	ID    int32       // id : integer
 	Title pgtype.Text // title : text
 	// for storing custom field expression result values
 	expressionResults map[string]any
@@ -22,7 +22,7 @@ type Category struct {
 
 var (
 	// ID represents the column "id" of with type "integer", nullable:false, primary:true
-	ID = p.NewInt64Access(p.MakeColumnInfo(tableInfo, "id", p.IsPrimary, p.NotNull, 1),
+	ID = p.NewInt32Access(p.MakeColumnInfo(tableInfo, "id", p.IsPrimary, p.NotNull, 1),
 		func(dest any) any { return &dest.(*Category).ID })
 	// Title represents the column "title" of with type "text", nullable:true, primary:false
 	Title = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "title", p.NotPrimary, p.Nullable, 2),
@@ -41,7 +41,7 @@ func init() {
 }
 
 // SetID sets the value to the field value and returns the receiver.
-func (e *Category) SetID(v int64) *Category { e.ID = v; return e }
+func (e *Category) SetID(v int32) *Category { e.ID = v; return e }
 
 // SetTitle sets the value to the field value and returns the receiver.
 func (e *Category) SetTitle(v string) *Category { e.Title = c.StringToText(v); return e }
