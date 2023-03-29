@@ -77,6 +77,10 @@ func Int64ToInt8(i int64) pgtype.Int8 {
 	return pgtype.Int8{Int: i, Status: pgtype.Present}
 }
 
+func Int32ToInt4(i int32) pgtype.Int4 {
+	return pgtype.Int4{Int: i, Status: pgtype.Present}
+}
+
 func Int8(i int) pgtype.Int8 {
 	return Int64ToInt8(int64(i))
 }

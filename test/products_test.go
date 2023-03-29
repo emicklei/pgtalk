@@ -143,7 +143,7 @@ func TestProductUpperCode(t *testing.T) {
 	}
 }
 
-func createProduct(t *testing.T, id int64, categoryId int64) {
+func createProduct(t *testing.T, id int32, categoryId int64) {
 	q := products.Insert(
 		products.ID.Set(id),
 		products.Code.Set(convert.StringToText("F42")),
@@ -162,7 +162,7 @@ func createProduct(t *testing.T, id int64, categoryId int64) {
 	}
 }
 
-func createCategory(t *testing.T, id int64) {
+func createCategory(t *testing.T, id int32) {
 	q := categories.Insert(categories.ID.Set(id), categories.Title.Set(convert.StringToText("one")))
 	ctx := context.Background()
 	tx, err := testConnect.Begin(ctx)
