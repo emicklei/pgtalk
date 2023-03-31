@@ -6,8 +6,8 @@ package categories
 import (
 	p "github.com/emicklei/pgtalk"
 	c "github.com/emicklei/pgtalk/convert"
-	"github.com/jackc/pgtype"
-	numeric "github.com/jackc/pgtype/ext/shopspring-numeric"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/shopspring/decimal"
 	"strings"
 	"time"
 )
@@ -31,7 +31,7 @@ var (
 	_         = c.UUID // for the occasional unused import from convert
 	_         = time.Now
 	_         = pgtype.Empty // for the occasional unused import from pgtype
-	_         = numeric.Numeric{}
+	_         = decimal.Decimal{}
 	tableInfo = p.TableInfo{Schema: "public", Name: "categories", Alias: "c1"}
 )
 
@@ -50,7 +50,7 @@ func (e *Category) SetTitle(v string) *Category { e.Title = c.StringToText(v); r
 // Can be used in Insert,Update,Select. Cannot be used to set null values for columns.
 func (e *Category) Setters() (list []p.ColumnAccessor) {
 	list = append(list, ID.Set(e.ID))
-	if e.Title.Status == pgtype.Present {
+	if e.Title.Valid {
 		list = append(list, Title.Set(e.Title))
 	}
 	return

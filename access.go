@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/pgtalk/convert"
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 var EmptyColumnAccessor = []ColumnAccessor{}

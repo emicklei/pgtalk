@@ -6,8 +6,8 @@ package products
 import (
 	p "github.com/emicklei/pgtalk"
 	c "github.com/emicklei/pgtalk/convert"
-	"github.com/jackc/pgtype"
-	numeric "github.com/jackc/pgtype/ext/shopspring-numeric"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/shopspring/decimal"
 	"strings"
 	"time"
 )
@@ -51,7 +51,7 @@ var (
 	_         = c.UUID // for the occasional unused import from convert
 	_         = time.Now
 	_         = pgtype.Empty // for the occasional unused import from pgtype
-	_         = numeric.Numeric{}
+	_         = decimal.Decimal{}
 	tableInfo = p.TableInfo{Schema: "public", Name: "products", Alias: "p1"}
 )
 
@@ -85,22 +85,22 @@ func (e *Product) SetCategoryId(v int64) *Product { e.CategoryId = c.Int64ToInt8
 // Can be used in Insert,Update,Select. Cannot be used to set null values for columns.
 func (e *Product) Setters() (list []p.ColumnAccessor) {
 	list = append(list, ID.Set(e.ID))
-	if e.CreatedAt.Status == pgtype.Present {
+	if e.CreatedAt.Valid {
 		list = append(list, CreatedAt.Set(e.CreatedAt))
 	}
-	if e.UpdatedAt.Status == pgtype.Present {
+	if e.UpdatedAt.Valid {
 		list = append(list, UpdatedAt.Set(e.UpdatedAt))
 	}
-	if e.DeletedAt.Status == pgtype.Present {
+	if e.DeletedAt.Valid {
 		list = append(list, DeletedAt.Set(e.DeletedAt))
 	}
-	if e.Code.Status == pgtype.Present {
+	if e.Code.Valid {
 		list = append(list, Code.Set(e.Code))
 	}
-	if e.Price.Status == pgtype.Present {
+	if e.Price.Valid {
 		list = append(list, Price.Set(e.Price))
 	}
-	if e.CategoryId.Status == pgtype.Present {
+	if e.CategoryId.Valid {
 		list = append(list, CategoryId.Set(e.CategoryId))
 	}
 	return

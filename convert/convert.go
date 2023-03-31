@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func UUID(v uuid.UUID) pgtype.UUID {
 	return pgtype.UUID{
-		Bytes:  v,
-		Status: pgtype.Present,
+		Bytes: v,
+		Valid: true,
 	}
 }
 
@@ -22,8 +22,8 @@ func StringToUUID(s string) pgtype.UUID {
 		panic(err)
 	}
 	return pgtype.UUID{
-		Bytes:  data,
-		Status: pgtype.Present,
+		Bytes: data,
+		Valid: true,
 	}
 }
 
@@ -50,7 +50,7 @@ func parseUUID(src string) (dst [16]byte, err error) {
 
 // UUIDToString returns format xxxx-yyyy-zzzz-rrrr-tttt
 func UUIDToString(t pgtype.UUID) string {
-	if t.Status != pgtype.Present {
+	if !t.Valid {
 		return ""
 	}
 	src := t.Bytes
@@ -58,43 +58,43 @@ func UUIDToString(t pgtype.UUID) string {
 }
 
 func TimeToTimestamptz(t time.Time) pgtype.Timestamptz {
-	return pgtype.Timestamptz{Time: t, Status: pgtype.Present}
+	return pgtype.Timestamptz{Time: t, Valid: true}
 }
 
 func TimeToTimestamp(t time.Time) pgtype.Timestamp {
-	return pgtype.Timestamp{Time: t.UTC(), Status: pgtype.Present}
+	return pgtype.Timestamp{Time: t.UTC(), Valid: true}
 }
 
 func TimeToDate(t time.Time) pgtype.Date {
-	return pgtype.Date{Time: t, Status: pgtype.Present}
+	return pgtype.Date{Time: t, Valid: true}
 }
 
 func StringToText(s string) pgtype.Text {
-	return pgtype.Text{String: s, Status: pgtype.Present}
+	return pgtype.Text{String: s, Valid: true}
 }
 
 func Int64ToInt8(i int64) pgtype.Int8 {
-	return pgtype.Int8{Int: i, Status: pgtype.Present}
+	return pgtype.Int8{Int64: i, Valid: true}
 }
 
 func Int32ToInt4(i int32) pgtype.Int4 {
-	return pgtype.Int4{Int: i, Status: pgtype.Present}
+	return pgtype.Int4{Int32: i, Valid: true}
 }
 
 func Int8(i int) pgtype.Int8 {
 	return Int64ToInt8(int64(i))
 }
 
-func ByteSliceToJSONB(d []byte) pgtype.JSONB {
-	return pgtype.JSONB{Bytes: d, Status: pgtype.Present}
-}
+// func ByteSliceToJSONB(d []byte) pgtype.JSONBCodec {
+// 	return pgtype.JSONB{Bytes: d, Valid: true}
+// }
 
 func Bool(b bool) pgtype.Bool {
-	return pgtype.Bool{Bool: b}
+	return pgtype.Bool{Bool: b, Valid: true}
 }
 
 func DateToTimePtr(d pgtype.Date) *time.Time {
-	if d.Status == pgtype.Present {
+	if d.Valid {
 		t := d.Time
 		return &t
 	}
@@ -103,9 +103,7 @@ func DateToTimePtr(d pgtype.Date) *time.Time {
 
 func Float64ToFloat8(f float64) pgtype.Float8 {
 	return pgtype.Float8{
-		Status: pgtype.Present,
-		Float:  f,
+		Valid:   true,
+		Float64: f,
 	}
 }
-
-// https://github.com/jackc/pgx/wiki/Numeric-and-decimal-support

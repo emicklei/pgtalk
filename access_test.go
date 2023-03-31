@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/emicklei/pgtalk/convert"
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func TestLiteral_String(t *testing.T) {

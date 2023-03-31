@@ -3,7 +3,7 @@ package pgtalk
 import (
 	"strings"
 
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type textAccess struct {

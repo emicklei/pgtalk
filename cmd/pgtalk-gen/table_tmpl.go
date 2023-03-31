@@ -9,8 +9,8 @@ import (
 	c "github.com/emicklei/pgtalk/convert"
 	"time"
 	"strings"
-	"github.com/jackc/pgtype"
-	numeric "github.com/jackc/pgtype/ext/shopspring-numeric" 
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/shopspring/decimal" 
 )
 
 // {{.GoType}} is generated from the {{.Schema}}.{{.TableName}} table.
@@ -32,7 +32,7 @@ var (
 	_ = c.UUID // for the occasional unused import from convert
 	_ = time.Now 
 	_ = pgtype.Empty // for the occasional unused import from pgtype
-	_ = numeric.Numeric{}
+	_ = decimal.Decimal{}
 	tableInfo = p.TableInfo{Schema: "{{.Schema}}", Name: "{{.TableName}}", Alias: "{{.TableAlias}}" }
 )
 
@@ -66,7 +66,7 @@ func (e *{{.GoType}}) Setters() (list []p.ColumnAccessor) {
 	{{- if .IsNotNull }}
 	list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
 	{{- else }}
-	if e.{{.GoName}}.Status == pgtype.Present {
+	if e.{{.GoName}}.Valid {
 		{{- if .IsGenericFieldAccess }}
 		list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
 		{{- else }}

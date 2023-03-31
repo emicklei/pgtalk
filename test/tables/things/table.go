@@ -6,21 +6,22 @@ package things
 import (
 	p "github.com/emicklei/pgtalk"
 	c "github.com/emicklei/pgtalk/convert"
-	"github.com/jackc/pgtype"
-	numeric "github.com/jackc/pgtype/ext/shopspring-numeric"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/shopspring/decimal"
 	"strings"
 	"time"
 )
 
 // Thing is generated from the public.things table.
 type Thing struct {
-	ID         pgtype.UUID      // id : uuid
-	Tdate      pgtype.Date      // tdate : date
-	Ttimestamp pgtype.Timestamp // ttimestamp : timestamp without time zone
-	Tjson      pgtype.JSONB     // tjson : jsonb
-	Ttext      pgtype.Text      // ttext : text
-	Tnumeric   numeric.Numeric  // tnumeric : numeric
-	Tdecimal   numeric.Numeric  // tdecimal : numeric
+	ID         pgtype.UUID         // id : uuid
+	Tdate      pgtype.Date         // tdate : date
+	Ttimestamp pgtype.Timestamp    // ttimestamp : timestamp without time zone
+	Tjsonb     p.JSON              // tjsonb : jsonb
+	Tjson      p.JSON              // tjson : json
+	Ttext      pgtype.Text         // ttext : text
+	Tnumeric   decimal.NullDecimal // tnumeric : numeric
+	Tdecimal   decimal.NullDecimal // tdecimal : numeric
 	// for storing custom field expression result values
 	expressionResults map[string]any
 }
@@ -35,29 +36,32 @@ var (
 	// Ttimestamp represents the column "ttimestamp" of with type "timestamp without time zone", nullable:true, primary:false
 	Ttimestamp = p.NewFieldAccess[pgtype.Timestamp](p.MakeColumnInfo(tableInfo, "ttimestamp", p.NotPrimary, p.Nullable, 3),
 		func(dest any) any { return &dest.(*Thing).Ttimestamp })
-	// Tjson represents the column "tjson" of with type "jsonb", nullable:true, primary:false
-	Tjson = p.NewJSONBAccess(p.MakeColumnInfo(tableInfo, "tjson", p.NotPrimary, p.Nullable, 4),
+	// Tjsonb represents the column "tjsonb" of with type "jsonb", nullable:true, primary:false
+	Tjsonb = p.NewJSONAccess(p.MakeColumnInfo(tableInfo, "tjsonb", p.NotPrimary, p.Nullable, 4),
+		func(dest any) any { return &dest.(*Thing).Tjsonb })
+	// Tjson represents the column "tjson" of with type "json", nullable:true, primary:false
+	Tjson = p.NewJSONAccess(p.MakeColumnInfo(tableInfo, "tjson", p.NotPrimary, p.Nullable, 5),
 		func(dest any) any { return &dest.(*Thing).Tjson })
 	// Ttext represents the column "ttext" of with type "text", nullable:true, primary:false
-	Ttext = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "ttext", p.NotPrimary, p.Nullable, 5),
+	Ttext = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "ttext", p.NotPrimary, p.Nullable, 6),
 		func(dest any) any { return &dest.(*Thing).Ttext })
 	// Tnumeric represents the column "tnumeric" of with type "numeric", nullable:true, primary:false
-	Tnumeric = p.NewFieldAccess[numeric.Numeric](p.MakeColumnInfo(tableInfo, "tnumeric", p.NotPrimary, p.Nullable, 6),
+	Tnumeric = p.NewFieldAccess[decimal.NullDecimal](p.MakeColumnInfo(tableInfo, "tnumeric", p.NotPrimary, p.Nullable, 7),
 		func(dest any) any { return &dest.(*Thing).Tnumeric })
 	// Tdecimal represents the column "tdecimal" of with type "numeric", nullable:true, primary:false
-	Tdecimal = p.NewFieldAccess[numeric.Numeric](p.MakeColumnInfo(tableInfo, "tdecimal", p.NotPrimary, p.Nullable, 7),
+	Tdecimal = p.NewFieldAccess[decimal.NullDecimal](p.MakeColumnInfo(tableInfo, "tdecimal", p.NotPrimary, p.Nullable, 8),
 		func(dest any) any { return &dest.(*Thing).Tdecimal })
 	// package private
 	_         = c.UUID // for the occasional unused import from convert
 	_         = time.Now
 	_         = pgtype.Empty // for the occasional unused import from pgtype
-	_         = numeric.Numeric{}
+	_         = decimal.Decimal{}
 	tableInfo = p.TableInfo{Schema: "public", Name: "things", Alias: "t1"}
 )
 
 func init() {
 	// after var initialization (to prevent cycle) we need to update the tableInfo to set all columns
-	tableInfo.Columns = []p.ColumnAccessor{ID, Tdate, Ttimestamp, Tjson, Ttext, Tnumeric, Tdecimal}
+	tableInfo.Columns = []p.ColumnAccessor{ID, Tdate, Ttimestamp, Tjsonb, Tjson, Ttext, Tnumeric, Tdecimal}
 }
 
 // SetID sets the value to the field value and returns the receiver.
@@ -69,40 +73,46 @@ func (e *Thing) SetTdate(v time.Time) *Thing { e.Tdate = c.TimeToDate(v); return
 // SetTtimestamp sets the value to the field value and returns the receiver.
 func (e *Thing) SetTtimestamp(v time.Time) *Thing { e.Ttimestamp = c.TimeToTimestamp(v); return e }
 
+// SetTjsonb sets the value to the field value and returns the receiver.
+func (e *Thing) SetTjsonb(v p.JSON) *Thing { e.Tjsonb = v; return e }
+
 // SetTjson sets the value to the field value and returns the receiver.
-func (e *Thing) SetTjson(v []byte) *Thing { e.Tjson = c.ByteSliceToJSONB(v); return e }
+func (e *Thing) SetTjson(v p.JSON) *Thing { e.Tjson = v; return e }
 
 // SetTtext sets the value to the field value and returns the receiver.
 func (e *Thing) SetTtext(v string) *Thing { e.Ttext = c.StringToText(v); return e }
 
 // SetTnumeric sets the value to the field value and returns the receiver.
-func (e *Thing) SetTnumeric(v numeric.Numeric) *Thing { e.Tnumeric = v; return e }
+func (e *Thing) SetTnumeric(v decimal.NullDecimal) *Thing { e.Tnumeric = v; return e }
 
 // SetTdecimal sets the value to the field value and returns the receiver.
-func (e *Thing) SetTdecimal(v numeric.Numeric) *Thing { e.Tdecimal = v; return e }
+func (e *Thing) SetTdecimal(v decimal.NullDecimal) *Thing { e.Tdecimal = v; return e }
 
 // Setters returns the list of changes to a Thing for which updates/inserts need to be processed.
 // Can be used in Insert,Update,Select. Cannot be used to set null values for columns.
 func (e *Thing) Setters() (list []p.ColumnAccessor) {
-	if e.ID.Status == pgtype.Present {
+	if e.ID.Valid {
 		list = append(list, ID.Set(e.ID))
 	}
-	if e.Tdate.Status == pgtype.Present {
+	if e.Tdate.Valid {
 		list = append(list, Tdate.Set(e.Tdate))
 	}
-	if e.Ttimestamp.Status == pgtype.Present {
+	if e.Ttimestamp.Valid {
 		list = append(list, Ttimestamp.Set(e.Ttimestamp))
 	}
-	if e.Tjson.Status == pgtype.Present {
-		list = append(list, Tjson.Set(e.Tjson.Bytes))
+	if e.Tjsonb.Valid {
+		list = append(list, Tjsonb.Set(e.Tjsonb.Map))
 	}
-	if e.Ttext.Status == pgtype.Present {
+	if e.Tjson.Valid {
+		list = append(list, Tjson.Set(e.Tjson.Map))
+	}
+	if e.Ttext.Valid {
 		list = append(list, Ttext.Set(e.Ttext))
 	}
-	if e.Tnumeric.Status == pgtype.Present {
+	if e.Tnumeric.Valid {
 		list = append(list, Tnumeric.Set(e.Tnumeric))
 	}
-	if e.Tdecimal.Status == pgtype.Present {
+	if e.Tdecimal.Valid {
 		list = append(list, Tdecimal.Set(e.Tdecimal))
 	}
 	return

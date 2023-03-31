@@ -85,21 +85,32 @@ var pgMappings = map[string]mapping{
 		newAccessFuncCall:      "NewFieldAccess[pgtype.Int4]",
 	},
 	"jsonb": {
-		nullableValueFieldName: "Bytes",
-		goFieldType:            "[]byte",
-		convertFuncName:        "ByteSliceToJSONB",
-		nullableGoFieldType:    "pgtype.JSONB",
-		newAccessFuncCall:      "NewJSONBAccess",
+		nullableValueFieldName: "Map",
+		nullableGoFieldType:    "p.JSON",
+		goFieldType:            "p.JSON",
+		newAccessFuncCall:      "NewJSONAccess",
+	},
+	"json": {
+		nullableValueFieldName: "Map",
+		nullableGoFieldType:    "p.JSON",
+		goFieldType:            "p.JSON",
+		newAccessFuncCall:      "NewJSONAccess",
 	},
 	"uuid": {
 		goFieldType:         "pgtype.UUID",
 		nullableGoFieldType: "pgtype.UUID",
 		newAccessFuncCall:   "NewFieldAccess[pgtype.UUID]",
 	},
+	// https://github.com/jackc/pgx/wiki/Numeric-and-decimal-support
 	"numeric": {
-		goFieldType:         "numeric.Numeric",
-		nullableGoFieldType: "numeric.Numeric",
-		newAccessFuncCall:   "NewFieldAccess[numeric.Numeric]",
+		goFieldType:         "decimal.NullDecimal",
+		nullableGoFieldType: "decimal.NullDecimal",
+		newAccessFuncCall:   "NewFieldAccess[decimal.NullDecimal]",
+	},
+	"decimal": {
+		goFieldType:         "decimal.NullDecimal",
+		nullableGoFieldType: "decimal.NullDecimal",
+		newAccessFuncCall:   "NewFieldAccess[decimal.NullDecimal]",
 	},
 	"point": {
 		nullableGoFieldType: "pgtype.Point",
@@ -115,9 +126,9 @@ var pgMappings = map[string]mapping{
 		newAccessFuncCall:      "NewFieldAccess[pgtype.Bool]",
 	},
 	"daterange": {
-		nullableGoFieldType: "pgtype.Daterange",
-		goFieldType:         "pgtype.Daterange",
-		newAccessFuncCall:   "NewFieldAccess[pgtype.Daterange]",
+		nullableGoFieldType: "pgtype.Range[pgtype.Date]",
+		goFieldType:         "pgtype.Range[pgtype.Date]",
+		newAccessFuncCall:   "NewFieldAccess[pgtype.Range[pgtype.Date]]",
 	},
 	"bytea": {
 		nullableGoFieldType: "pgtype.Bytea",

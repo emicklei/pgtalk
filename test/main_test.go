@@ -52,7 +52,8 @@ func ensureTables(conn *pgx.Conn) error {
 		id uuid,
 		tDate date,
 		tTimestamp timestamp without time zone,
-		TJSON jsonb,
+		TJSONB jsonb,
+		TJSON json,
 		tText text,
 		tNumeric numeric,
 		tDecimal decimal

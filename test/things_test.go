@@ -9,7 +9,7 @@ import (
 	"github.com/emicklei/pgtalk/convert"
 	"github.com/emicklei/pgtalk/test/tables/things"
 	"github.com/google/uuid"
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func TestSelfJoin(t *testing.T) {
@@ -84,7 +84,7 @@ func TestSelectMaps(t *testing.T) {
 }
 
 func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {
-	if got, want := len(things.Columns()), 7; got != want {
+	if got, want := len(things.Columns()), 8; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -104,7 +104,7 @@ func TestManageThing(t *testing.T) {
 	}
 	// UPDATE
 	{
-		update := things.Update(things.Tdate.Set(pgtype.Date{Status: pgtype.Null})).Where(things.ID.Equals(convert.UUID(id)))
+		update := things.Update(things.Tdate.Set(pgtype.Date{Valid: false})).Where(things.ID.Equals(convert.UUID(id)))
 		t.Log(pgtalk.SQL(update))
 		tx, err := testConnect.Begin(ctx)
 		if err != nil {
@@ -125,7 +125,7 @@ func TestManageThing(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Log(list)
-		if got, want := list[0].Tdate.Status, pgtype.Null; got != want {
+		if got, want := list[0].Tdate.Valid, false; got != want {
 			t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 		}
 	}
@@ -139,7 +139,7 @@ func createAThing(t *testing.T) uuid.UUID {
 		things.ID.Set(convert.UUID(id)),
 		things.Tdate.Set(convert.TimeToDate(time.Now())),
 		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
-		things.Tjson.Set([]byte(`{"key":"value"}`)),
+		things.Tjson.Set(map[string]any{"key": "value"}),
 		things.Ttext.Set(convert.StringToText("hello")),
 	)
 	tx, err := testConnect.Begin(ctx)
@@ -175,7 +175,7 @@ func TestJSONB(t *testing.T) {
 		things.ID.Set(convert.UUID(uuid.New())),
 		//things.Tdate.Set(time.Now()),
 		//things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
-		things.Tjson.Set([]byte(`{"key":"value"}`)))
+		things.Tjson.Set(map[string]any{"key": "value"}))
 
 	// insert 3
 	// {
@@ -232,9 +232,9 @@ func TestJSONB_3(t *testing.T) {
 	// insert 3
 	m := things.Insert(
 		things.ID.Set(convert.UUID(uuid.New())),
-		//things.Tdate.Set(convert.TimeToDate(time.Now())),
-		//things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
-		things.Tjson.Set([]byte(`{"key":"value"}`)))
+		things.Tdate.Set(convert.TimeToDate(time.Now())),
+		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
+		things.Tjson.Set(map[string]any{"key": "value"}))
 
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {

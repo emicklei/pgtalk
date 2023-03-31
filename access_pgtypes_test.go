@@ -3,7 +3,7 @@ package pgtalk
 import (
 	"testing"
 
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func TestUUID(t *testing.T) {

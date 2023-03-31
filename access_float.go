@@ -3,7 +3,7 @@ package pgtalk
 import (
 	"strings"
 
-	"github.com/jackc/pgtype"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 // float64Access can Read a column value (float) and Write a column value and Set a struct field (float64).

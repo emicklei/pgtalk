@@ -7,8 +7,8 @@ import (
 	"log"
 
 	"github.com/emicklei/tre"
-	"github.com/jackc/pgconn"
 	pgx "github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 const pgLoadViewDef = `
