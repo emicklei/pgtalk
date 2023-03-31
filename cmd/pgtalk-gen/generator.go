@@ -56,9 +56,14 @@ func generateFromTable(table PgTable, isView bool) {
 			IsNotNull:            each.NotNull,
 			TableAttributeNumber: each.FieldOrdinal,
 			ValueFieldName:       m.nullableValueFieldName,
-			IsGenericFieldAccess: strings.HasPrefix(m.newAccessFuncCall, "NewField"),
+			IsGenericFieldAccess: strings.HasPrefix(m.newAccessFuncCall, "NewField") || m.newAccessFuncCall == "NewJSONAccess", // TODO change template i.o this workaround
 			NonConvertedGoType:   m.goFieldType,
 			ConvertFuncName:      m.convertFuncName,
+			IsValidSrc:           ".Valid",
+		}
+		// TODO workaround
+		if m.newAccessFuncCall == "NewJSONAccess" {
+			f.IsValidSrc = " != nil"
 		}
 		tt.Fields = append(tt.Fields, f)
 	}

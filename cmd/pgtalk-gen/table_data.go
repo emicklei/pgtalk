@@ -24,6 +24,7 @@ type ColumnField struct {
 	TableAttributeNumber int
 	ValueFieldName       string //  can be empty
 	IsGenericFieldAccess bool
+	IsValidSrc           string
 	NonConvertedGoType   string
 	ConvertFuncName      string
 }

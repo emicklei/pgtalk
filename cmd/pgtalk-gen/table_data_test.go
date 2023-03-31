@@ -20,6 +20,8 @@ func TestTemplate(t *testing.T) {
 				GoType:               "int64",
 				FactoryMethod:        "NewInt8Access",
 				TableAttributeNumber: 1,
+				IsValidSrc:           ".Valid",
+				ValueFieldName:       "Some",
 			},
 			{
 				Name:                 "currency",
@@ -27,6 +29,8 @@ func TestTemplate(t *testing.T) {
 				GoType:               "sql.NullString",
 				FactoryMethod:        "NewTextAccess",
 				TableAttributeNumber: 2,
+				IsValidSrc:           ".Valid",
+				ValueFieldName:       "Some",
 			},
 		},
 	}

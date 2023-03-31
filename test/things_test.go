@@ -94,13 +94,15 @@ func TestManageThing(t *testing.T) {
 	id := createAThing(t)
 	// READ
 	{
-		read := things.Select(things.ID, things.Tdate, things.Ttimestamp, things.Tjson).Where(things.ID.Equals(convert.UUID(id)))
+		read := things.Select(things.ID, things.Tdate, things.Ttimestamp, things.Tjson, things.Tjsonb).Where(things.ID.Equals(convert.UUID(id)))
 		t.Log(pgtalk.SQL(read))
 		list, err := read.Exec(ctx, testConnect)
 		if err != nil {
 			t.Fatal(err)
 		}
 		t.Log(list)
+		t.Log(list[0].Tjson)
+		t.Log(list[0].Tjsonb)
 	}
 	// UPDATE
 	{
@@ -139,7 +141,8 @@ func createAThing(t *testing.T) uuid.UUID {
 		things.ID.Set(convert.UUID(id)),
 		things.Tdate.Set(convert.TimeToDate(time.Now())),
 		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
-		things.Tjson.Set(map[string]any{"key": "value"}),
+		things.Tjson.Set(map[string]any{"key1": "value"}),
+		things.Tjsonb.Set(map[string]any{"key2": "value"}),
 		things.Ttext.Set(convert.StringToText("hello")),
 	)
 	tx, err := testConnect.Begin(ctx)

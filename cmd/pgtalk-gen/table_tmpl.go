@@ -66,7 +66,7 @@ func (e *{{.GoType}}) Setters() (list []p.ColumnAccessor) {
 	{{- if .IsNotNull }}
 	list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
 	{{- else }}
-	if e.{{.GoName}}.Valid {
+	if e.{{.GoName}}{{.IsValidSrc}} {
 		{{- if .IsGenericFieldAccess }}
 		list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
 		{{- else }}

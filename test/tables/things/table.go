@@ -17,8 +17,8 @@ type Thing struct {
 	ID         pgtype.UUID         // id : uuid
 	Tdate      pgtype.Date         // tdate : date
 	Ttimestamp pgtype.Timestamp    // ttimestamp : timestamp without time zone
-	Tjsonb     p.JSON              // tjsonb : jsonb
-	Tjson      p.JSON              // tjson : json
+	Tjsonb     any                 // tjsonb : jsonb
+	Tjson      any                 // tjson : json
 	Ttext      pgtype.Text         // ttext : text
 	Tnumeric   decimal.NullDecimal // tnumeric : numeric
 	Tdecimal   decimal.NullDecimal // tdecimal : numeric
@@ -74,10 +74,10 @@ func (e *Thing) SetTdate(v time.Time) *Thing { e.Tdate = c.TimeToDate(v); return
 func (e *Thing) SetTtimestamp(v time.Time) *Thing { e.Ttimestamp = c.TimeToTimestamp(v); return e }
 
 // SetTjsonb sets the value to the field value and returns the receiver.
-func (e *Thing) SetTjsonb(v p.JSON) *Thing { e.Tjsonb = v; return e }
+func (e *Thing) SetTjsonb(v any) *Thing { e.Tjsonb = v; return e }
 
 // SetTjson sets the value to the field value and returns the receiver.
-func (e *Thing) SetTjson(v p.JSON) *Thing { e.Tjson = v; return e }
+func (e *Thing) SetTjson(v any) *Thing { e.Tjson = v; return e }
 
 // SetTtext sets the value to the field value and returns the receiver.
 func (e *Thing) SetTtext(v string) *Thing { e.Ttext = c.StringToText(v); return e }
@@ -100,11 +100,11 @@ func (e *Thing) Setters() (list []p.ColumnAccessor) {
 	if e.Ttimestamp.Valid {
 		list = append(list, Ttimestamp.Set(e.Ttimestamp))
 	}
-	if e.Tjsonb.Valid {
-		list = append(list, Tjsonb.Set(e.Tjsonb.Map))
+	if e.Tjsonb != nil {
+		list = append(list, Tjsonb.Set(e.Tjsonb))
 	}
-	if e.Tjson.Valid {
-		list = append(list, Tjson.Set(e.Tjson.Map))
+	if e.Tjson != nil {
+		list = append(list, Tjson.Set(e.Tjson))
 	}
 	if e.Ttext.Valid {
 		list = append(list, Ttext.Set(e.Ttext))

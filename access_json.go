@@ -1,15 +1,10 @@
 package pgtalk
 
-type JSON struct {
-	Valid bool
-	Map   map[string]any
-}
-
 type jsonAccess struct {
 	unimplementedBooleanExpression
 	ColumnInfo
 	valueFieldWriter fieldAccessFunc
-	valueToInsert    map[string]any
+	valueToInsert    any
 }
 
 func NewJSONAccess(info ColumnInfo,
@@ -17,8 +12,8 @@ func NewJSONAccess(info ColumnInfo,
 	return jsonAccess{ColumnInfo: info, valueFieldWriter: valueWriter}
 }
 
-func (a jsonAccess) Set(s map[string]any) jsonAccess {
-	a.valueToInsert = s
+func (a jsonAccess) Set(jsonObject any) jsonAccess {
+	a.valueToInsert = jsonObject
 	return a
 }
 
@@ -51,7 +46,7 @@ func (a jsonAccess) AppendScannable(list []any) []any {
 func (a jsonAccess) Get(values map[string]any) any {
 	v, ok := values[a.columnName]
 	if !ok {
-		return []byte{}
+		return nil
 	}
 	return v
 }
