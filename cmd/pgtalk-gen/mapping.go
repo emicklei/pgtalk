@@ -133,8 +133,9 @@ var pgMappings = map[string]mapping{
 		newAccessFuncCall:   "NewFieldAccess[pgtype.Bytea]",
 	},
 	"text[]": {
-		nullableGoFieldType: "pgtype.TextArray",
-		newAccessFuncCall:   "NewFieldAccess[pgtype.TextArray]",
+		goFieldType:         "pgtype.FlatArray[pgtype.Text]",
+		nullableGoFieldType: "pgtype.FlatArray[pgtype.Text]",
+		newAccessFuncCall:   "NewFieldAccess[pgtype.FlatArray[pgtype.Text]]",
 	},
 	"interval": {
 		nullableGoFieldType: "pgtype.Interval",

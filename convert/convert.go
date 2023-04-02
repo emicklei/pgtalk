@@ -107,3 +107,11 @@ func Float64ToFloat8(f float64) pgtype.Float8 {
 		Float64: f,
 	}
 }
+
+func StringsToTextArray(list []string) pgtype.FlatArray[pgtype.Text] {
+	a := pgtype.FlatArray[pgtype.Text]{}
+	for _, each := range list {
+		a = append(a, StringToText(each))
+	}
+	return a
+}
