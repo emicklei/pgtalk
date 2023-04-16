@@ -105,6 +105,11 @@ var pgMappings = map[string]mapping{
 		nullableGoFieldType: "decimal.NullDecimal",
 		newAccessFuncCall:   "NewFieldAccess[decimal.NullDecimal]",
 	},
+	"double precision": {
+		goFieldType:         "float64",
+		nullableGoFieldType: "pgtype.Float8",
+		newAccessFuncCall:   "NewFieldAccess[pgtype.Float8]",
+	},
 	"decimal": {
 		goFieldType:         "decimal.NullDecimal",
 		nullableGoFieldType: "decimal.NullDecimal",

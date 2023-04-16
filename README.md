@@ -137,15 +137,28 @@ or by example
 
 ## supported Column Types
 
-- text, character, uuid
-- bigint, integer, number
-- date, timestamp
-- jsonb, bytes
-- daterange
+- bigint
+- integer
+- jsonb
+- json
+- uuid
 - point
-- bytea, text[], interval
+- interval
+- timestamp with time zone
+- date
+- text
+- character varying
+- numeric
+- boolean
+- timestamp without time zone
+- daterange
+- bytea
+- text[]
+- citext
+- double precision
+- decimal
 
-Send me a PR for a missing type available from https://www.postgresql.org/docs/9.5/datatype.html .
+Send me a PR for a missing type available from https://www.postgresql.org/docs/9.5/datatype.html by modifying `mapping.go` in the `cmd/pgtalk-gen` package.
 
 ## how to run the generator
 

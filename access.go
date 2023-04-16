@@ -169,3 +169,11 @@ func StringWithFields(v any, includePresent bool) string {
 	fmt.Fprint(b, "}")
 	return b.String()
 }
+
+type SQLLiteral struct {
+	Literal string
+}
+
+func (l SQLLiteral) SQLOn(w WriteContext) {
+	w.Write([]byte(l.Literal))
+}

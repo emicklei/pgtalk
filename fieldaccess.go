@@ -104,6 +104,14 @@ func (a FieldAccess[T]) TableAlias(alias string) FieldAccess[T] {
 	return a
 }
 
+func (a FieldAccess[T]) IsNull() binaryExpression {
+	return makeBinaryOperator(a, "IS", valuePrinter{v: SQLLiteral{Literal: "NULL"}})
+}
+
+func (a FieldAccess[T]) IsNotNull() binaryExpression {
+	return makeBinaryOperator(a, "IS NOT", valuePrinter{v: SQLLiteral{Literal: "NULL"}})
+}
+
 // AppendScannable is part of ColumnAccessor
 func (a FieldAccess[T]) AppendScannable(list []any) []any {
 	return append(list, &a.valueToInsert)
