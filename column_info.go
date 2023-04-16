@@ -37,6 +37,7 @@ func (c ColumnInfo) SQLOn(w WriteContext) {
 	fmt.Fprintf(w, "%s.%s", w.TableAlias(c.tableInfo.Name, c.tableInfo.Alias), c.Name())
 }
 
+// TableAlias changes the table alias for this column info.
 func (c ColumnInfo) TableAlias(alias string) ColumnInfo {
 	c.tableInfo = c.tableInfo.WithAlias(alias)
 	return c

@@ -56,6 +56,7 @@ func (a float64Access) FieldValueToScan(entity any) any {
 	return a.fieldWriter(entity)
 }
 
+// TableAlias changes the table alias for this column accessor.
 func (a float64Access) TableAlias(alias string) float64Access {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a

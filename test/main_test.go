@@ -16,7 +16,7 @@ import (
 var testConnect *pgx.Conn
 
 func TestMain(m *testing.M) {
-	connectionString := "postgres://postgres:pgtalk@localhost:5432/pgtalk"
+	connectionString := "postgres://postgres:pgtalk@localhost:7432/postgres"
 	if len(connectionString) == 0 {
 		println("no database env set")
 		os.Exit(m.Run())

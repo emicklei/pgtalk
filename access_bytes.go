@@ -29,6 +29,7 @@ func (a bytesAccess) Set(v []byte) bytesAccess {
 	return a
 }
 
+// TableAlias changes the table alias for this column accessor.
 func (a bytesAccess) TableAlias(alias string) bytesAccess {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a

@@ -30,6 +30,7 @@ func (a timeAccess) FieldValueToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
 
+// TableAlias changes the table alias for this column accessor.
 func (a timeAccess) TableAlias(alias string) timeAccess {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a

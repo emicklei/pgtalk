@@ -99,15 +99,18 @@ func (a FieldAccess[T]) Compare(operator string, operand any) binaryExpression {
 	return makeBinaryOperator(a, operator, valuePrinter{v: operand})
 }
 
+// TableAlias changes the table alias for this column accessor.
 func (a FieldAccess[T]) TableAlias(alias string) FieldAccess[T] {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a
 }
 
+// IsNull creates a SQL Expresion with IS NULL.
 func (a FieldAccess[T]) IsNull() binaryExpression {
 	return makeBinaryOperator(a, "IS", valuePrinter{v: SQLLiteral{Literal: "NULL"}})
 }
 
+// IsNotNull creates a SQL Expresion with IS NOT NULL.
 func (a FieldAccess[T]) IsNotNull() binaryExpression {
 	return makeBinaryOperator(a, "IS NOT", valuePrinter{v: SQLLiteral{Literal: "NULL"}})
 }

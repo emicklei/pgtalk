@@ -33,6 +33,7 @@ func (a booleanAccess) FieldValueToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
 
+// TableAlias changes the table alias for this column accessor.
 func (a booleanAccess) TableAlias(alias string) booleanAccess {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a

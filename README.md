@@ -80,6 +80,19 @@ or by example
 		...
 	}
 
+### SQL query records as maps
+
+	q := products.Select(products.ID, pgtalk. SQLAs("UPPER(p1.Code)", "upper"))
+
+	// SELECT p1.id,UPPER(p1.Code) AS upper FROM public.products p1
+
+	listOfMaps, _ := q.ExecIntoMaps(context.Background(),aConnection)
+	for _, each := range listOfMaps {
+		id := products.ID.Get(each).(pgtype.UUID)
+		upper := each["upper"].(string)
+		...
+	}
+
 ## Using Query parameter
 
 	p := NewParameter("F42")

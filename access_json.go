@@ -32,6 +32,7 @@ func (a jsonAccess) Extract(path string) SQLExpression {
 	return makeBinaryOperator(a, "->", newLiteralString(path))
 }
 
+// TableAlias changes the table alias for this column accessor.
 func (a jsonAccess) TableAlias(alias string) jsonAccess {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a

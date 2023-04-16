@@ -59,6 +59,7 @@ func (a int64Access) Compare(op string, i int) binaryExpression {
 
 func (a int64Access) Column() ColumnInfo { return a.ColumnInfo }
 
+// TableAlias changes the table alias for this column accessor.
 func (a int64Access) TableAlias(alias string) int64Access {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a

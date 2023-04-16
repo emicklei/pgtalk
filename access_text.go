@@ -43,7 +43,7 @@ func (a textAccess) Compare(op string, stringOrTextAccess any) binaryExpression 
 	if p, ok := stringOrTextAccess.(*QueryParameter); ok {
 		return makeBinaryOperator(a, op, p)
 	}
-	panic("string or TextAcces expected")
+	panic("string or TextAccess expected")
 }
 
 func (a textAccess) FieldValueToScan(entity any) any {
@@ -64,6 +64,7 @@ func (a textAccess) In(values ...string) binaryExpression {
 
 func (a textAccess) Column() ColumnInfo { return a.ColumnInfo }
 
+// TableAlias changes the table alias for this column accessor.
 func (a textAccess) TableAlias(alias string) textAccess {
 	a.ColumnInfo = a.ColumnInfo.TableAlias(alias)
 	return a

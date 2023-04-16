@@ -151,6 +151,8 @@ func (d QuerySet[T]) Exec(ctx context.Context, conn querier, parameters ...*Quer
 	return
 }
 
+// ExecIntoMaps executes the query and returns a list of generic maps (column->value).
+// This can be used if you do not want to get full records types or have multiple custom values.
 func (d QuerySet[T]) ExecIntoMaps(ctx context.Context, conn querier, parameters ...*QueryParameter) (list []map[string]any, err error) {
 	return execIntoMaps(ctx, conn, SQL(d), d.selectors, parameters...)
 }

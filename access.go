@@ -50,8 +50,6 @@ type unimplementedBooleanExpression struct{}
 func (unimplementedBooleanExpression) And(e SQLExpression) SQLExpression { panic("unsupported And") }
 func (unimplementedBooleanExpression) Or(e SQLExpression) SQLExpression  { panic("unsupported Or") }
 
-//func (unimplementedBooleanExpression) Like(s string) SQLExpression       { panic("unsupported Like") }
-
 // hack
 func toJSON(m json.Marshaler) string {
 	data, _ := m.MarshalJSON()
