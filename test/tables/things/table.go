@@ -17,8 +17,8 @@ type Thing struct {
 	ID         pgtype.UUID         // id : uuid
 	Tdate      pgtype.Date         // tdate : date
 	Ttimestamp pgtype.Timestamp    // ttimestamp : timestamp without time zone
-	Tjsonb     p.NullAny       // tjsonb : jsonb
-	Tjson      p.NullAny       // tjson : json
+	Tjsonb     p.NullJSON          // tjsonb : jsonb
+	Tjson      p.NullJSON          // tjson : json
 	Ttext      pgtype.Text         // ttext : text
 	Tnumeric   decimal.NullDecimal // tnumeric : numeric
 	Tdecimal   decimal.NullDecimal // tdecimal : numeric
@@ -74,10 +74,10 @@ func (e *Thing) SetTdate(v time.Time) *Thing { e.Tdate = c.TimeToDate(v); return
 func (e *Thing) SetTtimestamp(v time.Time) *Thing { e.Ttimestamp = c.TimeToTimestamp(v); return e }
 
 // SetTjsonb sets the value to the field value and returns the receiver.
-func (e *Thing) SetTjsonb(v p.NullAny) *Thing { e.Tjsonb = v; return e }
+func (e *Thing) SetTjsonb(v p.NullJSON) *Thing { e.Tjsonb = v; return e }
 
 // SetTjson sets the value to the field value and returns the receiver.
-func (e *Thing) SetTjson(v p.NullAny) *Thing { e.Tjson = v; return e }
+func (e *Thing) SetTjson(v p.NullJSON) *Thing { e.Tjson = v; return e }
 
 // SetTtext sets the value to the field value and returns the receiver.
 func (e *Thing) SetTtext(v string) *Thing { e.Ttext = c.StringToText(v); return e }

@@ -141,14 +141,15 @@ func createAThing(t *testing.T) uuid.UUID {
 		things.ID.Set(convert.UUID(id)),
 		things.Tdate.Set(convert.TimeToDate(time.Now())),
 		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
-		things.Tjson.Set(map[string]any{"key1": "value"}),
-		things.Tjsonb.Set(map[string]any{"key2": "value"}),
+		things.Tjson.Set(map[string]any{"key1": "value1"}),
+		things.Tjsonb.Set(map[string]any{"key2": "value2"}),
 		things.Ttext.Set(convert.StringToText("hello")),
 	)
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Log(pgtalk.SQL(create))
 	_ = create.Exec(ctx, testConnect)
 	err = tx.Commit(ctx)
 	if err != nil {
@@ -200,6 +201,18 @@ func createNullThing(t *testing.T) uuid.UUID {
 	}
 	return id
 }
+
+func TestGetJSONString(t *testing.T) {
+	r := testConnect.QueryRow(context.Background(), `SELECT '5'::json;`)
+	var v any
+	err := r.Scan(&v)
+	t.Log(err, v)
+}
+
+// func TestPutJSONString(t *testing.T) {
+// 	_, err := testConnect.Exec(context.Background(), `INSERT INTO things(id,tjson) values($1,$2);`, uuid.New(), "something")
+// 	t.Log(err)
+// }
 
 func TestJSONB(t *testing.T) {
 	ctx := context.Background()
