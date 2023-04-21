@@ -157,6 +157,50 @@ func createAThing(t *testing.T) uuid.UUID {
 	return id
 }
 
+func TestManageNullThing(t *testing.T) {
+	ctx := context.Background()
+	id := createNullThing(t)
+	// READ
+	{
+		read := things.Select(things.ID, things.Tdate, things.Ttimestamp, things.Tjson, things.Tjsonb).Where(things.ID.Equals(convert.UUID(id)))
+		t.Log(pgtalk.SQL(read))
+		list, err := read.Exec(ctx, testConnect)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log(list)
+		t.Log(list[0].Tdate)
+		t.Log(list[0].Ttimestamp)
+		t.Log(list[0].Tjson)
+		t.Log(list[0].Tjsonb)
+		t.Log(list[0].Ttext)
+	}
+}
+
+func createNullThing(t *testing.T) uuid.UUID {
+	// CREATE
+	ctx := context.Background()
+	id := uuid.New()
+	create := things.Insert(
+		things.ID.Set(convert.UUID(id)),
+		things.Tdate.Set(pgtype.Date{Valid: false}),
+		things.Ttimestamp.Set(pgtype.Timestamp{Valid: false}),
+		things.Tjson.Set(nil),
+		things.Tjsonb.Set(nil),
+		things.Ttext.Set(pgtype.Text{Valid: false}),
+	)
+	tx, err := testConnect.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = create.Exec(ctx, testConnect)
+	err = tx.Commit(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return id
+}
+
 func TestJSONB(t *testing.T) {
 	ctx := context.Background()
 	if testConnect == nil {

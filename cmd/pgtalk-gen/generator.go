@@ -56,15 +56,15 @@ func generateFromTable(table PgTable, isView bool) {
 			IsNotNull:            each.NotNull,
 			TableAttributeNumber: each.FieldOrdinal,
 			ValueFieldName:       m.nullableValueFieldName,
-			IsGenericFieldAccess: strings.HasPrefix(m.newAccessFuncCall, "NewField") || m.newAccessFuncCall == "NewJSONAccess", // TODO change template i.o this workaround
+			IsGenericFieldAccess: isGenericFieldAccess(m.newAccessFuncCall),
 			NonConvertedGoType:   m.goFieldType,
 			ConvertFuncName:      m.convertFuncName,
 			IsValidSrc:           ".Valid",
 		}
 		// TODO workaround
-		if m.newAccessFuncCall == "NewJSONAccess" {
-			f.IsValidSrc = " != nil"
-		}
+		// if m.newAccessFuncCall == "NewJSONAccess" {
+		// 	f.IsValidSrc = " != nil"
+		// }
 		tt.Fields = append(tt.Fields, f)
 	}
 	tmpl, err := template.New("tt").Parse(tableTemplateSrc)
@@ -92,6 +92,10 @@ func generateFromTable(table PgTable, isView bool) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func isGenericFieldAccess(call string) bool {
+	return strings.HasPrefix(call, "NewField") || call == "NewJSONAccess" // TODO change template i.o this workaround
 }
 
 var knownAliases = map[string]int{}

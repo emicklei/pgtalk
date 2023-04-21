@@ -85,13 +85,13 @@ var pgMappings = map[string]mapping{
 		newAccessFuncCall:      "NewFieldAccess[pgtype.Int4]",
 	},
 	"jsonb": {
-		nullableGoFieldType: "any",
-		goFieldType:         "any",
+		nullableGoFieldType: "p.NullableAny",
+		goFieldType:         "p.NullableAny",
 		newAccessFuncCall:   "NewJSONAccess",
 	},
 	"json": {
-		nullableGoFieldType: "any",
-		goFieldType:         "any",
+		nullableGoFieldType: "p.NullableAny",
+		goFieldType:         "p.NullableAny",
 		newAccessFuncCall:   "NewJSONAccess",
 	},
 	"uuid": {
