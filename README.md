@@ -96,7 +96,7 @@ or by example
 ## Using Query parameter
 
 	p := NewParameter("F42")
-	q := products.Select(products.Code).Where(products.Code.Equals(arg))
+	q := products.Select(products.Code).Where(products.Code.Equals(p))
 
 	// SELECT p1.code FROM public.products p1 WHERE (p1.code = $1)
 	// with $1 = "F42"
@@ -188,4 +188,4 @@ or views
 
 	pgtalk-gen -views -o yourpackage -include "skills.*"
 
-(c) 2022, http://ernestmicklei.com. MIT License.
+(c) 2023, https://ernestmicklei.com. MIT License.
