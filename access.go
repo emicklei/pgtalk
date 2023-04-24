@@ -42,6 +42,16 @@ func (p valuePrinter) SQLOn(w WriteContext) {
 		fmt.Fprintf(w, "'%s'", e.String)
 		return
 	}
+	if e, ok := p.v.(pgtype.Timestamptz); ok {
+		// '2015-07-16 00:00:00'
+		// RFC3339     = "2006-01-02T15:04:05Z07:00"
+		fmt.Fprintf(w, "timestamp '%s'", e.Time.Format("2006-01-02 15:04:05"))
+		return
+	}
+	if e, ok := p.v.(pgtype.Timestamp); ok {
+		fmt.Fprintf(w, "timestamp '%s'", e.Time.Format("2006-01-02 15:04:05"))
+		return
+	}
 	fmt.Fprintf(w, "%v", p.v)
 }
 
