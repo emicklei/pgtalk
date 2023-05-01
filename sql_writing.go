@@ -3,6 +3,7 @@ package pgtalk
 import (
 	"bytes"
 	"io"
+	"strings"
 )
 
 type WriteContext interface {
@@ -48,8 +49,15 @@ func (w wc) TableAlias(tableName, defaultAlias string) string {
 	return defaultAlias
 }
 
-func SQL(some SQLWriter) string {
+// IndentedSQL returns source with tabs and lines trying to have a formatted view.
+func IndentedSQL(some SQLWriter) string {
 	buf := new(bytes.Buffer)
 	some.SQLOn(NewWriteContext(buf))
 	return buf.String()
+}
+
+// SQL returns source as a oneliner without tabs or line ends.
+func SQL(some SQLWriter) string {
+	src := IndentedSQL(some)
+	return strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(src, "\t", " "), "\n", " "), "  ", " ")
 }
