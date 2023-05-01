@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.1] - 2023-05-01
+
+- SQL printing uses no tabs/line-ends; use IndentedSQL for a more-pretty form
+
 ## [v1.0.0] - 2023-04-30
 
 - initial major version after one year using it in a commercial production environment.
