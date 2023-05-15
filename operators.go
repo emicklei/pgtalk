@@ -2,6 +2,7 @@ package pgtalk
 
 import (
 	"fmt"
+	"strings"
 )
 
 const (
@@ -17,7 +18,13 @@ type binaryExpression struct {
 func (o binaryExpression) SQLOn(w WriteContext) {
 	fmt.Fprint(w, "(")
 	o.Left.SQLOn(w)
-	fmt.Fprintf(w, " %s ", o.Operator)
+	// inline comparison operators
+	if strings.Contains(validComparisonOperators, o.Operator) {
+		fmt.Fprintf(w, " ")
+	} else {
+		fmt.Fprintf(w, "\n\t")
+	}
+	fmt.Fprintf(w, "%s ", o.Operator)
 	o.Right.SQLOn(w)
 	fmt.Fprint(w, ")")
 }
