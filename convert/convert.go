@@ -16,10 +16,15 @@ func UUID(v uuid.UUID) pgtype.UUID {
 	}
 }
 
+// StringToUUID converts a string UUID in standard form to a pgtype.UUID.
+// Check for Valid before using the result.
 func StringToUUID(s string) pgtype.UUID {
 	data, err := parseUUID(s)
 	if err != nil {
-		panic(err)
+		return pgtype.UUID{
+			Bytes: [16]byte{},
+			Valid: false,
+		}
 	}
 	return pgtype.UUID{
 		Bytes: data,
