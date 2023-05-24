@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.3] - 2023-05-24
+
+- replace panic call on StringToUUID conversion
+
+## [v1.0.2] - 2023-05-15
+
+- indent non-comparision operators in pretty SQL
+
 ## [v1.0.1] - 2023-05-01
 
 - SQL printing uses no tabs/line-ends; use IndentedSQL for a more-pretty form
