@@ -54,6 +54,11 @@ func (a textAccess) Like(pattern string) binaryExpression {
 	return makeBinaryOperator(a, "LIKE", newLiteralString(pattern))
 }
 
+// ILIKE can be used instead of LIKE to make the match case-insensitive according to the active locale.
+func (a textAccess) ILike(pattern string) binaryExpression {
+	return makeBinaryOperator(a, "ILIKE", newLiteralString(pattern))
+}
+
 func (a textAccess) In(values ...string) binaryExpression {
 	vs := make([]any, len(values))
 	for i := 0; i < len(values); i++ {
