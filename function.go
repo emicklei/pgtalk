@@ -27,3 +27,7 @@ func (f SQLFunction) SQLOn(w WriteContext) {
 func NewSQLFunction(name string, arguments ...SQLExpression) SQLFunction {
 	return SQLFunction{Name: name, Arguments: arguments}
 }
+
+func NewSQLConstant(value any) SQLExpression {
+	return valuePrinter{v: value}
+}

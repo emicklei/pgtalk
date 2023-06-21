@@ -18,7 +18,7 @@ type QuerySet[T any] struct {
 	offset             int
 	groupBy            []ColumnAccessor
 	having             SQLExpression
-	orderBy            []ColumnAccessor
+	orderBy            []SQLWriter
 	sortOption         string
 }
 
@@ -68,7 +68,7 @@ func (q QuerySet[T]) SQLOn(w WriteContext) {
 	}
 	if len(q.orderBy) > 0 {
 		fmt.Fprint(w, "\nORDER BY\n")
-		writeAccessOn(q.orderBy, w)
+		writeListOn(q.orderBy, w)
 	}
 	if q.sortOption != "" {
 		fmt.Fprint(w, " ", q.sortOption)
@@ -111,7 +111,7 @@ func (q QuerySet[T]) GroupBy(cas ...ColumnAccessor) QuerySet[T] {
 	return q
 }
 func (q QuerySet[T]) Having(condition SQLExpression) QuerySet[T] { q.having = condition; return q }
-func (q QuerySet[T]) OrderBy(cas ...ColumnAccessor) QuerySet[T] {
+func (q QuerySet[T]) OrderBy(cas ...SQLWriter) QuerySet[T] {
 	q.orderBy = cas
 	return q
 }

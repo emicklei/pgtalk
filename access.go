@@ -26,6 +26,7 @@ func (p valuePrinter) SQLOn(w WriteContext) {
 		e.SQLOn(w)
 		return
 	}
+	// TODO rewrite using type switch
 	if e, ok := p.v.(string); ok {
 		fmt.Fprintf(w, "'%s'", e)
 		return
@@ -126,6 +127,16 @@ const (
 )
 
 func writeAccessOn(list []ColumnAccessor, w WriteContext) {
+	for i, each := range list {
+		if i > 0 {
+			io.WriteString(w, ",\n")
+		}
+		io.WriteString(w, "\t")
+		each.SQLOn(w)
+	}
+}
+
+func writeListOn(list []SQLWriter, w WriteContext) {
 	for i, each := range list {
 		if i > 0 {
 			io.WriteString(w, ",\n")
