@@ -2,7 +2,6 @@ package pgtalk
 
 import (
 	"fmt"
-	"io"
 )
 
 //	SQLAs returns a ColumnAccessor with a customer SQL expression.
@@ -22,7 +21,7 @@ type expressionSource struct {
 
 // SQLOn is part of SQLWriter
 func (e expressionSource) SQLOn(w WriteContext) {
-	io.WriteString(w, e.SQL)
+	fmt.Fprintf(w, "(%s)", e.SQL)
 }
 
 // computedField is a ColumnAccessor for read.
