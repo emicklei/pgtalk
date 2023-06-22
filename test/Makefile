@@ -1,3 +1,6 @@
+rmdb:
+	docker rm pgtalk-db
+
 db:
 	# make sure to create an empty database called "pgtalk"
 	#

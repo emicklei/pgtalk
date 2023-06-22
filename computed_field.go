@@ -28,7 +28,6 @@ func (e expressionSource) SQLOn(w WriteContext) {
 type computedField struct {
 	ResultName string
 	Expression SQLExpression
-	Value      any
 }
 
 func (c *computedField) SQLOn(w WriteContext) {
@@ -41,18 +40,19 @@ func (c *computedField) Column() ColumnInfo { return ColumnInfo{columnName: c.Re
 
 // FieldValueToScan returns the address of the value of the field in the entity
 func (c *computedField) FieldValueToScan(entity any) any {
-	addr := &c.Value
+	var value any
 	if h, ok := entity.(expressionValueHolder); ok {
 		// side effect to update the entity custom expressions
-		h.AddExpressionResult(c.ResultName, addr)
+		h.AddExpressionResult(c.ResultName, &value)
 	}
-	return addr
+	return &value
 }
 
 // AppendScannable collects values for scanning by a result Row
 // Cannot use ValueToInsert because that looses type information such that the Scanner will use default mapping
 func (c *computedField) AppendScannable(list []any) []any {
-	return append(list, &c.Value)
+	var value any
+	return append(list, &value)
 }
 
 // Get accesses the value from a map.
