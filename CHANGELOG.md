@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.2.3] - 2023-08-07
+
+- fix custom expression result handling
+
 ## [v1.2.2] - 2023-08-07
 
 - (potential breaking) change of signature of FieldAccess[T].In() (from any -> T)
