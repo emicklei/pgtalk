@@ -132,21 +132,31 @@ func TestFullSelect(t *testing.T) {
 
 func TestProductUpperCode(t *testing.T) {
 	createProduct(t, 1234, 1)
-	q := products.Select(products.ID, pgtalk.SQLAs("UPPER(p1.Code)", "upper"))
+	createProduct(t, 12345, 1)
+	q := products.Select(products.ID, pgtalk.SQLAs("UPPER(p1.Code)", "upper"), pgtalk.SQLAs("p1.id", "rid"))
 	t.Log(pgtalk.SQL(q))
 	list, err := q.Exec(context.Background(), testConnect)
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, each := range list {
-		t.Log(each.GetExpressionResult("upper"))
+	if got, want := list[0].GetExpressionResult("upper"), "F42"; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+	if got, want := list[1].GetExpressionResult("upper"), "F42"; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+	if got, want := list[0].GetExpressionResult("rid"), list[0].ID; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+	if got, want := list[1].GetExpressionResult("rid"), list[1].ID; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
 
 func createProduct(t *testing.T, id int32, categoryId int64) {
 	q := products.Insert(
 		products.ID.Set(id),
-		products.Code.Set(convert.StringToText("F42")),
+		products.Code.Set(convert.StringToText("f42")),
 		products.CategoryId.Set(convert.Int64ToInt8(categoryId)))
 	ctx := context.Background()
 	tx, err := testConnect.Begin(ctx)
