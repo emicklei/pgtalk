@@ -7,12 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.2.2] - 2023-08-07
+
+- (potential breaking) change of signature of FieldAccess[T].In() (from any -> T)
+
+## [v1.2.1] - 2023-08-07 
+
+- put SQL AS expression in brackets
+
+## [v1.2.0] - 2023-06-21
+
+- relax interface of ordery, add NewSQLConstant
+
+## [v1.1.0] - 2023-06-16
+
+- add ilike
+
 ## [v1.0.3] - 2023-05-24
 
 - replace panic call on StringToUUID conversion
 
 ## [v1.0.2] - 2023-05-15
-
+q
 - indent non-comparision operators in pretty SQL
 
 ## [v1.0.1] - 2023-05-01

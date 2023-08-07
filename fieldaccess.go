@@ -84,7 +84,8 @@ func (a FieldAccess[T]) LessThan(operand any) binaryExpression {
 	panic("expected a " + fmt.Sprintf("%T", t) + " got a " + fmt.Sprintf("%T", operand))
 }
 
-func (a FieldAccess[T]) In(values ...any) binaryExpression {
+// In returns a binary expression to check that the value of the fieldAccess is in the values collection.
+func (a FieldAccess[T]) In(values ...T) binaryExpression {
 	vs := make([]any, len(values))
 	for i := 0; i < len(values); i++ {
 		vs[i] = values[i]

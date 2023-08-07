@@ -43,7 +43,7 @@ func TestGetStringOfPoly(t *testing.T) {
 
 func TestUUID_IN_SQL(t *testing.T) {
 	a := NewFieldAccess[pgtype.UUID](ColumnInfo{ti, "col", false, false, false, 1}, nil)
-	ids := []any{
+	ids := []pgtype.UUID{
 		convert.StringToUUID("b344a1918d0cbd1542de669644dd1bfd"),
 	}
 	ex := a.In(ids...)
