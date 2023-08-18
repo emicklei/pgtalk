@@ -8,6 +8,10 @@ After code generation, you get a Go type for each table or view with functions t
 Except for query exectution, all operations on a QuerySet or MutationSet will return a copy of that value.
 This package requires Go SDK version 1.18+ because it uses type parameterization.
 
+## status
+
+This package is used in production [https://ag5.com] and [https://go-toad.com] and its programming API is stable since v1.0.0.
+
 ## install
 
 	go install github.com/emicklei/pgtalk/cmd/pgtalk-gen@latest
