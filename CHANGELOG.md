@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.3.0] - 2023-10-02
+
+- add FieldAccess.GreaterThan
+
 ## [v1.2.3] - 2023-08-07
 
 - fix custom expression result handling
