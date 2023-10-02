@@ -72,13 +72,25 @@ func (a FieldAccess[T]) Equals(operand any) binaryExpression {
 	return makeBinaryOperator(a, "=", valuePrinter{v: operand})
 }
 
-// Less returns a SQLExpression
+// LessThan returns a SQLExpression
 func (a FieldAccess[T]) LessThan(operand any) binaryExpression {
 	if fat, ok := operand.(FieldAccess[T]); ok {
 		return makeBinaryOperator(a, "<", fat)
 	}
 	if t, ok := operand.(T); ok {
 		return makeBinaryOperator(a, "<", valuePrinter{v: t})
+	}
+	var t T
+	panic("expected a " + fmt.Sprintf("%T", t) + " got a " + fmt.Sprintf("%T", operand))
+}
+
+// GreaterThan returns a SQLExpression
+func (a FieldAccess[T]) GreaterThan(operand any) binaryExpression {
+	if fat, ok := operand.(FieldAccess[T]); ok {
+		return makeBinaryOperator(a, ">", fat)
+	}
+	if t, ok := operand.(T); ok {
+		return makeBinaryOperator(a, ">", valuePrinter{v: t})
 	}
 	var t T
 	panic("expected a " + fmt.Sprintf("%T", t) + " got a " + fmt.Sprintf("%T", operand))
