@@ -187,3 +187,52 @@ func createCategory(t *testing.T, id int32) {
 		t.Fatal(err)
 	}
 }
+
+/*
+*
+INSERT INTO
+
+	seaspray_v1_Achievement ( entity_id,
+	  entity_dataset_id,
+	  entity_version,
+	  entity_changed_at,
+	  entity_deleted,
+	  entity_data_stage,
+	  entity_json,
+	  entity_csv)
+
+SELECT
+
+	entity_id,
+	entity_dataset_id,
+	0,
+	entity_changed_at,
+	TRUE,
+	entity_data_stage,
+	entity_json,
+	entity_csv
+
+FROM
+
+	seaspray_v1_Achievement p1
+
+WHERE
+
+	entity_version = -1
+	AND NOT EXISTS (
+	SELECT
+	  entity_id
+	FROM
+	  seaspray_v1_Achievement p2
+	WHERE
+	  p2.entity_id = p1.entity_id
+	  AND entity_version = 0)
+
+*
+*/
+func TestInsertIntoFromSubSelect(t *testing.T) {
+	notExists := products.Select(products.ID).TableAlias("p2").Where(products.Code.Equals(0))
+	t.Log(pgtalk.SQL(notExists))
+	insert := products.Insert(products.ID)
+	t.Log(pgtalk.SQL(insert))
+}
