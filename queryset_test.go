@@ -1,7 +1,6 @@
 package pgtalk
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 )
@@ -14,7 +13,6 @@ func TestQuerySetSelect(t *testing.T) {
 	q.condition = IsNotNull(polyFUUID)
 	q.orderBy = []SQLWriter{polyFUUID}
 	q = q.TableAlias("ppp")
-	fmt.Println(SQL(q))
 	if got, want := oneliner(SQL(q)), "SELECT ppp.ftime, ppp.ffloat FROM public.polies ppp WHERE (ppp.fuuid IS NOT NULL) ORDER BY ppp.fuuid LIMIT 1 OFFSET 2"; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)

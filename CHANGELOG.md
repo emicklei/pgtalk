@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.4.0] - 2024-01-15
+
+- add operand with google uuid.UUID type
+
 ## [v1.3.0] - 2023-10-02
 
 - add FieldAccess.GreaterThan

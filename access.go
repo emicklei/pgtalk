@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/pgtalk/convert"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -51,6 +52,10 @@ func (p valuePrinter) SQLOn(w WriteContext) {
 	}
 	if e, ok := p.v.(pgtype.Timestamp); ok {
 		fmt.Fprintf(w, "timestamp '%s'", e.Time.Format("2006-01-02 15:04:05"))
+		return
+	}
+	if e, ok := p.v.(uuid.UUID); ok {
+		fmt.Fprintf(w, "'%s'::uuid", e.String())
 		return
 	}
 	fmt.Fprintf(w, "%v", p.v)
