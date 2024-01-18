@@ -32,6 +32,28 @@ func TestSelectProductsWhere(t *testing.T) {
 	log.Printf("%v,%v,%v", products[0].ID, products[0].Code, err)
 }
 
+func TestSelectProductsWhereIterator(t *testing.T) {
+	createCategory(t, 24)
+	createProduct(t, 13, 24)
+	q := products.
+		Select(products.ID, products.Code).
+		Limit(1)
+	if testConnect == nil {
+		return
+	}
+	productsIt, err := q.Iterate(context.Background(), testConnect)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for productsIt.HasNext() {
+		each, err := productsIt.Next()
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log(each)
+	}
+}
+
 func TestSelectAllColumns(t *testing.T) {
 	q := products.
 		Select(products.Columns()...).

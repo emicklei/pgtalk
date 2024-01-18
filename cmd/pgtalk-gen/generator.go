@@ -54,7 +54,6 @@ func generateFromTable(table PgTable, isView bool) {
 			IsNotNullSrc:         isNotNullSource(each.NotNull),
 			IsPrimary:            each.IsPrimaryKey,
 			IsNotNull:            each.NotNull,
-			TableAttributeNumber: each.FieldOrdinal,
 			ValueFieldName:       m.nullableValueFieldName,
 			IsGenericFieldAccess: isGenericFieldAccess(m.newAccessFuncCall),
 			NonConvertedGoType:   m.goFieldType,
