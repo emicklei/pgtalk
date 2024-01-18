@@ -3,7 +3,7 @@ package pgtalk
 import "testing"
 
 func TestTextOperators(t *testing.T) {
-	a := NewTextAccess(ColumnInfo{ti, "col", false, false, false, 1}, nil)
+	a := NewTextAccess(ColumnInfo{ti, "col", false, false, false}, nil)
 	if got, want := testSQL(a.Equals("help")), "(t1.col = 'help')"; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.4.1] - 2024-01-18
+
+- remove dependency on field ordinal of pgcolum
+
 ## [v1.4.0] - 2024-01-15
 
 - add operand with google uuid.UUID type
