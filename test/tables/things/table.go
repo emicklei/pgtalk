@@ -28,28 +28,28 @@ type Thing struct {
 
 var (
 	// ID represents the column "id" of with type "uuid", nullable:true, primary:false
-	ID = p.NewFieldAccess[pgtype.UUID](p.MakeColumnInfo(tableInfo, "id", p.NotPrimary, p.Nullable, 1),
+	ID = p.NewFieldAccess[pgtype.UUID](p.MakeColumnInfo(tableInfo, "id", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).ID })
 	// Tdate represents the column "tdate" of with type "date", nullable:true, primary:false
-	Tdate = p.NewFieldAccess[pgtype.Date](p.MakeColumnInfo(tableInfo, "tdate", p.NotPrimary, p.Nullable, 2),
+	Tdate = p.NewFieldAccess[pgtype.Date](p.MakeColumnInfo(tableInfo, "tdate", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Tdate })
 	// Ttimestamp represents the column "ttimestamp" of with type "timestamp without time zone", nullable:true, primary:false
-	Ttimestamp = p.NewFieldAccess[pgtype.Timestamp](p.MakeColumnInfo(tableInfo, "ttimestamp", p.NotPrimary, p.Nullable, 3),
+	Ttimestamp = p.NewFieldAccess[pgtype.Timestamp](p.MakeColumnInfo(tableInfo, "ttimestamp", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Ttimestamp })
 	// Tjsonb represents the column "tjsonb" of with type "jsonb", nullable:true, primary:false
-	Tjsonb = p.NewJSONAccess(p.MakeColumnInfo(tableInfo, "tjsonb", p.NotPrimary, p.Nullable, 4),
+	Tjsonb = p.NewJSONAccess(p.MakeColumnInfo(tableInfo, "tjsonb", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Tjsonb })
 	// Tjson represents the column "tjson" of with type "json", nullable:true, primary:false
-	Tjson = p.NewJSONAccess(p.MakeColumnInfo(tableInfo, "tjson", p.NotPrimary, p.Nullable, 5),
+	Tjson = p.NewJSONAccess(p.MakeColumnInfo(tableInfo, "tjson", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Tjson })
 	// Ttext represents the column "ttext" of with type "text", nullable:true, primary:false
-	Ttext = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "ttext", p.NotPrimary, p.Nullable, 6),
+	Ttext = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "ttext", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Ttext })
 	// Tnumeric represents the column "tnumeric" of with type "numeric", nullable:true, primary:false
-	Tnumeric = p.NewFieldAccess[decimal.NullDecimal](p.MakeColumnInfo(tableInfo, "tnumeric", p.NotPrimary, p.Nullable, 7),
+	Tnumeric = p.NewFieldAccess[decimal.NullDecimal](p.MakeColumnInfo(tableInfo, "tnumeric", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Tnumeric })
 	// Tdecimal represents the column "tdecimal" of with type "numeric", nullable:true, primary:false
-	Tdecimal = p.NewFieldAccess[decimal.NullDecimal](p.MakeColumnInfo(tableInfo, "tdecimal", p.NotPrimary, p.Nullable, 8),
+	Tdecimal = p.NewFieldAccess[decimal.NullDecimal](p.MakeColumnInfo(tableInfo, "tdecimal", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Tdecimal })
 	// package private
 	_         = c.UUID // for the occasional unused import from convert

@@ -42,7 +42,7 @@ func (i *resultIterator[T]) Next() (*T, error) {
 	toScan := []any{}
 	for _, each := range list {
 		for _, other := range i.selectors {
-			if other.Column().tableAttributeNumber == each.TableAttributeNumber {
+			if other.Column().columnName == each.Name {
 				toScan = append(toScan, other.FieldValueToScan(entity))
 			}
 		}

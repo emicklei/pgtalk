@@ -22,10 +22,10 @@ type Category struct {
 
 var (
 	// ID represents the column "id" of with type "integer", nullable:false, primary:true
-	ID = p.NewInt32Access(p.MakeColumnInfo(tableInfo, "id", p.IsPrimary, p.NotNull, 1),
+	ID = p.NewInt32Access(p.MakeColumnInfo(tableInfo, "id", p.IsPrimary, p.NotNull, 0),
 		func(dest any) any { return &dest.(*Category).ID })
 	// Title represents the column "title" of with type "text", nullable:true, primary:false
-	Title = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "title", p.NotPrimary, p.Nullable, 2),
+	Title = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "title", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Category).Title })
 	// package private
 	_         = c.UUID // for the occasional unused import from convert

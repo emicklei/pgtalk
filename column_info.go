@@ -7,22 +7,22 @@ import (
 )
 
 type ColumnInfo struct {
-	tableInfo            TableInfo
-	columnName           string
-	isPrimary            bool
-	notNull              bool
-	isMixedCase          bool
-	tableAttributeNumber uint16
+	tableInfo   TableInfo
+	columnName  string
+	isPrimary   bool
+	notNull     bool
+	isMixedCase bool
 }
 
-func MakeColumnInfo(tableInfo TableInfo, columnName string, isPrimary bool, isNotNull bool, tableAttributeNumber uint16) ColumnInfo {
+// MakeColumnInfo creates a ColumnInfo describing a column in a table.
+// The last argument is now ignored (used to be table attribute number, field ordinal).
+func MakeColumnInfo(tableInfo TableInfo, columnName string, isPrimary bool, isNotNull bool, _ uint16) ColumnInfo {
 	return ColumnInfo{
-		tableInfo:            tableInfo,
-		columnName:           columnName,
-		notNull:              isNotNull,
-		isPrimary:            isPrimary,
-		isMixedCase:          strings.ToLower(columnName) != columnName,
-		tableAttributeNumber: tableAttributeNumber,
+		tableInfo:   tableInfo,
+		columnName:  columnName,
+		notNull:     isNotNull,
+		isPrimary:   isPrimary,
+		isMixedCase: strings.ToLower(columnName) != columnName,
 	}
 }
 
