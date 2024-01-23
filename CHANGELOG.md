@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.4.2] - 2024-01-23
+
+- add RightOuterJoin and deprecate RightJoin
+- add checks in JOIN SQL writing to prevent panics
+
 ## [v1.4.1] - 2024-01-18
 
 - remove dependency on field ordinal of pgcolum
