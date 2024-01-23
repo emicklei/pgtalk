@@ -200,7 +200,12 @@ func (d QuerySet[T]) LeftOuterJoin(otherQuerySet querySet) join {
 	}
 }
 
+// Deprecated: use RightOuterJoin
 func (d QuerySet[T]) RightJoin(otherQuerySet querySet) join {
+	return d.RightOuterJoin(otherQuerySet)
+}
+
+func (d QuerySet[T]) RightOuterJoin(otherQuerySet querySet) join {
 	return join{
 		leftSet:  d,
 		rightSet: otherQuerySet,

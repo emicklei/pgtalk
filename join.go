@@ -31,6 +31,14 @@ type join struct {
 
 func (i join) SQLOn(w WriteContext) {
 	fmt.Fprint(w, "SELECT\n")
+	if i.leftSet == nil {
+		fmt.Fprint(w, "ERROR: no left queryset set")
+		return
+	}
+	if i.rightSet == nil {
+		fmt.Fprint(w, "ERROR: no right queryset set")
+		return
+	}
 	left := i.leftSet.selectAccessors()
 	wl := i.leftSet.augmentedContext(w)
 	wr := i.rightSet.augmentedContext(w)
@@ -45,6 +53,10 @@ func (i join) SQLOn(w WriteContext) {
 	writeJoinType(i.joinType, w)
 	i.rightSet.fromSectionOn(wr)
 	fmt.Fprint(w, "\nON ")
+	if i.condition == nil {
+		fmt.Fprint(w, "ERROR: no condition set")
+		return
+	}
 	i.condition.SQLOn(w) // TODO which tableInfo to use?
 	if _, ok := i.leftSet.whereCondition().(noCondition); !ok {
 		fmt.Fprint(wl, "\nWHERE ")
