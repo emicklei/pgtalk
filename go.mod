@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/emicklei/tre v1.5.0
-	github.com/google/uuid v1.5.0
+	github.com/google/uuid v1.6.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgx/v5 v5.5.2
 	github.com/shopspring/decimal v1.3.1

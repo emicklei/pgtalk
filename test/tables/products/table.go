@@ -60,6 +60,11 @@ func init() {
 	tableInfo.Columns = []p.ColumnAccessor{ID, CreatedAt, UpdatedAt, DeletedAt, Code, Price, CategoryId}
 }
 
+// TableInfo returns meta information about the table.
+func TableInfo() p.TableInfo {
+	return tableInfo
+}
+
 // SetID sets the value to the field value and returns the receiver.
 func (e *Product) SetID(v int32) *Product { e.ID = v; return e }
 

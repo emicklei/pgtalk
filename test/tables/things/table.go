@@ -64,6 +64,11 @@ func init() {
 	tableInfo.Columns = []p.ColumnAccessor{ID, Tdate, Ttimestamp, Tjsonb, Tjson, Ttext, Tnumeric, Tdecimal}
 }
 
+// TableInfo returns meta information about the table.
+func TableInfo() p.TableInfo {
+	return tableInfo
+}
+
 // SetID sets the value to the field value and returns the receiver.
 func (e *Thing) SetID(v pgtype.UUID) *Thing { e.ID = v; return e }
 

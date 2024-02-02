@@ -41,6 +41,11 @@ func init() {
 	tableInfo.Columns = []p.ColumnAccessor{ {{- range .Fields}}{{.GoName}},{{- end}} }
 }
 
+// TableInfo returns meta information about the table.
+func TableInfo() p.TableInfo {
+	return tableInfo
+}
+
 {{- range .Fields}}
 {{- if .IsNotNull }}
 
