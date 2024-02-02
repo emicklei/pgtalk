@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime/debug"
+	"slices"
 	"strings"
 
 	"github.com/iancoleman/strcase"
@@ -60,12 +61,13 @@ func generateFromTable(table PgTable, isView bool) {
 			ConvertFuncName:      m.convertFuncName,
 			IsValidSrc:           ".Valid",
 		}
-		// TODO workaround
-		// if m.newAccessFuncCall == "NewJSONAccess" {
-		// 	f.IsValidSrc = " != nil"
-		// }
 		tt.Fields = append(tt.Fields, f)
 	}
+	// sort fields to have stable generated output
+	slices.SortFunc(tt.Fields, func(a, b ColumnField) int {
+		return strings.Compare(a.Name, b.Name)
+	})
+
 	tmpl, err := template.New("tt").Parse(tableTemplateSrc)
 	if err != nil {
 		log.Fatal(err)

@@ -14,39 +14,39 @@ import (
 
 // Product is generated from the public.products table.
 type Product struct {
-	ID         int32              // id : integer
-	CreatedAt  pgtype.Timestamptz // created_at : timestamp with time zone
-	UpdatedAt  pgtype.Timestamptz // updated_at : timestamp with time zone
-	DeletedAt  pgtype.Timestamptz // deleted_at : timestamp with time zone
-	Code       pgtype.Text        // code : text
-	Price      pgtype.Int8        // price : bigint
 	CategoryId pgtype.Int8        // category_id : bigint
+	Code       pgtype.Text        // code : text
+	CreatedAt  pgtype.Timestamptz // created_at : timestamp with time zone
+	DeletedAt  pgtype.Timestamptz // deleted_at : timestamp with time zone
+	ID         int32              // id : integer
+	Price      pgtype.Int8        // price : bigint
+	UpdatedAt  pgtype.Timestamptz // updated_at : timestamp with time zone
 	// for storing custom field expression result values
 	expressionResults map[string]any
 }
 
 var (
-	// ID represents the column "id" of with type "integer", nullable:false, primary:true
-	ID = p.NewInt32Access(p.MakeColumnInfo(tableInfo, "id", p.IsPrimary, p.NotNull, 0),
-		func(dest any) any { return &dest.(*Product).ID })
-	// CreatedAt represents the column "created_at" of with type "timestamp with time zone", nullable:true, primary:false
-	CreatedAt = p.NewFieldAccess[pgtype.Timestamptz](p.MakeColumnInfo(tableInfo, "created_at", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Product).CreatedAt })
-	// UpdatedAt represents the column "updated_at" of with type "timestamp with time zone", nullable:true, primary:false
-	UpdatedAt = p.NewFieldAccess[pgtype.Timestamptz](p.MakeColumnInfo(tableInfo, "updated_at", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Product).UpdatedAt })
-	// DeletedAt represents the column "deleted_at" of with type "timestamp with time zone", nullable:true, primary:false
-	DeletedAt = p.NewFieldAccess[pgtype.Timestamptz](p.MakeColumnInfo(tableInfo, "deleted_at", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Product).DeletedAt })
-	// Code represents the column "code" of with type "text", nullable:true, primary:false
-	Code = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "code", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Product).Code })
-	// Price represents the column "price" of with type "bigint", nullable:true, primary:false
-	Price = p.NewFieldAccess[pgtype.Int8](p.MakeColumnInfo(tableInfo, "price", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Product).Price })
 	// CategoryId represents the column "category_id" of with type "bigint", nullable:true, primary:false
 	CategoryId = p.NewFieldAccess[pgtype.Int8](p.MakeColumnInfo(tableInfo, "category_id", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Product).CategoryId })
+	// Code represents the column "code" of with type "text", nullable:true, primary:false
+	Code = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "code", p.NotPrimary, p.Nullable, 0),
+		func(dest any) any { return &dest.(*Product).Code })
+	// CreatedAt represents the column "created_at" of with type "timestamp with time zone", nullable:true, primary:false
+	CreatedAt = p.NewFieldAccess[pgtype.Timestamptz](p.MakeColumnInfo(tableInfo, "created_at", p.NotPrimary, p.Nullable, 0),
+		func(dest any) any { return &dest.(*Product).CreatedAt })
+	// DeletedAt represents the column "deleted_at" of with type "timestamp with time zone", nullable:true, primary:false
+	DeletedAt = p.NewFieldAccess[pgtype.Timestamptz](p.MakeColumnInfo(tableInfo, "deleted_at", p.NotPrimary, p.Nullable, 0),
+		func(dest any) any { return &dest.(*Product).DeletedAt })
+	// ID represents the column "id" of with type "integer", nullable:false, primary:true
+	ID = p.NewInt32Access(p.MakeColumnInfo(tableInfo, "id", p.IsPrimary, p.NotNull, 0),
+		func(dest any) any { return &dest.(*Product).ID })
+	// Price represents the column "price" of with type "bigint", nullable:true, primary:false
+	Price = p.NewFieldAccess[pgtype.Int8](p.MakeColumnInfo(tableInfo, "price", p.NotPrimary, p.Nullable, 0),
+		func(dest any) any { return &dest.(*Product).Price })
+	// UpdatedAt represents the column "updated_at" of with type "timestamp with time zone", nullable:true, primary:false
+	UpdatedAt = p.NewFieldAccess[pgtype.Timestamptz](p.MakeColumnInfo(tableInfo, "updated_at", p.NotPrimary, p.Nullable, 0),
+		func(dest any) any { return &dest.(*Product).UpdatedAt })
 	// package private
 	_         = c.UUID // for the occasional unused import from convert
 	_         = time.Now
@@ -57,7 +57,7 @@ var (
 
 func init() {
 	// after var initialization (to prevent cycle) we need to update the tableInfo to set all columns
-	tableInfo.Columns = []p.ColumnAccessor{ID, CreatedAt, UpdatedAt, DeletedAt, Code, Price, CategoryId}
+	tableInfo.Columns = []p.ColumnAccessor{CategoryId, Code, CreatedAt, DeletedAt, ID, Price, UpdatedAt}
 }
 
 // TableInfo returns meta information about the table.
@@ -65,48 +65,48 @@ func TableInfo() p.TableInfo {
 	return tableInfo
 }
 
-// SetID sets the value to the field value and returns the receiver.
-func (e *Product) SetID(v int32) *Product { e.ID = v; return e }
-
-// SetCreatedAt sets the value to the field value and returns the receiver.
-func (e *Product) SetCreatedAt(v time.Time) *Product { e.CreatedAt = c.TimeToTimestamptz(v); return e }
-
-// SetUpdatedAt sets the value to the field value and returns the receiver.
-func (e *Product) SetUpdatedAt(v time.Time) *Product { e.UpdatedAt = c.TimeToTimestamptz(v); return e }
-
-// SetDeletedAt sets the value to the field value and returns the receiver.
-func (e *Product) SetDeletedAt(v time.Time) *Product { e.DeletedAt = c.TimeToTimestamptz(v); return e }
+// SetCategoryId sets the value to the field value and returns the receiver.
+func (e *Product) SetCategoryId(v int64) *Product { e.CategoryId = c.Int64ToInt8(v); return e }
 
 // SetCode sets the value to the field value and returns the receiver.
 func (e *Product) SetCode(v string) *Product { e.Code = c.StringToText(v); return e }
 
+// SetCreatedAt sets the value to the field value and returns the receiver.
+func (e *Product) SetCreatedAt(v time.Time) *Product { e.CreatedAt = c.TimeToTimestamptz(v); return e }
+
+// SetDeletedAt sets the value to the field value and returns the receiver.
+func (e *Product) SetDeletedAt(v time.Time) *Product { e.DeletedAt = c.TimeToTimestamptz(v); return e }
+
+// SetID sets the value to the field value and returns the receiver.
+func (e *Product) SetID(v int32) *Product { e.ID = v; return e }
+
 // SetPrice sets the value to the field value and returns the receiver.
 func (e *Product) SetPrice(v int64) *Product { e.Price = c.Int64ToInt8(v); return e }
 
-// SetCategoryId sets the value to the field value and returns the receiver.
-func (e *Product) SetCategoryId(v int64) *Product { e.CategoryId = c.Int64ToInt8(v); return e }
+// SetUpdatedAt sets the value to the field value and returns the receiver.
+func (e *Product) SetUpdatedAt(v time.Time) *Product { e.UpdatedAt = c.TimeToTimestamptz(v); return e }
 
 // Setters returns the list of changes to a Product for which updates/inserts need to be processed.
 // Can be used in Insert,Update,Select. Cannot be used to set null values for columns.
 func (e *Product) Setters() (list []p.ColumnAccessor) {
-	list = append(list, ID.Set(e.ID))
-	if e.CreatedAt.Valid {
-		list = append(list, CreatedAt.Set(e.CreatedAt))
-	}
-	if e.UpdatedAt.Valid {
-		list = append(list, UpdatedAt.Set(e.UpdatedAt))
-	}
-	if e.DeletedAt.Valid {
-		list = append(list, DeletedAt.Set(e.DeletedAt))
+	if e.CategoryId.Valid {
+		list = append(list, CategoryId.Set(e.CategoryId))
 	}
 	if e.Code.Valid {
 		list = append(list, Code.Set(e.Code))
 	}
+	if e.CreatedAt.Valid {
+		list = append(list, CreatedAt.Set(e.CreatedAt))
+	}
+	if e.DeletedAt.Valid {
+		list = append(list, DeletedAt.Set(e.DeletedAt))
+	}
+	list = append(list, ID.Set(e.ID))
 	if e.Price.Valid {
 		list = append(list, Price.Set(e.Price))
 	}
-	if e.CategoryId.Valid {
-		list = append(list, CategoryId.Set(e.CategoryId))
+	if e.UpdatedAt.Valid {
+		list = append(list, UpdatedAt.Set(e.UpdatedAt))
 	}
 	return
 }
