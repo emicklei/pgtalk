@@ -78,3 +78,11 @@ func (a int64Access) Get(values map[string]any) any {
 	}
 	return v
 }
+
+func (a int64Access) In(values ...int32) binaryExpression {
+	vs := make([]any, len(values))
+	for i := 0; i < len(values); i++ {
+		vs[i] = values[i]
+	}
+	return makeBinaryOperator(a, "IN", valuesPrinter{vs: vs})
+}

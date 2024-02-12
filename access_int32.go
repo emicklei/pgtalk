@@ -40,6 +40,14 @@ func (a int32Access) Set(v int32) int32Access {
 	return a
 }
 
+func (a int32Access) In(values ...int32) binaryExpression {
+	vs := make([]any, len(values))
+	for i := 0; i < len(values); i++ {
+		vs[i] = values[i]
+	}
+	return makeBinaryOperator(a, "IN", valuesPrinter{vs: vs})
+}
+
 func (a int32Access) Equals(intLike any) binaryExpression {
 	if i, ok := intLike.(int); ok {
 		return makeBinaryOperator(a, "=", valuePrinter{v: i})
