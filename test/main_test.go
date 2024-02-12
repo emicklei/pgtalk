@@ -16,7 +16,7 @@ import (
 var testConnect *pgx.Conn
 
 func TestMain(m *testing.M) {
-	connectionString := "postgres://postgres:pgtalk@localhost:7432/postgres"
+	connectionString := os.Getenv("PGTALK_CONN") // "postgres://postgres:pgtalk@localhost:7432/postgres"
 	if len(connectionString) == 0 {
 		println("no database env set")
 		os.Exit(m.Run())
@@ -66,7 +66,7 @@ func ensureTables(conn *pgx.Conn) error {
 		deleted_at  timestamp with time zone,
 		code       text,
 		price      bigint,
-		category_id bigint			
+		category_id integer			
 	);
 	drop table IF EXISTS categories;
 	create table categories(

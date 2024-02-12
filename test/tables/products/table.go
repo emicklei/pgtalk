@@ -14,7 +14,7 @@ import (
 
 // Product is generated from the public.products table.
 type Product struct {
-	CategoryId pgtype.Int8        // category_id : bigint
+	CategoryId pgtype.Int4        // category_id : integer
 	Code       pgtype.Text        // code : text
 	CreatedAt  pgtype.Timestamptz // created_at : timestamp with time zone
 	DeletedAt  pgtype.Timestamptz // deleted_at : timestamp with time zone
@@ -26,8 +26,8 @@ type Product struct {
 }
 
 var (
-	// CategoryId represents the column "category_id" of with type "bigint", nullable:true, primary:false
-	CategoryId = p.NewFieldAccess[pgtype.Int8](p.MakeColumnInfo(tableInfo, "category_id", p.NotPrimary, p.Nullable, 0),
+	// CategoryId represents the column "category_id" of with type "integer", nullable:true, primary:false
+	CategoryId = p.NewFieldAccess[pgtype.Int4](p.MakeColumnInfo(tableInfo, "category_id", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Product).CategoryId })
 	// Code represents the column "code" of with type "text", nullable:true, primary:false
 	Code = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "code", p.NotPrimary, p.Nullable, 0),
@@ -66,7 +66,7 @@ func TableInfo() p.TableInfo {
 }
 
 // SetCategoryId sets the value to the field value and returns the receiver.
-func (e *Product) SetCategoryId(v int64) *Product { e.CategoryId = c.Int64ToInt8(v); return e }
+func (e *Product) SetCategoryId(v int32) *Product { e.CategoryId = c.Int32ToInt4(v); return e }
 
 // SetCode sets the value to the field value and returns the receiver.
 func (e *Product) SetCode(v string) *Product { e.Code = c.StringToText(v); return e }

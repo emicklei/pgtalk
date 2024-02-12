@@ -58,7 +58,7 @@ func TestSelectAllColumns(t *testing.T) {
 	q := products.
 		Select(products.Columns()...).
 		Limit(2)
-	if got, want := oneliner(pgtalk.SQL(q)), `SELECT p1.id, p1.created_at, p1.updated_at, p1.deleted_at, p1.code, p1.price, p1.category_id FROM public.products p1 LIMIT 2`; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), `SELECT p1.category_id, p1.code, p1.created_at, p1.deleted_at, p1.id, p1.price, p1.updated_at FROM public.products p1 LIMIT 2`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -67,7 +67,7 @@ func TestIn(t *testing.T) {
 	q := products.
 		Select(products.Columns()...).
 		Where(products.Code.In(convert.StringToText("F42"), convert.StringToText("f42")))
-	if got, want := oneliner(pgtalk.SQL(q)), `SELECT p1.id, p1.created_at, p1.updated_at, p1.deleted_at, p1.code, p1.price, p1.category_id FROM public.products p1 WHERE (p1.code IN ('F42','f42'))`; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), `SELECT p1.category_id, p1.code, p1.created_at, p1.deleted_at, p1.id, p1.price, p1.updated_at FROM public.products p1 WHERE (p1.code IN ('F42','f42'))`; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -96,7 +96,6 @@ func TestInnerJoin(t *testing.T) {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
-	t.Log(sql)
 	if testConnect == nil {
 		return
 	}
@@ -145,7 +144,7 @@ func TestFullSelect(t *testing.T) {
 		OrderBy(products.CategoryId).
 		Ascending().
 		Limit(3)
-	if got, want := oneliner(pgtalk.SQL(q)), `SELECT DISTINCT p1.id, p1.created_at, p1.updated_at, p1.deleted_at, p1.code, p1.price, p1.category_id FROM public.products p1 WHERE ((p1.code > 'A') AND (p1.category_id IS NOT NULL)) GROUP BY p1.category_id ORDER BY p1.category_id ASC LIMIT 3`; got != want {
+	if got, want := oneliner(pgtalk.SQL(q)), `SELECT DISTINCT p1.category_id, p1.code, p1.created_at, p1.deleted_at, p1.id, p1.price, p1.updated_at FROM public.products p1 WHERE ((p1.code > 'A') AND (p1.category_id IS NOT NULL)) GROUP BY p1.category_id ORDER BY p1.category_id ASC LIMIT 3`; got != want {
 		t.Log(diff(got, want))
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
@@ -175,11 +174,11 @@ func TestProductUpperCode(t *testing.T) {
 	}
 }
 
-func createProduct(t *testing.T, id int32, categoryId int64) {
+func createProduct(t *testing.T, id int32, categoryId int) {
 	q := products.Insert(
 		products.ID.Set(id),
 		products.Code.Set(convert.StringToText("f42")),
-		products.CategoryId.Set(convert.Int64ToInt8(categoryId)))
+		products.CategoryId.Set(convert.Int4(categoryId)))
 	ctx := context.Background()
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {

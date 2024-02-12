@@ -1,7 +1,10 @@
 package pgtalk
 
 import (
+	"fmt"
 	"strings"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 // int32Access can Read a column value (int4) and Write a column value and Set a struct field (int32).
@@ -47,7 +50,10 @@ func (a int32Access) Equals(intLike any) binaryExpression {
 	if p, ok := intLike.(*QueryParameter); ok {
 		return makeBinaryOperator(a, "=", p)
 	}
-	panic("int or Int32Access or *QueryParameter expected")
+	if p, ok := intLike.(FieldAccess[pgtype.Int4]); ok {
+		return makeBinaryOperator(a, "=", p)
+	}
+	panic(fmt.Sprintf("int or Int32Access or *QueryParameter expected, got %T", intLike))
 }
 
 func (a int32Access) Compare(op string, i int) binaryExpression {

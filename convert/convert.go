@@ -82,12 +82,20 @@ func Int64ToInt8(i int64) pgtype.Int8 {
 	return pgtype.Int8{Int64: i, Valid: true}
 }
 
+func Int4ToInt8(i pgtype.Int4) pgtype.Int8 {
+	return pgtype.Int8{Int64: int64(i.Int32), Valid: true}
+}
+
 func Int32ToInt4(i int32) pgtype.Int4 {
 	return pgtype.Int4{Int32: i, Valid: true}
 }
 
 func Int8(i int) pgtype.Int8 {
 	return Int64ToInt8(int64(i))
+}
+
+func Int4(i int) pgtype.Int4 {
+	return Int32ToInt4(int32(i))
 }
 
 // func ByteSliceToJSONB(d []byte) pgtype.JSONBCodec {
