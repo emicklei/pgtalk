@@ -58,6 +58,22 @@ func (p valuePrinter) SQLOn(w WriteContext) {
 		fmt.Fprintf(w, "'%s'::uuid", e.String())
 		return
 	}
+	if e, ok := p.v.(pgtype.Int4); ok {
+		fmt.Fprintf(w, "%d", e.Int32)
+		return
+	}
+	if e, ok := p.v.(pgtype.Int8); ok {
+		fmt.Fprintf(w, "%d", e.Int64)
+		return
+	}
+	if e, ok := p.v.(pgtype.Float4); ok {
+		fmt.Fprintf(w, "%f", e.Float32)
+		return
+	}
+	if e, ok := p.v.(pgtype.Float8); ok {
+		fmt.Fprintf(w, "%f", e.Float64)
+		return
+	}
 	fmt.Fprintf(w, "%v", p.v)
 }
 
