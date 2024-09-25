@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.5.0] - 2024-09-25
+
+- add FOR UPDATE,SHARE,...
+- add SKIP LOCKED
+- updated dependencies
+
 ## [v1.4.2] - 2024-01-23
 
 - add RightOuterJoin and deprecate RightJoin
