@@ -36,3 +36,13 @@ func TestQueryWithParameter(t *testing.T) {
 	mock := newMockConnection(t)
 	q.Exec(mock.ctx(), mock, i42)
 }
+
+func TestSelectForSkipLocked(t *testing.T) {
+	q := MakeQuerySet[poly](polyTable, polyTable.Columns)
+	q = q.For(FOR_UPDATE)
+	q = q.SkipLocked()
+	q = q.Where(polyFUUID.Equals(1))
+	if got, want := oneliner(SQL(q)), "SELECT FROM public.polies p1 WHERE (p1.fuuid = 1) FOR UPDATE SKIP LOCKED"; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+}

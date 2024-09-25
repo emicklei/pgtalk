@@ -20,6 +20,8 @@ type QuerySet[T any] struct {
 	having             SQLExpression
 	orderBy            []SQLWriter
 	sortOption         string
+	selectFor          string
+	skipLocked         bool
 }
 
 func MakeQuerySet[T any](tableInfo TableInfo, selectors []ColumnAccessor) QuerySet[T] {
@@ -78,6 +80,12 @@ func (q QuerySet[T]) SQLOn(w WriteContext) {
 	}
 	if q.offset > 0 {
 		fmt.Fprintf(w, "\nOFFSET %d", q.offset)
+	}
+	if q.selectFor != "" {
+		fmt.Fprintf(w, "\nFOR %s", q.selectFor)
+	}
+	if q.skipLocked {
+		fmt.Fprint(w, "\nSKIP LOCKED")
 	}
 }
 
@@ -219,4 +227,23 @@ func (d QuerySet[T]) FullJoin(otherQuerySet querySet) join {
 		rightSet: otherQuerySet,
 		joinType: fullOuterJoinType,
 	}
+}
+
+type SQL_FOR string
+
+const (
+	FOR_UPDATE        SQL_FOR = "UPDATE"
+	FOR_NO_KEY_UPDATE SQL_FOR = "NO KEY UPDATE"
+	FOR_SHARE         SQL_FOR = "SHARE"
+	FOR_KEY_SHARE     SQL_FOR = "KEY SHARE"
+)
+
+func (d QuerySet[T]) For(f SQL_FOR) QuerySet[T] {
+	d.selectFor = string(f)
+	return d
+}
+
+func (d QuerySet[T]) SkipLocked() QuerySet[T] {
+	d.skipLocked = true
+	return d
 }
