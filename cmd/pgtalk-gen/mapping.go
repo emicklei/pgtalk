@@ -1,5 +1,45 @@
 package main
 
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
+)
+
+type configurableMappingEntry struct {
+	Use string `json:"use"`
+}
+
+func applyConfiguredMappings(location string) error {
+	if location == "" {
+		return nil
+	}
+	content, err := os.ReadFile(location)
+	if err != nil {
+		return err
+	}
+	entries := map[string]configurableMappingEntry{}
+	if err := json.Unmarshal(content, &entries); err != nil {
+		return err
+	}
+	for k, v := range entries {
+		// fetch the mapping under "use"
+		existing, ok := pgMappings[v.Use]
+		if !ok {
+			return fmt.Errorf("no such defined mapping: %s", v.Use)
+		}
+		// make sure existing are not replaced
+		_, ok = pgMappings[k]
+		if ok {
+			return fmt.Errorf("cannot replace mapping: %s", k)
+		}
+		log.Printf("add datatype mapping %s => %s\n", k, v.Use)
+		pgMappings[k] = existing
+	}
+	return nil
+}
+
 type mapping struct {
 	goFieldType string // non-nullable type
 	newFuncCall string // to create accessor for non-nullable type

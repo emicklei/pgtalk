@@ -18,6 +18,7 @@ var (
 	oVerbose         = flag.Bool("v", false, "use verbose logging")
 	oIncludePatterns = flag.String("include", ".*", "comma separated list of regexp for tables to include")
 	oExludePatterns  = flag.String("exclude", "", "comma separated list of regexp for tables to exclude")
+	oMapping         = flag.String("mapping", "", "mapping file for undefined pg data types")
 )
 
 func main() {
@@ -27,6 +28,12 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Missing value of environment variable PGTALK_CONN\n")
 		os.Exit(1)
 	}
+
+	if err := applyConfiguredMappings(*oMapping); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to process custom mappings: %v\n", err)
+		os.Exit(1)
+	}
+
 	conn, err := pgx.Connect(context.Background(), connectionString)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
