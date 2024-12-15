@@ -84,7 +84,7 @@ func TestSelectMaps(t *testing.T) {
 }
 
 func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {
-	if got, want := len(things.Columns()), 8; got != want {
+	if got, want := len(things.Columns()), 9; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -144,6 +144,7 @@ func createAThing(t *testing.T) uuid.UUID {
 		things.Tjson.Set(map[string]any{"key1": "value1"}),
 		things.Tjsonb.Set(map[string]any{"key2": "value2"}),
 		things.Ttext.Set(convert.StringToText("hello")),
+		things.Ttextarray.Set(convert.StringsToTextArray([]string{"a", "b", "c"})),
 	)
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {

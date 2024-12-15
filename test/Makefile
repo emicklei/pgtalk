@@ -12,5 +12,5 @@ gen:
 	gofmt -w .
 
 test:
-	PGTALK_CONN=postgres://postgres:pgtalk@localhost:7432/postgres go test -v
+	PGTALK_CONN=postgres://postgres:pgtalk@localhost:7432/postgres go test
 
