@@ -321,3 +321,26 @@ func TestExtraJSONBField(t *testing.T) {
 	a := things.Tjson.Extract("title")
 	t.Log(a) // TODO
 }
+
+func TestReadTextArray(t *testing.T) {
+	ctx := context.Background()
+	id := createAThing(t)
+	read := things.Select(things.ID, things.Ttextarray).Where(things.ID.Equals(convert.UUID(id)))
+	t.Log(pgtalk.SQL(read))
+	list, err := read.Exec(ctx, testConnect)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(list) == 0 {
+		t.Fatal("no data")
+	}
+	if len(list[0].Ttextarray) != 3 {
+		t.Fatal("expected 3 elements")
+	}
+	if !list[0].Ttextarray[0].Valid {
+		t.Fatal("expected first element to be valid")
+	}
+	if list[0].Ttextarray[0].String != "a" {
+		t.Fatal("expected first element to be 'a'")
+	}
+}
