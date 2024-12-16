@@ -84,7 +84,7 @@ func TestSelectMaps(t *testing.T) {
 }
 
 func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {
-	if got, want := len(things.Columns()), 9; got != want {
+	if got, want := len(things.Columns()), 10; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }

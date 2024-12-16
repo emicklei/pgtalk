@@ -17,6 +17,7 @@ type Thing struct {
 	ID         pgtype.UUID                   // id : uuid
 	Tdate      pgtype.Date                   // tdate : date
 	Tdecimal   decimal.NullDecimal           // tdecimal : numeric
+	Tinet      pgtype.Text                   // tinet : inet
 	Tjson      p.NullJSON                    // tjson : json
 	Tjsonb     p.NullJSON                    // tjsonb : jsonb
 	Tnumeric   decimal.NullDecimal           // tnumeric : numeric
@@ -37,6 +38,9 @@ var (
 	// Tdecimal represents the column "tdecimal" of with type "numeric", nullable:true, primary:false
 	Tdecimal = p.NewFieldAccess[decimal.NullDecimal](p.MakeColumnInfo(tableInfo, "tdecimal", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Tdecimal })
+	// Tinet represents the column "tinet" of with type "inet", nullable:true, primary:false
+	Tinet = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "tinet", p.NotPrimary, p.Nullable, 0),
+		func(dest any) any { return &dest.(*Thing).Tinet })
 	// Tjson represents the column "tjson" of with type "json", nullable:true, primary:false
 	Tjson = p.NewJSONAccess(p.MakeColumnInfo(tableInfo, "tjson", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Tjson })
@@ -65,7 +69,7 @@ var (
 
 func init() {
 	// after var initialization (to prevent cycle) we need to update the tableInfo to set all columns
-	tableInfo.Columns = []p.ColumnAccessor{ID, Tdate, Tdecimal, Tjson, Tjsonb, Tnumeric, Ttext, Ttextarray, Ttimestamp}
+	tableInfo.Columns = []p.ColumnAccessor{ID, Tdate, Tdecimal, Tinet, Tjson, Tjsonb, Tnumeric, Ttext, Ttextarray, Ttimestamp}
 }
 
 // TableInfo returns meta information about the table.
@@ -81,6 +85,9 @@ func (e *Thing) SetTdate(v time.Time) *Thing { e.Tdate = c.TimeToDate(v); return
 
 // SetTdecimal sets the value to the field value and returns the receiver.
 func (e *Thing) SetTdecimal(v decimal.NullDecimal) *Thing { e.Tdecimal = v; return e }
+
+// SetTinet sets the value to the field value and returns the receiver.
+func (e *Thing) SetTinet(v string) *Thing { e.Tinet = c.StringToText(v); return e }
 
 // SetTjson sets the value to the field value and returns the receiver.
 func (e *Thing) SetTjson(v p.NullJSON) *Thing { e.Tjson = v; return e }
@@ -111,6 +118,9 @@ func (e *Thing) Setters() (list []p.ColumnAccessor) {
 	}
 	if e.Tdecimal.Valid {
 		list = append(list, Tdecimal.Set(e.Tdecimal))
+	}
+	if e.Tinet.Valid {
+		list = append(list, Tinet.Set(e.Tinet))
 	}
 	if e.Tjson.Valid {
 		list = append(list, Tjson.Set(e.Tjson))
