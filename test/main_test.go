@@ -58,7 +58,8 @@ func ensureTables(conn *pgx.Conn) error {
 		tNumeric numeric,
 		tDecimal decimal,
 		tTextArray text[],
-		tInterval interval
+		tInterval interval,
+		tJSONPath jsonpath
 	);
 	drop table IF EXISTS products;
 	create table products(

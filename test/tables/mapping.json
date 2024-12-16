@@ -1,0 +1,6 @@
+{
+    "jsonpath":{
+        "nullableFieldType":"tables.JSONPath",
+        "newAccessFuncName":"tables.NewJSONPathAccess"
+    }
+}

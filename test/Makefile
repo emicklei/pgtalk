@@ -8,8 +8,8 @@ db:
 
 gen:
 	cd ../cmd/pgtalk-gen && go install
-	PGTALK_CONN=postgres://postgres:pgtalk@localhost:7432/postgres pgtalk-gen -v -o . -include things,products,categories -mapping mapping.json
-	gofmt -w .
+	PGTALK_CONN=postgres://postgres:pgtalk@localhost:7432/postgres pgtalk-gen -v -o . -include things,products,categories -mapping tables/mapping.json
+	# gofmt -w .
 
 test:
 	PGTALK_CONN=postgres://postgres:pgtalk@localhost:7432/postgres go test ${FLAGS}

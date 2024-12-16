@@ -9,6 +9,12 @@ import (
 
 type configurableMappingEntry struct {
 	Use string `json:"use"` // if this is set then other fields are ignored
+	// others
+	NullableGoFieldType    string `json:"nullableFieldType"`      // full name of the nullable type
+	NullableValueFieldName string `json:"nullableValueFieldName"` // to access the go field value of a nullable type
+	ConvertGoFuncName      string `json:"convertFuncName"`        // to convert from a go field value to a nullable type
+	NewAccessFuncName      string `json:"newAccessFuncName"`      // to create the accessor
+
 }
 
 func applyConfiguredMappings(location string) error {
@@ -24,18 +30,39 @@ func applyConfiguredMappings(location string) error {
 		return err
 	}
 	for k, v := range entries {
-		// fetch the mapping under "use"
-		existing, ok := pgMappings[v.Use]
-		if !ok {
-			return fmt.Errorf("no such defined mapping: %s", v.Use)
+		// are we using a defined mapping?
+		if v.Use != "" {
+			// fetch the mapping under "use"
+			existing, ok := pgMappings[v.Use]
+			if !ok {
+				return fmt.Errorf("no such defined mapping: %s", v.Use)
+			}
+			// make sure existing is not replaced
+			_, ok = pgMappings[k]
+			if ok {
+				return fmt.Errorf("cannot replace mapping: %s", k)
+			}
+			log.Printf("add datatype mapping %s => %s\n", k, v.Use)
+			pgMappings[k] = existing
+		} else {
+			// custom defined accessor
+			// make sure existing is not replaced
+			_, ok := pgMappings[k]
+			if ok {
+				return fmt.Errorf("cannot replace mapping: %s", k)
+			}
+			newMapping := mapping{
+				nullableGoFieldType:    v.NullableGoFieldType,
+				nullableValueFieldName: v.NullableValueFieldName,
+				convertFuncName:        v.ConvertGoFuncName,
+				newAccessFuncCall:      v.NewAccessFuncName,
+			}
+			if err := newMapping.validate(); err != nil {
+				return fmt.Errorf("invalid mapping %s: %v", k, err)
+			}
+			log.Printf("add new datatype %s\n", k)
+			pgMappings[k] = newMapping
 		}
-		// make sure existing are not replaced
-		_, ok = pgMappings[k]
-		if ok {
-			return fmt.Errorf("cannot replace mapping: %s", k)
-		}
-		log.Printf("add datatype mapping %s => %s\n", k, v.Use)
-		pgMappings[k] = existing
 	}
 	return nil
 }
@@ -49,6 +76,16 @@ type mapping struct {
 	convertFuncName        string // to convert from a go field value to a nullable type
 	newAccessFuncCall      string // to create the accessor
 	isArray                bool   // true if the type is an array
+}
+
+func (m mapping) validate() error {
+	if m.nullableGoFieldType == "" {
+		return fmt.Errorf("nullableFieldType is required")
+	}
+	if m.newAccessFuncCall == "" {
+		return fmt.Errorf("newAccessFuncName is required")
+	}
+	return nil
 }
 
 // https://www.postgresql.org/docs/9.1/datatype-numeric.html

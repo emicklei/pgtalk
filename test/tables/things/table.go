@@ -4,72 +4,78 @@ package things
 // DO NOT EDIT
 
 import (
-	p "github.com/emicklei/pgtalk"
-	c "github.com/emicklei/pgtalk/convert"
-	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/shopspring/decimal"
 	"strings"
 	"time"
+
+	p "github.com/emicklei/pgtalk"
+	c "github.com/emicklei/pgtalk/convert"
+	"github.com/emicklei/pgtalk/test/tables"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/shopspring/decimal"
 )
 
 // Thing is generated from the public.things table.
 type Thing struct {
-	ID         pgtype.UUID                   // id : uuid
-	Tdate      pgtype.Date                   // tdate : date
-	Tdecimal   decimal.NullDecimal           // tdecimal : numeric
-	Tinet      pgtype.Text                   // tinet : inet
-	Tjson      p.NullJSON                    // tjson : json
-	Tjsonb     p.NullJSON                    // tjsonb : jsonb
-	Tnumeric   decimal.NullDecimal           // tnumeric : numeric
-	Ttext      pgtype.Text                   // ttext : text
-	Ttextarray pgtype.FlatArray[pgtype.Text] // ttextarray : text[]
-	Ttimestamp pgtype.Timestamp              // ttimestamp : timestamp without time zone
+	ID	pgtype.UUID // id : uuid
+	Tdate	pgtype.Date // tdate : date
+	Tdecimal	decimal.NullDecimal // tdecimal : numeric
+	Tinterval	pgtype.Interval // tinterval : interval
+	Tjson	p.NullJSON // tjson : json
+	Tjsonb	p.NullJSON // tjsonb : jsonb
+	Tjsonpath	tables.JSONPath // tjsonpath : jsonpath
+	Tnumeric	decimal.NullDecimal // tnumeric : numeric
+	Ttext	pgtype.Text // ttext : text
+	Ttextarray	pgtype.FlatArray[pgtype.Text] // ttextarray : text[]
+	Ttimestamp	pgtype.Timestamp // ttimestamp : timestamp without time zone
 	// for storing custom field expression result values
 	expressionResults map[string]any
 }
 
-var (
+var (	
 	// ID represents the column "id" of with type "uuid", nullable:true, primary:false
 	ID = p.NewFieldAccess[pgtype.UUID](p.MakeColumnInfo(tableInfo, "id", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Thing).ID })
+		func(dest any) any { return &dest.(*Thing).ID })	
 	// Tdate represents the column "tdate" of with type "date", nullable:true, primary:false
 	Tdate = p.NewFieldAccess[pgtype.Date](p.MakeColumnInfo(tableInfo, "tdate", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Thing).Tdate })
+		func(dest any) any { return &dest.(*Thing).Tdate })	
 	// Tdecimal represents the column "tdecimal" of with type "numeric", nullable:true, primary:false
 	Tdecimal = p.NewFieldAccess[decimal.NullDecimal](p.MakeColumnInfo(tableInfo, "tdecimal", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Thing).Tdecimal })
-	// Tinet represents the column "tinet" of with type "inet", nullable:true, primary:false
-	Tinet = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "tinet", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Thing).Tinet })
+		func(dest any) any { return &dest.(*Thing).Tdecimal })	
+	// Tinterval represents the column "tinterval" of with type "interval", nullable:true, primary:false
+	Tinterval = p.NewFieldAccess[pgtype.Interval](p.MakeColumnInfo(tableInfo, "tinterval", p.NotPrimary, p.Nullable, 0),
+		func(dest any) any { return &dest.(*Thing).Tinterval })	
 	// Tjson represents the column "tjson" of with type "json", nullable:true, primary:false
 	Tjson = p.NewJSONAccess(p.MakeColumnInfo(tableInfo, "tjson", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Thing).Tjson })
+		func(dest any) any { return &dest.(*Thing).Tjson })	
 	// Tjsonb represents the column "tjsonb" of with type "jsonb", nullable:true, primary:false
 	Tjsonb = p.NewJSONAccess(p.MakeColumnInfo(tableInfo, "tjsonb", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Thing).Tjsonb })
+		func(dest any) any { return &dest.(*Thing).Tjsonb })	
+	// Tjsonpath represents the column "tjsonpath" of with type "jsonpath", nullable:true, primary:false
+	Tjsonpath = tables.NewJSONPathAccess(p.MakeColumnInfo(tableInfo, "tjsonpath", p.NotPrimary, p.Nullable, 0),
+		func(dest any) any { return &dest.(*Thing).Tjsonpath })	
 	// Tnumeric represents the column "tnumeric" of with type "numeric", nullable:true, primary:false
 	Tnumeric = p.NewFieldAccess[decimal.NullDecimal](p.MakeColumnInfo(tableInfo, "tnumeric", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Thing).Tnumeric })
+		func(dest any) any { return &dest.(*Thing).Tnumeric })	
 	// Ttext represents the column "ttext" of with type "text", nullable:true, primary:false
 	Ttext = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "ttext", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Thing).Ttext })
+		func(dest any) any { return &dest.(*Thing).Ttext })	
 	// Ttextarray represents the column "ttextarray" of with type "text[]", nullable:true, primary:false
 	Ttextarray = p.NewFieldAccess[pgtype.FlatArray[pgtype.Text]](p.MakeColumnInfo(tableInfo, "ttextarray", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Thing).Ttextarray })
+		func(dest any) any { return &dest.(*Thing).Ttextarray })	
 	// Ttimestamp represents the column "ttimestamp" of with type "timestamp without time zone", nullable:true, primary:false
 	Ttimestamp = p.NewFieldAccess[pgtype.Timestamp](p.MakeColumnInfo(tableInfo, "ttimestamp", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Ttimestamp })
 	// package private
-	_         = c.UUID // for the occasional unused import from convert
-	_         = time.Now
-	_         = pgtype.Empty // for the occasional unused import from pgtype
-	_         = decimal.Decimal{}
-	tableInfo = p.TableInfo{Schema: "public", Name: "things", Alias: "t1"}
+	_ = c.UUID // for the occasional unused import from convert
+	_ = time.Now 
+	_ = pgtype.Empty // for the occasional unused import from pgtype
+	_ = decimal.Decimal{}
+	tableInfo = p.TableInfo{Schema: "public", Name: "things", Alias: "t1" }
 )
 
 func init() {
 	// after var initialization (to prevent cycle) we need to update the tableInfo to set all columns
-	tableInfo.Columns = []p.ColumnAccessor{ID, Tdate, Tdecimal, Tinet, Tjson, Tjsonb, Tnumeric, Ttext, Ttextarray, Ttimestamp}
+	tableInfo.Columns = []p.ColumnAccessor{ID,Tdate,Tdecimal,Tinterval,Tjson,Tjsonb,Tjsonpath,Tnumeric,Ttext,Ttextarray,Ttimestamp, }
 }
 
 // TableInfo returns meta information about the table.
@@ -77,35 +83,49 @@ func TableInfo() p.TableInfo {
 	return tableInfo
 }
 
+
 // SetID sets the value to the field value and returns the receiver.
-func (e *Thing) SetID(v pgtype.UUID) *Thing { e.ID = v; return e }
+func (e *Thing) SetID(v pgtype.UUID) *Thing { e.ID = v ; return e }
+
 
 // SetTdate sets the value to the field value and returns the receiver.
-func (e *Thing) SetTdate(v time.Time) *Thing { e.Tdate = c.TimeToDate(v); return e }
+func (e *Thing) SetTdate(v time.Time) *Thing { e.Tdate = c.TimeToDate(v) ; return e }
+
 
 // SetTdecimal sets the value to the field value and returns the receiver.
-func (e *Thing) SetTdecimal(v decimal.NullDecimal) *Thing { e.Tdecimal = v; return e }
+func (e *Thing) SetTdecimal(v decimal.NullDecimal) *Thing { e.Tdecimal = v ; return e }
 
-// SetTinet sets the value to the field value and returns the receiver.
-func (e *Thing) SetTinet(v string) *Thing { e.Tinet = c.StringToText(v); return e }
+
+// SetTinterval sets the value to the field value and returns the receiver.
+func (e *Thing) SetTinterval(v pgtype.Interval) *Thing { e.Tinterval = v ; return e }
+
 
 // SetTjson sets the value to the field value and returns the receiver.
-func (e *Thing) SetTjson(v p.NullJSON) *Thing { e.Tjson = v; return e }
+func (e *Thing) SetTjson(v p.NullJSON) *Thing { e.Tjson = v ; return e }
+
 
 // SetTjsonb sets the value to the field value and returns the receiver.
-func (e *Thing) SetTjsonb(v p.NullJSON) *Thing { e.Tjsonb = v; return e }
+func (e *Thing) SetTjsonb(v p.NullJSON) *Thing { e.Tjsonb = v ; return e }
+
+
+// SetTjsonpath sets the value to the field value and returns the receiver.
+func (e *Thing) SetTjsonpath(v tables.JSONPath) *Thing { e.Tjsonpath = v ; return e }
+
 
 // SetTnumeric sets the value to the field value and returns the receiver.
-func (e *Thing) SetTnumeric(v decimal.NullDecimal) *Thing { e.Tnumeric = v; return e }
+func (e *Thing) SetTnumeric(v decimal.NullDecimal) *Thing { e.Tnumeric = v ; return e }
+
 
 // SetTtext sets the value to the field value and returns the receiver.
-func (e *Thing) SetTtext(v string) *Thing { e.Ttext = c.StringToText(v); return e }
+func (e *Thing) SetTtext(v string) *Thing { e.Ttext = c.StringToText(v) ; return e }
+
 
 // SetTtextarray sets the value to the field value and returns the receiver.
-func (e *Thing) SetTtextarray(v pgtype.FlatArray[pgtype.Text]) *Thing { e.Ttextarray = v; return e }
+func (e *Thing) SetTtextarray(v pgtype.FlatArray[pgtype.Text]) *Thing { e.Ttextarray = v ; return e }
+
 
 // SetTtimestamp sets the value to the field value and returns the receiver.
-func (e *Thing) SetTtimestamp(v time.Time) *Thing { e.Ttimestamp = c.TimeToTimestamp(v); return e }
+func (e *Thing) SetTtimestamp(v time.Time) *Thing { e.Ttimestamp = c.TimeToTimestamp(v) ; return e }
 
 // Setters returns the list of changes to a Thing for which updates/inserts need to be processed.
 // Can be used in Insert,Update,Select. Cannot be used to set null (or empty array) values for columns.
@@ -119,14 +139,17 @@ func (e *Thing) Setters() (list []p.ColumnAccessor) {
 	if e.Tdecimal.Valid {
 		list = append(list, Tdecimal.Set(e.Tdecimal))
 	}
-	if e.Tinet.Valid {
-		list = append(list, Tinet.Set(e.Tinet))
+	if e.Tinterval.Valid {
+		list = append(list, Tinterval.Set(e.Tinterval))
 	}
 	if e.Tjson.Valid {
 		list = append(list, Tjson.Set(e.Tjson))
 	}
 	if e.Tjsonb.Valid {
 		list = append(list, Tjsonb.Set(e.Tjsonb))
+	}
+	if e.Tjsonpath.Valid {
+		list = append(list, Tjsonpath.Set(e.Tjsonpath))
 	}
 	if e.Tnumeric.Valid {
 		list = append(list, Tnumeric.Set(e.Tnumeric))
@@ -139,7 +162,7 @@ func (e *Thing) Setters() (list []p.ColumnAccessor) {
 	}
 	if e.Ttimestamp.Valid {
 		list = append(list, Ttimestamp.Set(e.Ttimestamp))
-	}
+	}	
 	return
 }
 
@@ -157,9 +180,9 @@ func Columns(names ...string) (list []p.ColumnAccessor) {
 	for _, each := range names {
 		for _, other := range tableInfo.Columns {
 			n := other.Column().Name()
-			if strings.HasPrefix(n, "'") { // mixed case names are quoted
-				n = strings.Trim(n, "'")
-			}
+			if strings.HasPrefix(n,"'") { // mixed case names are quoted
+				n = strings.Trim(n,"'")
+			} 
 			if n == each {
 				list = append(list, other)
 			}
@@ -174,7 +197,7 @@ func (e *Thing) AddExpressionResult(key string, value any) {
 		// lazy initialize
 		e.expressionResults = map[string]any{}
 	}
-	e.expressionResults[key] = value
+	e.expressionResults[key]=value
 }
 
 // GetExpressionResult gets a value from the custom expression results. Returns nil if absent.
