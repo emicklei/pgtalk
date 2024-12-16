@@ -52,7 +52,7 @@ func (e *Category) SetID(v int32) *Category { e.ID = v; return e }
 func (e *Category) SetTitle(v string) *Category { e.Title = c.StringToText(v); return e }
 
 // Setters returns the list of changes to a Category for which updates/inserts need to be processed.
-// Can be used in Insert,Update,Select. Cannot be used to set null values for columns.
+// Can be used in Insert,Update,Select. Cannot be used to set null (or empty array) values for columns.
 func (e *Category) Setters() (list []p.ColumnAccessor) {
 	list = append(list, ID.Set(e.ID))
 	if e.Title.Valid {

@@ -87,7 +87,7 @@ func (e *Product) SetPrice(v int64) *Product { e.Price = c.Int64ToInt8(v); retur
 func (e *Product) SetUpdatedAt(v time.Time) *Product { e.UpdatedAt = c.TimeToTimestamptz(v); return e }
 
 // Setters returns the list of changes to a Product for which updates/inserts need to be processed.
-// Can be used in Insert,Update,Select. Cannot be used to set null values for columns.
+// Can be used in Insert,Update,Select. Cannot be used to set null (or empty array) values for columns.
 func (e *Product) Setters() (list []p.ColumnAccessor) {
 	if e.CategoryId.Valid {
 		list = append(list, CategoryId.Set(e.CategoryId))

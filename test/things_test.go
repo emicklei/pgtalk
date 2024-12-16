@@ -84,7 +84,7 @@ func TestSelectMaps(t *testing.T) {
 }
 
 func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {
-	if got, want := len(things.Columns()), 8; got != want {
+	if got, want := len(things.Columns()), 9; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -144,6 +144,7 @@ func createAThing(t *testing.T) uuid.UUID {
 		things.Tjson.Set(map[string]any{"key1": "value1"}),
 		things.Tjsonb.Set(map[string]any{"key2": "value2"}),
 		things.Ttext.Set(convert.StringToText("hello")),
+		things.Ttextarray.Set(convert.StringsToTextArray([]string{"a", "b", "c"})),
 	)
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {
@@ -319,4 +320,27 @@ func TestJSONB_3(t *testing.T) {
 func TestExtraJSONBField(t *testing.T) {
 	a := things.Tjson.Extract("title")
 	t.Log(a) // TODO
+}
+
+func TestReadTextArray(t *testing.T) {
+	ctx := context.Background()
+	id := createAThing(t)
+	read := things.Select(things.ID, things.Ttextarray).Where(things.ID.Equals(convert.UUID(id)))
+	t.Log(pgtalk.SQL(read))
+	list, err := read.Exec(ctx, testConnect)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(list) == 0 {
+		t.Fatal("no data")
+	}
+	if len(list[0].Ttextarray) != 3 {
+		t.Fatal("expected 3 elements")
+	}
+	if !list[0].Ttextarray[0].Valid {
+		t.Fatal("expected first element to be valid")
+	}
+	if list[0].Ttextarray[0].String != "a" {
+		t.Fatal("expected first element to be 'a'")
+	}
 }

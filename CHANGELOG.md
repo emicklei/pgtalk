@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.5.1] - 2024-12-16
+
+- fix handling text[] datatype
+
 ## [v1.5.0] - 2024-09-25
 
 - add FOR UPDATE,SHARE,...

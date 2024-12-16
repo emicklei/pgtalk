@@ -14,14 +14,15 @@ import (
 
 // Thing is generated from the public.things table.
 type Thing struct {
-	ID         pgtype.UUID         // id : uuid
-	Tdate      pgtype.Date         // tdate : date
-	Tdecimal   decimal.NullDecimal // tdecimal : numeric
-	Tjson      p.NullJSON          // tjson : json
-	Tjsonb     p.NullJSON          // tjsonb : jsonb
-	Tnumeric   decimal.NullDecimal // tnumeric : numeric
-	Ttext      pgtype.Text         // ttext : text
-	Ttimestamp pgtype.Timestamp    // ttimestamp : timestamp without time zone
+	ID         pgtype.UUID                   // id : uuid
+	Tdate      pgtype.Date                   // tdate : date
+	Tdecimal   decimal.NullDecimal           // tdecimal : numeric
+	Tjson      p.NullJSON                    // tjson : json
+	Tjsonb     p.NullJSON                    // tjsonb : jsonb
+	Tnumeric   decimal.NullDecimal           // tnumeric : numeric
+	Ttext      pgtype.Text                   // ttext : text
+	Ttextarray pgtype.FlatArray[pgtype.Text] // ttextarray : text[]
+	Ttimestamp pgtype.Timestamp              // ttimestamp : timestamp without time zone
 	// for storing custom field expression result values
 	expressionResults map[string]any
 }
@@ -48,6 +49,9 @@ var (
 	// Ttext represents the column "ttext" of with type "text", nullable:true, primary:false
 	Ttext = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "ttext", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Ttext })
+	// Ttextarray represents the column "ttextarray" of with type "text[]", nullable:true, primary:false
+	Ttextarray = p.NewFieldAccess[pgtype.FlatArray[pgtype.Text]](p.MakeColumnInfo(tableInfo, "ttextarray", p.NotPrimary, p.Nullable, 0),
+		func(dest any) any { return &dest.(*Thing).Ttextarray })
 	// Ttimestamp represents the column "ttimestamp" of with type "timestamp without time zone", nullable:true, primary:false
 	Ttimestamp = p.NewFieldAccess[pgtype.Timestamp](p.MakeColumnInfo(tableInfo, "ttimestamp", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Ttimestamp })
@@ -61,7 +65,7 @@ var (
 
 func init() {
 	// after var initialization (to prevent cycle) we need to update the tableInfo to set all columns
-	tableInfo.Columns = []p.ColumnAccessor{ID, Tdate, Tdecimal, Tjson, Tjsonb, Tnumeric, Ttext, Ttimestamp}
+	tableInfo.Columns = []p.ColumnAccessor{ID, Tdate, Tdecimal, Tjson, Tjsonb, Tnumeric, Ttext, Ttextarray, Ttimestamp}
 }
 
 // TableInfo returns meta information about the table.
@@ -90,11 +94,14 @@ func (e *Thing) SetTnumeric(v decimal.NullDecimal) *Thing { e.Tnumeric = v; retu
 // SetTtext sets the value to the field value and returns the receiver.
 func (e *Thing) SetTtext(v string) *Thing { e.Ttext = c.StringToText(v); return e }
 
+// SetTtextarray sets the value to the field value and returns the receiver.
+func (e *Thing) SetTtextarray(v pgtype.FlatArray[pgtype.Text]) *Thing { e.Ttextarray = v; return e }
+
 // SetTtimestamp sets the value to the field value and returns the receiver.
 func (e *Thing) SetTtimestamp(v time.Time) *Thing { e.Ttimestamp = c.TimeToTimestamp(v); return e }
 
 // Setters returns the list of changes to a Thing for which updates/inserts need to be processed.
-// Can be used in Insert,Update,Select. Cannot be used to set null values for columns.
+// Can be used in Insert,Update,Select. Cannot be used to set null (or empty array) values for columns.
 func (e *Thing) Setters() (list []p.ColumnAccessor) {
 	if e.ID.Valid {
 		list = append(list, ID.Set(e.ID))
@@ -116,6 +123,9 @@ func (e *Thing) Setters() (list []p.ColumnAccessor) {
 	}
 	if e.Ttext.Valid {
 		list = append(list, Ttext.Set(e.Ttext))
+	}
+	if len(e.Ttextarray) > 0 {
+		list = append(list, Ttextarray.Set(e.Ttextarray))
 	}
 	if e.Ttimestamp.Valid {
 		list = append(list, Ttimestamp.Set(e.Ttimestamp))

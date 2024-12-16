@@ -8,6 +8,7 @@ type mapping struct {
 	nullableValueFieldName string // to access the go field value of a nullable type
 	convertFuncName        string // to convert from a go field value to a nullable type
 	newAccessFuncCall      string // to create the accessor
+	isArray                bool   // true if the type is an array
 }
 
 // https://www.postgresql.org/docs/9.1/datatype-numeric.html
@@ -141,6 +142,7 @@ var pgMappings = map[string]mapping{
 		goFieldType:         "pgtype.FlatArray[pgtype.Text]",
 		nullableGoFieldType: "pgtype.FlatArray[pgtype.Text]",
 		newAccessFuncCall:   "NewFieldAccess[pgtype.FlatArray[pgtype.Text]]",
+		isArray:             true,
 	},
 	"interval": {
 		nullableGoFieldType: "pgtype.Interval",

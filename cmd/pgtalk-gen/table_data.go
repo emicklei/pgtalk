@@ -25,6 +25,7 @@ type ColumnField struct {
 	ValueFieldName       string //  can be empty
 	IsGenericFieldAccess bool
 	IsValidSrc           string
+	IsArray              bool
 	NonConvertedGoType   string
 	ConvertFuncName      string
 }
