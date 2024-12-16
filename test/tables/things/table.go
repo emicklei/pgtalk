@@ -101,7 +101,7 @@ func (e *Thing) SetTtextarray(v pgtype.FlatArray[pgtype.Text]) *Thing { e.Ttexta
 func (e *Thing) SetTtimestamp(v time.Time) *Thing { e.Ttimestamp = c.TimeToTimestamp(v); return e }
 
 // Setters returns the list of changes to a Thing for which updates/inserts need to be processed.
-// Can be used in Insert,Update,Select. Cannot be used to set null values for columns.
+// Can be used in Insert,Update,Select. Cannot be used to set null (or empty array) values for columns.
 func (e *Thing) Setters() (list []p.ColumnAccessor) {
 	if e.ID.Valid {
 		list = append(list, ID.Set(e.ID))

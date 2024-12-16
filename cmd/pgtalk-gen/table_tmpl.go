@@ -65,7 +65,7 @@ func (e *{{$.GoType}}) Set{{.GoName}}(v {{.NonConvertedGoType}}) *{{$.GoType}} {
 {{- end}}
 
 // Setters returns the list of changes to a {{.GoType}} for which updates/inserts need to be processed.
-// Can be used in Insert,Update,Select. Cannot be used to set null values for columns.
+// Can be used in Insert,Update,Select. Cannot be used to set null (or empty array) values for columns.
 func (e *{{.GoType}}) Setters() (list []p.ColumnAccessor) {
 {{- range .Fields}}
 	{{- if .IsNotNull }}
