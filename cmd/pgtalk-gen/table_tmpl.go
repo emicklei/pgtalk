@@ -71,6 +71,11 @@ func (e *{{.GoType}}) Setters() (list []p.ColumnAccessor) {
 	{{- if .IsNotNull }}
 	list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
 	{{- else }}
+	{{- if .IsArray }}
+	if len(e.{{.GoName}}) > 0 {
+		list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
+	}	
+	{{- else }}
 	if e.{{.GoName}}{{.IsValidSrc}} {
 		{{- if .IsGenericFieldAccess }}
 		list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
@@ -79,6 +84,7 @@ func (e *{{.GoType}}) Setters() (list []p.ColumnAccessor) {
 		{{- end }}
 	}
 	{{- end }}	
+	{{- end }}
 {{- end}}	
 	return
 }

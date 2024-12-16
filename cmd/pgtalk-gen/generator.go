@@ -60,6 +60,7 @@ func generateFromTable(table PgTable, isView bool) {
 			NonConvertedGoType:   m.goFieldType,
 			ConvertFuncName:      m.convertFuncName,
 			IsValidSrc:           ".Valid",
+			IsArray:              m.isArray,
 		}
 		tt.Fields = append(tt.Fields, f)
 	}
