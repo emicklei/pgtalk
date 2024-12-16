@@ -97,7 +97,7 @@ func generateFromTable(table PgTable, isView bool) {
 }
 
 func isGenericFieldAccess(call string) bool {
-	return strings.HasPrefix(call, "NewField") || call == "NewJSONAccess" // TODO change template i.o this workaround
+	return strings.HasPrefix(call, "p.NewField") || call == "p.NewJSONAccess" // TODO change template i.o this workaround
 }
 
 var knownAliases = map[string]int{}

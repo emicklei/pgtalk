@@ -176,6 +176,20 @@ or by example
 
 Send me a PR for a missing type available from https://www.postgresql.org/docs/9.5/datatype.html by modifying `mapping.go` in the `cmd/pgtalk-gen` package.
 
+## custom datatype mappping
+
+If your datatype can be aliased (use) to one of the supported types then you can define such mapping in a configuration file.
+
+	pgtalk-gen -mapping your-mapping.json
+
+An example of such as mapping file `your-mapping.json`:
+
+	{
+		"character(26)": {
+			"use": "character varying"
+		}
+	}
+
 ## how to run the generator
 
 The user in the connection string must have the right privileges to read schema information.

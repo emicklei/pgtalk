@@ -25,7 +25,7 @@ type {{.GoType}} struct {
 var (
 {{- range .Fields}}	
 	// {{.GoName}} represents the column "{{.Name}}" of with type "{{.DataType}}", nullable:{{not .IsNotNull}}, primary:{{.IsPrimary}}
-	{{.GoName}} = p.{{.FactoryMethod}}(p.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimarySrc}}, {{.IsNotNullSrc}}, {{.TableAttributeNumber}}),
+	{{.GoName}} = {{.FactoryMethod}}(p.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimarySrc}}, {{.IsNotNullSrc}}, {{.TableAttributeNumber}}),
 		func(dest any) any { return &dest.(*{{$.GoType}}).{{.GoName}} })
 {{- end}}
 	// package private
@@ -58,7 +58,7 @@ func (e *{{$.GoType}}) Set{{.GoName}}(v {{.GoType}}) *{{$.GoType}} { e.{{.GoName
 func (e *{{$.GoType}}) Set{{.GoName}}(v {{.GoType}}) *{{$.GoType}} { e.{{.GoName}} = v ; return e }
 {{- else}}
 // Set{{.GoName}} sets the value to the field value and returns the receiver.
-func (e *{{$.GoType}}) Set{{.GoName}}(v {{.NonConvertedGoType}}) *{{$.GoType}} { e.{{.GoName}} = c.{{.ConvertFuncName}}(v) ; return e }
+func (e *{{$.GoType}}) Set{{.GoName}}(v {{.NonConvertedGoType}}) *{{$.GoType}} { e.{{.GoName}} = {{.ConvertFuncName}}(v) ; return e }
 {{- end }}
 
 {{- end }}
