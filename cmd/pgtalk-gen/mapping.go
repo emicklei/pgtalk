@@ -10,10 +10,11 @@ import (
 type configurableMappingEntry struct {
 	Use string `json:"use"` // if this is set then other fields are ignored
 	// others
-	NullableGoFieldType    string `json:"nullableFieldType"`      // full name of the nullable type
-	NullableValueFieldName string `json:"nullableValueFieldName"` // to access the go field value of a nullable type
-	ConvertGoFuncName      string `json:"convertFuncName"`        // to convert from a go field value to a nullable type
-	NewAccessFuncName      string `json:"newAccessFuncName"`      // to create the accessor
+	NullableGoFieldType    string   `json:"nullableFieldType"`      // full name of the nullable type
+	NullableValueFieldName string   `json:"nullableValueFieldName"` // to access the go field value of a nullable type
+	ConvertGoFuncName      string   `json:"convertFuncName"`        // to convert from a go field value to a nullable type
+	NewAccessFuncName      string   `json:"newAccessFuncName"`      // to create the accessor
+	Imports                []string `json:"imports"`                // zero or more go package imports to access functions and types used
 
 }
 
@@ -56,6 +57,7 @@ func applyConfiguredMappings(location string) error {
 				nullableValueFieldName: v.NullableValueFieldName,
 				convertFuncName:        v.ConvertGoFuncName,
 				newAccessFuncCall:      v.NewAccessFuncName,
+				imports:                v.Imports,
 			}
 			if err := newMapping.validate(); err != nil {
 				return fmt.Errorf("invalid mapping %s: %v", k, err)
@@ -71,11 +73,12 @@ type mapping struct {
 	goFieldType string // non-nullable type
 	newFuncCall string // to create accessor for non-nullable type
 	// null
-	nullableGoFieldType    string // full name of the nullable type
-	nullableValueFieldName string // to access the go field value of a nullable type
-	convertFuncName        string // to convert from a go field value to a nullable type
-	newAccessFuncCall      string // to create the accessor
-	isArray                bool   // true if the type is an array
+	nullableGoFieldType    string   // full name of the nullable type
+	nullableValueFieldName string   // to access the go field value of a nullable type
+	convertFuncName        string   // to convert from a go field value to a nullable type
+	newAccessFuncCall      string   // to create the accessor
+	isArray                bool     // true if the type is an array
+	imports                []string // extra imports from custom mappings
 }
 
 func (m mapping) validate() error {

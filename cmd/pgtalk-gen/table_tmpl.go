@@ -11,6 +11,9 @@ import (
 	"strings"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/shopspring/decimal" 
+	{{- range .Imports}}
+	"{{.}}"
+	{{- end}}
 )
 
 // {{.GoType}} is generated from the {{.Schema}}.{{.TableName}} table.
@@ -80,7 +83,11 @@ func (e *{{.GoType}}) Setters() (list []p.ColumnAccessor) {
 		{{- if .IsGenericFieldAccess }}
 		list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
 		{{- else }}
-		list = append(list, {{.GoName}}.Set(e.{{.GoName}}.{{.ValueFieldName}}))
+		{{- if ne .ValueFieldName "" }}
+			list = append(list, {{.GoName}}.Set(e.{{.GoName}}.{{.ValueFieldName}}))
+		{{- else }}
+			list = append(list, {{.GoName}}.Set(e.{{.GoName}}))
+		{{- end }}
 		{{- end }}
 	}
 	{{- end }}	

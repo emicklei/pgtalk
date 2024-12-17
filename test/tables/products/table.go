@@ -8,7 +8,7 @@ import (
 	"time"
 	"strings"
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/shopspring/decimal" 
+	"github.com/shopspring/decimal"
 )
 
 // Product is generated from the public.products table.

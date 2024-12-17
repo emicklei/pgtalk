@@ -25,12 +25,16 @@ func generateFromTable(table PgTable, isView bool) {
 		TableAlias:   alias(table.Name),
 		GoPackage:    table.Name,
 		GoType:       asSingular(strcase.ToCamel(table.Name)),
+		Imports:      []string{"strings"},
 	}
 	// need version to put in generated files
 	bi, ok := debug.ReadBuildInfo()
 	if ok && len(bi.Main.Version) > 0 {
 		tt.BuildVersion = bi.Main.Version
 	}
+
+	// collect imports required for the fields
+	imports := []string{}
 	for _, each := range table.Columns {
 		m, ok := pgMappings[each.DataType]
 		if !ok {
@@ -62,12 +66,15 @@ func generateFromTable(table PgTable, isView bool) {
 			IsValidSrc:           ".Valid",
 			IsArray:              m.isArray,
 		}
+		imports = append(imports, m.imports...)
 		tt.Fields = append(tt.Fields, f)
 	}
 	// sort fields to have stable generated output
 	slices.SortFunc(tt.Fields, func(a, b ColumnField) int {
 		return strings.Compare(a.Name, b.Name)
 	})
+
+	tt.Imports = unique(imports)
 
 	tmpl, err := template.New("tt").Parse(tableTemplateSrc)
 	if err != nil {
@@ -163,4 +170,16 @@ func isNotNullSource(isNotNull bool) string {
 		return "p.NotNull"
 	}
 	return "p.Nullable"
+}
+
+func unique[A comparable](input []A) []A {
+	seen := make(map[A]bool)
+	var result []A
+	for _, v := range input {
+		if !seen[v] {
+			seen[v] = true
+			result = append(result, v)
+		}
+	}
+	return result
 }
