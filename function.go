@@ -31,3 +31,7 @@ func NewSQLFunction(name string, arguments ...SQLExpression) SQLFunction {
 func NewSQLConstant(value any) SQLExpression {
 	return valuePrinter{v: value}
 }
+
+func Nextval(sequenceName string) SQLFunction {
+	return NewSQLFunction("nextval", NewSQLConstant(sequenceName))
+}

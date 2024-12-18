@@ -11,8 +11,9 @@ import (
 type int32Access struct {
 	unimplementedBooleanExpression
 	ColumnInfo
-	fieldWriter   fieldAccessFunc
-	valueToInsert int32
+	fieldWriter        fieldAccessFunc
+	valueToInsert      int32
+	expressionToInsert SQLFunction
 }
 
 func NewInt32Access(
@@ -35,8 +36,16 @@ func (a int32Access) ValueToInsert() any {
 	return a.valueToInsert
 }
 
-func (a int32Access) Set(v int32) int32Access {
-	a.valueToInsert = v
+func (a int32Access) Set(intOrFunction any) int32Access {
+	if i, ok := intOrFunction.(int); ok {
+		a.valueToInsert = int32(i)
+	} else if i, ok := intOrFunction.(int32); ok {
+		a.valueToInsert = i
+	} else if e, ok := intOrFunction.(SQLFunction); ok {
+		a.expressionToInsert = e
+	} else {
+		panic(fmt.Sprintf("int32 or SQLExpression expected, got %T", intOrFunction))
+	}
 	return a
 }
 

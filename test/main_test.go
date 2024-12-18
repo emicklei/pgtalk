@@ -50,6 +50,7 @@ func ensureTables(conn *pgx.Conn) error {
 	drop table IF EXISTS things;
 	create table things(
 		id uuid,
+		tSerial serial,
 		tDate date,
 		tTimestamp timestamp without time zone,
 		TJSONB jsonb,
@@ -59,6 +60,9 @@ func ensureTables(conn *pgx.Conn) error {
 		tDecimal decimal,
 		tTextArray text[]
 	);
+	drop sequence if exists serial;
+	CREATE SEQUENCE serial START 1;
+
 	drop table IF EXISTS products;
 	create table products(
 		id serial primary key,

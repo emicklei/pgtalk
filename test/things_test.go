@@ -84,7 +84,7 @@ func TestSelectMaps(t *testing.T) {
 }
 
 func TestTableInfoColumnsOfThingsNotEmpty(t *testing.T) {
-	if got, want := len(things.Columns()), 9; got != want {
+	if got, want := len(things.Columns()), 10; got != want {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
@@ -139,6 +139,7 @@ func createAThing(t *testing.T) uuid.UUID {
 	id := uuid.New()
 	create := things.Insert(
 		things.ID.Set(convert.UUID(id)),
+		things.Tserial.Set(pgtalk.Nextval("serial")),
 		things.Tdate.Set(convert.TimeToDate(time.Now())),
 		things.Ttimestamp.Set(convert.TimeToTimestamp(time.Now())),
 		things.Tjson.Set(map[string]any{"key1": "value1"}),

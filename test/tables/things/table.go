@@ -20,6 +20,7 @@ type Thing struct {
 	Tjson      p.NullJSON                    // tjson : json
 	Tjsonb     p.NullJSON                    // tjsonb : jsonb
 	Tnumeric   decimal.NullDecimal           // tnumeric : numeric
+	Tserial    int32                         // tserial : integer
 	Ttext      pgtype.Text                   // ttext : text
 	Ttextarray pgtype.FlatArray[pgtype.Text] // ttextarray : text[]
 	Ttimestamp pgtype.Timestamp              // ttimestamp : timestamp without time zone
@@ -46,6 +47,9 @@ var (
 	// Tnumeric represents the column "tnumeric" of with type "numeric", nullable:true, primary:false
 	Tnumeric = p.NewFieldAccess[decimal.NullDecimal](p.MakeColumnInfo(tableInfo, "tnumeric", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Tnumeric })
+	// Tserial represents the column "tserial" of with type "integer", nullable:false, primary:false
+	Tserial = p.NewInt32Access(p.MakeColumnInfo(tableInfo, "tserial", p.NotPrimary, p.NotNull, 0),
+		func(dest any) any { return &dest.(*Thing).Tserial })
 	// Ttext represents the column "ttext" of with type "text", nullable:true, primary:false
 	Ttext = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "ttext", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Ttext })
@@ -65,7 +69,7 @@ var (
 
 func init() {
 	// after var initialization (to prevent cycle) we need to update the tableInfo to set all columns
-	tableInfo.Columns = []p.ColumnAccessor{ID, Tdate, Tdecimal, Tjson, Tjsonb, Tnumeric, Ttext, Ttextarray, Ttimestamp}
+	tableInfo.Columns = []p.ColumnAccessor{ID, Tdate, Tdecimal, Tjson, Tjsonb, Tnumeric, Tserial, Ttext, Ttextarray, Ttimestamp}
 }
 
 // TableInfo returns meta information about the table.
@@ -90,6 +94,9 @@ func (e *Thing) SetTjsonb(v p.NullJSON) *Thing { e.Tjsonb = v; return e }
 
 // SetTnumeric sets the value to the field value and returns the receiver.
 func (e *Thing) SetTnumeric(v decimal.NullDecimal) *Thing { e.Tnumeric = v; return e }
+
+// SetTserial sets the value to the field value and returns the receiver.
+func (e *Thing) SetTserial(v int32) *Thing { e.Tserial = v; return e }
 
 // SetTtext sets the value to the field value and returns the receiver.
 func (e *Thing) SetTtext(v string) *Thing { e.Ttext = c.StringToText(v); return e }
@@ -121,6 +128,7 @@ func (e *Thing) Setters() (list []p.ColumnAccessor) {
 	if e.Tnumeric.Valid {
 		list = append(list, Tnumeric.Set(e.Tnumeric))
 	}
+	list = append(list, Tserial.Set(e.Tserial))
 	if e.Ttext.Valid {
 		list = append(list, Ttext.Set(e.Ttext))
 	}
