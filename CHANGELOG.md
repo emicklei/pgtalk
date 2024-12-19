@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [v1.6.0] - 2024-12-19
+## [v1.6.1, v1.6.0] - 2024-12-19
 
 - add GetParams to iterator for inspection.
 
