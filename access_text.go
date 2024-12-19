@@ -11,14 +11,21 @@ type textAccess struct {
 	ColumnInfo
 	valueFieldWriter fieldAccessFunc
 	valueToInsert    string
+	sqlFunction      SQLFunction
 }
 
 func NewTextAccess(info ColumnInfo, writer fieldAccessFunc) textAccess {
 	return textAccess{ColumnInfo: info, valueFieldWriter: writer}
 }
 
-func (a textAccess) Set(v string) textAccess {
-	a.valueToInsert = v
+func (a textAccess) Set(stringOrFunction any) textAccess {
+	if s, ok := stringOrFunction.(string); ok {
+		a.valueToInsert = s
+	} else if f, ok := stringOrFunction.(SQLFunction); ok {
+		a.sqlFunction = f
+	} else {
+		panic("string or SQLFunction expected")
+	}
 	return a
 }
 
