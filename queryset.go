@@ -135,6 +135,7 @@ func (d QuerySet[T]) Iterate(ctx context.Context, conn querier, parameters ...*Q
 		queryError: err,
 		rows:       rows,
 		selectors:  d.selectors,
+		params:     params,
 	}, err
 }
 

@@ -8,6 +8,7 @@ type resultIterator[T any] struct {
 	queryError error
 	rows       pgx.Rows
 	selectors  []ColumnAccessor
+	params     []any
 }
 
 // Close closes the rows, making the connection ready for use again. It is safe
@@ -23,6 +24,8 @@ func (i *resultIterator[T]) Err() error {
 	return i.rows.Err()
 }
 
+// HasNext returns true if there are more rows to scan.
+// If none are left, it closes the rows.
 func (i *resultIterator[T]) HasNext() bool {
 	if i.queryError != nil {
 		return false
@@ -51,4 +54,9 @@ func (i *resultIterator[T]) Next() (*T, error) {
 		return nil, err
 	}
 	return entity, nil
+}
+
+// GetParams returns all the parameters used in the query. Can be used for debugging or logging
+func (i *resultIterator[T]) GetParams() []any {
+	return i.params
 }
