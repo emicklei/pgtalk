@@ -59,7 +59,10 @@ func (a textAccess) ILike(pattern string) binaryExpression {
 	return makeBinaryOperator(a, "ILIKE", newLiteralString(pattern))
 }
 
-func (a textAccess) In(values ...string) binaryExpression {
+func (a textAccess) In(values ...string) SQLExpression {
+	if len(values) == 0 {
+		return makeConstantExpression(false)
+	}
 	vs := make([]any, len(values))
 	for i := 0; i < len(values); i++ {
 		vs[i] = values[i]

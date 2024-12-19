@@ -79,7 +79,10 @@ func (a int64Access) Get(values map[string]any) any {
 	return v
 }
 
-func (a int64Access) In(values ...int32) binaryExpression {
+func (a int64Access) In(values ...int32) SQLExpression {
+	if len(values) == 0 {
+		return makeConstantExpression(false)
+	}
 	vs := make([]any, len(values))
 	for i := 0; i < len(values); i++ {
 		vs[i] = values[i]

@@ -97,7 +97,10 @@ func (a FieldAccess[T]) GreaterThan(operand any) binaryExpression {
 }
 
 // In returns a binary expression to check that the value of the fieldAccess is in the values collection.
-func (a FieldAccess[T]) In(values ...T) binaryExpression {
+func (a FieldAccess[T]) In(values ...T) SQLExpression {
+	if len(values) == 0 {
+		return makeConstantExpression(false)
+	}
 	vs := make([]any, len(values))
 	for i := 0; i < len(values); i++ {
 		vs[i] = values[i]

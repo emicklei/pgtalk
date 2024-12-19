@@ -40,7 +40,10 @@ func (a int32Access) Set(v int32) int32Access {
 	return a
 }
 
-func (a int32Access) In(values ...int32) binaryExpression {
+func (a int32Access) In(values ...int32) SQLExpression {
+	if len(values) == 0 {
+		return makeConstantExpression(false)
+	}
 	vs := make([]any, len(values))
 	for i := 0; i < len(values); i++ {
 		vs[i] = values[i]

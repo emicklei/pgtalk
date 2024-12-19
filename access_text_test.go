@@ -25,6 +25,15 @@ func TestTextIn(t *testing.T) {
 	}
 }
 
+func TestTextInEmpty(t *testing.T) {
+	ta := NewTextAccess(ci, nil)
+	in := ta.In()
+	sql := SQL(in)
+	if got, want := sql, "false"; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
+
 func TestTextLike(t *testing.T) {
 	ta := NewTextAccess(ci, nil)
 	in := ta.Like("*me")

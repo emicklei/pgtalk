@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.6.3] - 2024-12-19
+
+- fix handling IN operator with empty values
+
 ## [v1.6.2, v1.6.1, v1.6.0] - 2024-12-19
 
 - add GetParams to iterator for inspection.
