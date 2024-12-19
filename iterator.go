@@ -57,6 +57,10 @@ func (i *resultIterator[T]) Next() (*T, error) {
 }
 
 // GetParams returns all the parameters used in the query. Can be used for debugging or logging
-func (i *resultIterator[T]) GetParams() []any {
-	return i.params
+func (i *resultIterator[T]) GetParams() map[int]any {
+	ret := make(map[int]any, len(i.params))
+	for i, each := range i.params {
+		ret[i+1] = each
+	}
+	return ret
 }

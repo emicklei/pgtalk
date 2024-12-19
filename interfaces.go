@@ -68,5 +68,5 @@ type ResultIterator[T any] interface {
 	// Next returns the next row populated in a T.
 	Next() (*T, error)
 	// GetParams returns all the parameters used in the query. Can be used for debugging or logging
-	GetParams() []any
+	GetParams() map[int]any
 }
