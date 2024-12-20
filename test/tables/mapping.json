@@ -1,7 +1,0 @@
-{
-    "jsonpath":{
-        "nullableFieldType":"tables.JSONPath",
-        "newAccessFuncName":"tables.NewJSONPathAccess",
-        "imports": ["github.com/emicklei/pgtalk/test/tables"]
-    }
-}

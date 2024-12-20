@@ -190,6 +190,18 @@ An example of such as mapping file `your-mapping.json`:
 		}
 	}
 
+If your datatype cannot be aliased then you can write the missing logic for a datatype and an accessor type.
+See example `test/types/real.go` for such an implementation.
+The configuration for this mapping is:
+
+	{
+		"real":{
+			"nullableFieldType":"types.Real",
+			"newAccessFuncName":"types.NewRealAccess",
+			"imports": ["github.com/emicklei/pgtalk/test/types"]
+		}
+	}
+
 ## how to run the generator
 
 The user in the connection string must have the right privileges to read schema information.

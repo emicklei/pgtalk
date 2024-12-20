@@ -7,8 +7,8 @@ import (
 
 	"github.com/emicklei/pgtalk"
 	"github.com/emicklei/pgtalk/convert"
-	"github.com/emicklei/pgtalk/test/tables"
 	"github.com/emicklei/pgtalk/test/tables/things"
+	"github.com/emicklei/pgtalk/test/types"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -146,14 +146,17 @@ func createAThing(t *testing.T) uuid.UUID {
 		things.Tjsonb.Set(map[string]any{"key2": "value2"}),
 		things.Ttext.Set(convert.StringToText("hello")),
 		things.Ttextarray.Set(convert.StringsToTextArray([]string{"a", "b", "c"})),
-		things.Tjsonpath.Set(tables.JSONPath{Valid: true, String: "/"}), // custom datatype mapping
+		things.Treal.Set(types.Real{Valid: true, Float: 3.14}), // custom datatype mapping
 	)
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Log(pgtalk.SQL(create))
-	_ = create.Exec(ctx, testConnect)
+	it := create.Exec(ctx, testConnect)
+	if it.Err() != nil {
+		t.Fatal(it.Err())
+	}
 	err = tx.Commit(ctx)
 	if err != nil {
 		t.Fatal(err)
@@ -344,5 +347,22 @@ func TestReadTextArray(t *testing.T) {
 	}
 	if list[0].Ttextarray[0].String != "a" {
 		t.Fatal("expected first element to be 'a'")
+	}
+}
+
+func TestReadReal(t *testing.T) {
+	ctx := context.Background()
+	id := createAThing(t)
+	read := things.Select(things.ID, things.Treal).Where(things.ID.Equals(convert.UUID(id)))
+	t.Log(pgtalk.SQL(read))
+	list, err := read.Exec(ctx, testConnect)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(list) == 0 {
+		t.Fatal("no data")
+	}
+	if list[0].Treal.Float != 3.14 {
+		t.Fatal("expected Pi, got", list[0].Treal.Float)
 	}
 }

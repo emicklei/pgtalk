@@ -38,7 +38,7 @@ func generateFromTable(table PgTable, isView bool) {
 	for _, each := range table.Columns {
 		m, ok := pgMappings[each.DataType]
 		if !ok {
-			log.Println("[warn] missing map entry for", each.DataType, "column", each.Name, "skipping")
+			log.Println("[warn] missing map entry for", each.DataType, "column '", each.Name, "' is skipped")
 			continue
 		}
 		goType := m.goFieldType

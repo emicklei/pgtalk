@@ -9,7 +9,7 @@ import (
 	"strings"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/shopspring/decimal"
-	"github.com/emicklei/pgtalk/test/tables"
+	"github.com/emicklei/pgtalk/test/types"
 )
 
 // Thing is generated from the public.things table.
@@ -20,8 +20,8 @@ type Thing struct {
 	Tinterval	pgtype.Interval // tinterval : interval
 	Tjson	p.NullJSON // tjson : json
 	Tjsonb	p.NullJSON // tjsonb : jsonb
-	Tjsonpath	tables.JSONPath // tjsonpath : jsonpath
 	Tnumeric	decimal.NullDecimal // tnumeric : numeric
+	Treal	types.Real // treal : real
 	Ttext	pgtype.Text // ttext : text
 	Ttextarray	pgtype.FlatArray[pgtype.Text] // ttextarray : text[]
 	Ttimestamp	pgtype.Timestamp // ttimestamp : timestamp without time zone
@@ -48,12 +48,12 @@ var (
 	// Tjsonb represents the column "tjsonb" of with type "jsonb", nullable:true, primary:false
 	Tjsonb = p.NewJSONAccess(p.MakeColumnInfo(tableInfo, "tjsonb", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Tjsonb })	
-	// Tjsonpath represents the column "tjsonpath" of with type "jsonpath", nullable:true, primary:false
-	Tjsonpath = tables.NewJSONPathAccess(p.MakeColumnInfo(tableInfo, "tjsonpath", p.NotPrimary, p.Nullable, 0),
-		func(dest any) any { return &dest.(*Thing).Tjsonpath })	
 	// Tnumeric represents the column "tnumeric" of with type "numeric", nullable:true, primary:false
 	Tnumeric = p.NewFieldAccess[decimal.NullDecimal](p.MakeColumnInfo(tableInfo, "tnumeric", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Tnumeric })	
+	// Treal represents the column "treal" of with type "real", nullable:true, primary:false
+	Treal = types.NewRealAccess(p.MakeColumnInfo(tableInfo, "treal", p.NotPrimary, p.Nullable, 0),
+		func(dest any) any { return &dest.(*Thing).Treal })	
 	// Ttext represents the column "ttext" of with type "text", nullable:true, primary:false
 	Ttext = p.NewFieldAccess[pgtype.Text](p.MakeColumnInfo(tableInfo, "ttext", p.NotPrimary, p.Nullable, 0),
 		func(dest any) any { return &dest.(*Thing).Ttext })	
@@ -73,7 +73,7 @@ var (
 
 func init() {
 	// after var initialization (to prevent cycle) we need to update the tableInfo to set all columns
-	tableInfo.Columns = []p.ColumnAccessor{ID,Tdate,Tdecimal,Tinterval,Tjson,Tjsonb,Tjsonpath,Tnumeric,Ttext,Ttextarray,Ttimestamp, }
+	tableInfo.Columns = []p.ColumnAccessor{ID,Tdate,Tdecimal,Tinterval,Tjson,Tjsonb,Tnumeric,Treal,Ttext,Ttextarray,Ttimestamp, }
 }
 
 // TableInfo returns meta information about the table.
@@ -106,12 +106,12 @@ func (e *Thing) SetTjson(v p.NullJSON) *Thing { e.Tjson = v ; return e }
 func (e *Thing) SetTjsonb(v p.NullJSON) *Thing { e.Tjsonb = v ; return e }
 
 
-// SetTjsonpath sets the value to the field value and returns the receiver.
-func (e *Thing) SetTjsonpath(v tables.JSONPath) *Thing { e.Tjsonpath = v ; return e }
-
-
 // SetTnumeric sets the value to the field value and returns the receiver.
 func (e *Thing) SetTnumeric(v decimal.NullDecimal) *Thing { e.Tnumeric = v ; return e }
+
+
+// SetTreal sets the value to the field value and returns the receiver.
+func (e *Thing) SetTreal(v types.Real) *Thing { e.Treal = v ; return e }
 
 
 // SetTtext sets the value to the field value and returns the receiver.
@@ -146,11 +146,11 @@ func (e *Thing) Setters() (list []p.ColumnAccessor) {
 	if e.Tjsonb.Valid {
 		list = append(list, Tjsonb.Set(e.Tjsonb))
 	}
-	if e.Tjsonpath.Valid {
-			list = append(list, Tjsonpath.Set(e.Tjsonpath))
-	}
 	if e.Tnumeric.Valid {
 		list = append(list, Tnumeric.Set(e.Tnumeric))
+	}
+	if e.Treal.Valid {
+			list = append(list, Treal.Set(e.Treal))
 	}
 	if e.Ttext.Valid {
 		list = append(list, Ttext.Set(e.Ttext))
