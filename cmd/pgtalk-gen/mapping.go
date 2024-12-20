@@ -24,7 +24,8 @@ func applyConfiguredMappings(location string) error {
 	}
 	content, err := os.ReadFile(location)
 	if err != nil {
-		return err
+		log.Printf("[warn] unable to read custom mappings, err:%v\n", err)
+		return nil
 	}
 	entries := map[string]configurableMappingEntry{}
 	if err := json.Unmarshal(content, &entries); err != nil {

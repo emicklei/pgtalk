@@ -7,6 +7,7 @@ import (
 
 	"github.com/emicklei/pgtalk"
 	"github.com/emicklei/pgtalk/convert"
+	"github.com/emicklei/pgtalk/test/tables"
 	"github.com/emicklei/pgtalk/test/tables/things"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -145,6 +146,7 @@ func createAThing(t *testing.T) uuid.UUID {
 		things.Tjsonb.Set(map[string]any{"key2": "value2"}),
 		things.Ttext.Set(convert.StringToText("hello")),
 		things.Ttextarray.Set(convert.StringsToTextArray([]string{"a", "b", "c"})),
+		things.Tjsonpath.Set(tables.JSONPath{Valid: true, String: "/"}), // custom datatype mapping
 	)
 	tx, err := testConnect.Begin(ctx)
 	if err != nil {
