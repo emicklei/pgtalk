@@ -1,0 +1,7 @@
+{
+    "real":{
+        "nullableFieldType":"types.Real",
+        "newAccessFuncName":"types.NewRealAccess",
+        "imports": ["github.com/emicklei/pgtalk/test/types"]
+    }
+}

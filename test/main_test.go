@@ -57,7 +57,9 @@ func ensureTables(conn *pgx.Conn) error {
 		tText text,
 		tNumeric numeric,
 		tDecimal decimal,
-		tTextArray text[]
+		tTextArray text[],
+		tInterval interval,
+		tReal real
 	);
 	drop table IF EXISTS products;
 	create table products(

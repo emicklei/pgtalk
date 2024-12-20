@@ -8,6 +8,7 @@ type TableType struct {
 	GoPackage    string
 	GoType       string
 	Fields       []ColumnField
+	Imports      []string
 }
 
 type ColumnField struct {

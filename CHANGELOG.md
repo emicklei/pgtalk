@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.7.0] - 2024-12-20
+
+- add ability to specify custom datatype mapping
+
 ## [v1.6.3] - 2024-12-19
 
 - fix handling IN operator with empty values
