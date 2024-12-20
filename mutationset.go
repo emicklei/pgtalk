@@ -89,7 +89,9 @@ func (m MutationSet[T]) On() MutationSet[T] {
 	return m
 }
 
-// Pre: must be run inside transaction
+// Pre: must be run inside transaction.
+// The iterator is closed unless it has data to return (set via Returning).
+// The iterator must be closed on error or after consuming all data.
 func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...*QueryParameter) ResultIterator[T] {
 	// first collect parameters with query indices
 	params := m.valuesToInsert(parameters)
@@ -99,7 +101,7 @@ func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...*Q
 	if err == nil && !m.canProduceResults() {
 		rows.Close()
 	}
-	return &resultIterator[T]{queryError: err, rows: rows, selectors: m.returning}
+	return &resultIterator[T]{queryError: err, rows: rows, selectors: m.returning, params: params}
 }
 
 // valuesToInsert returns the parameters values for the mutation query.

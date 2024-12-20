@@ -67,4 +67,6 @@ type ResultIterator[T any] interface {
 	HasNext() bool
 	// Next returns the next row populated in a T.
 	Next() (*T, error)
+	// GetParams returns all the parameters used in the query. Can be used for debugging or logging
+	GetParams() map[int]any
 }

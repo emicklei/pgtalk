@@ -125,3 +125,20 @@ func IsNotNull(e SQLExpression) nullCheck {
 func IsNull(e SQLExpression) nullCheck {
 	return nullCheck{Operand: e, IsNot: false}
 }
+
+type constantExpression struct {
+	v any
+}
+
+func makeConstantExpression(v any) constantExpression {
+	return constantExpression{v: v}
+}
+func (c constantExpression) SQLOn(w WriteContext) {
+	makeValuePrinter(c.v).SQLOn(w)
+}
+func (c constantExpression) Or(right SQLExpression) SQLExpression {
+	return makeBinaryOperator(c, "OR", right)
+}
+func (c constantExpression) And(right SQLExpression) SQLExpression {
+	return makeBinaryOperator(c, "AND", right)
+}
