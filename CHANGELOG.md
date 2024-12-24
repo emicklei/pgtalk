@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.7.1] - 2024-12-24
+
+- add TextArrayToStrings
+
 ## [v1.7.0] - 2024-12-20
 
 - add ability to specify custom datatype mapping

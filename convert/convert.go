@@ -128,3 +128,11 @@ func StringsToTextArray(list []string) pgtype.FlatArray[pgtype.Text] {
 	}
 	return a
 }
+
+func TextArrayToStrings(array pgtype.FlatArray[pgtype.Text]) []string {
+	list := []string{}
+	for _, each := range array {
+		list = append(list, each.String)
+	}
+	return list
+}
