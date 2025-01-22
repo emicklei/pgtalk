@@ -97,6 +97,11 @@ func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...*Q
 	params := m.valuesToInsert(parameters)
 	// then compose SQL
 	query := SQL(m)
+	// query or exe?
+	if !m.canProduceResults() {
+		ct, err := conn.Exec(ctx, query, params...)
+		return &resultIterator[T]{queryError: err, commandTag: ct, params: params}
+	}
 	rows, err := conn.Query(ctx, query, params...)
 	if err == nil && !m.canProduceResults() {
 		rows.Close()

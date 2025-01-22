@@ -97,4 +97,11 @@ func (f *fakeConnection) Query(ctx context.Context, sql string, args ...any) (pg
 	return fakeRows{f.t}, nil
 }
 
+func (f *fakeConnection) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
+	f.t.Helper()
+	f.t.Log("sql:", oneliner(sql))
+	f.t.Log("parameters:", args)
+	return pgconn.CommandTag{}, nil
+}
+
 func (f *fakeConnection) ctx() context.Context { return context.Background() }
