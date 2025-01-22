@@ -23,6 +23,10 @@ func (i *resultIterator[T]) Err() error {
 	if i.queryError != nil {
 		return i.queryError
 	}
+	// happens when query is executed with Exec
+	if i.rows == nil {
+		return nil
+	}
 	return i.rows.Err()
 }
 
@@ -35,6 +39,10 @@ func (i *resultIterator[T]) CommandTag() pgconn.CommandTag {
 // If none are left, it closes the rows.
 func (i *resultIterator[T]) HasNext() bool {
 	if i.queryError != nil {
+		return false
+	}
+	// happens when query is executed with Exec
+	if i.rows == nil {
 		return false
 	}
 	if i.rows.Next() {

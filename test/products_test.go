@@ -174,6 +174,21 @@ func TestProductUpperCode(t *testing.T) {
 	}
 }
 
+func TestUpdateProductRowsAffected(t *testing.T) {
+	if testConnect == nil {
+		t.Skip("no connection")
+	}
+	createProduct(t, 123456, 1)
+	m := products.Update(products.Code.Set(convert.StringToText("G1"))).Where(products.ID.Equals(123456))
+	it := m.Exec(context.Background(), testConnect)
+	if it.Err() != nil {
+		t.Fatal(it.Err())
+	}
+	if got, want := it.CommandTag().RowsAffected(), int64(1); got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}
+
 func createProduct(t *testing.T, id int32, categoryId int) {
 	q := products.Insert(
 		products.ID.Set(id),

@@ -70,4 +70,6 @@ type ResultIterator[T any] interface {
 	Next() (*T, error)
 	// GetParams returns all the parameters used in the query. Can be used for debugging or logging
 	GetParams() map[int]any
+	// CommandTag is valid if the query is an Exec query, i.e. not returning rows.
+	CommandTag() pgconn.CommandTag
 }
