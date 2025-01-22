@@ -2,11 +2,11 @@
 
 ## start local postgres db
 
-    make db
-
+    make dbsrv
+    
 ## create database
 
-Use your tool to create the databse "pgtalk" in the public schema.
+    make db
 
 ## running the db tests
 
