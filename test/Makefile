@@ -1,10 +1,11 @@
 rmdb:
 	docker rm -f pgtalk-db
 
-db:
-	# make sure to create an empty database called "pgtalk"
-	#
+dbsrv:
 	docker run --name pgtalk-db -e POSTGRES_PASSWORD=pgtalk  -p 7432:5432 -d postgres
+
+db:
+	docker exec -it pgtalk-db createdb -U postgres pgtalk
 
 gen:
 	cd ../cmd/pgtalk-gen && go install

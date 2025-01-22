@@ -2,10 +2,12 @@ package pgtalk
 
 import (
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type resultIterator[T any] struct {
 	queryError error
+	commandTag pgconn.CommandTag
 	rows       pgx.Rows
 	selectors  []ColumnAccessor
 	params     []any
@@ -21,13 +23,26 @@ func (i *resultIterator[T]) Err() error {
 	if i.queryError != nil {
 		return i.queryError
 	}
+	// happens when query is executed with Exec
+	if i.rows == nil {
+		return nil
+	}
 	return i.rows.Err()
+}
+
+// CommandTag is valid if the query is an Exec query, i.e. not returning rows.
+func (i *resultIterator[T]) CommandTag() pgconn.CommandTag {
+	return i.commandTag
 }
 
 // HasNext returns true if there are more rows to scan.
 // If none are left, it closes the rows.
 func (i *resultIterator[T]) HasNext() bool {
 	if i.queryError != nil {
+		return false
+	}
+	// happens when query is executed with Exec
+	if i.rows == nil {
 		return false
 	}
 	if i.rows.Next() {
