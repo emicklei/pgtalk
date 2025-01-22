@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.8.0] - 2025-01-22
+
+- add access to CommandTag in iterator to get RowsAffected value
+
 ## [v1.7.1] - 2024-12-24
 
 - add TextArrayToStrings
