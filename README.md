@@ -59,6 +59,15 @@ or by example
 			Where(products.ID.Equals(p.ID)).
 			Returning(products.Code)
 
+or by collecting columns first
+
+	cols := NewColumns()
+	cols.Add(products.Code.Set("testme"))
+	if categoryWhasChanged {
+		cols.Add(products.CategoryID.Set(changedValue))
+	}
+	m := products.Update(cols...).Where(products.ID.Equals(10)).
+
 ### Delete
 
 	m := products.Delete().Where(products.ID.Equals(10))

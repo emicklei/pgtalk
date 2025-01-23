@@ -55,6 +55,9 @@ func (a int32Access) Equals(intLike any) binaryExpression {
 	if i, ok := intLike.(int); ok {
 		return makeBinaryOperator(a, "=", valuePrinter{v: i})
 	}
+	if i, ok := intLike.(int32); ok {
+		return makeBinaryOperator(a, "=", valuePrinter{v: i})
+	}
 	if ia, ok := intLike.(int32Access); ok {
 		return makeBinaryOperator(a, "=", ia)
 	}
@@ -64,7 +67,7 @@ func (a int32Access) Equals(intLike any) binaryExpression {
 	if p, ok := intLike.(FieldAccess[pgtype.Int4]); ok {
 		return makeBinaryOperator(a, "=", p)
 	}
-	panic(fmt.Sprintf("int or Int32Access or *QueryParameter expected, got %T", intLike))
+	panic(fmt.Sprintf("int, int32, Int32Access or *QueryParameter expected, got %T", intLike))
 }
 
 func (a int32Access) Compare(op string, i int) binaryExpression {

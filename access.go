@@ -22,7 +22,7 @@ type ColumnAccessorSlice []ColumnAccessor
 // This can be used to build a list of columns e.g when updating.
 func NewColumns() (list ColumnAccessorSlice) { return }
 
-// Add appends a non-nil column to the list
+// Add appends a non-nil column accessor to the list
 func (s *ColumnAccessorSlice) Add(c ColumnAccessor) {
 	if c != nil {
 		*s = append(*s, c)

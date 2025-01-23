@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.8.1] - 2025-01-23
+
+- fix int32Access.Equals to accept int32 too
+- add NewColumns()
+
 ## [v1.8.0] - 2025-01-22
 
 - add access to CommandTag in iterator to get RowsAffected value
