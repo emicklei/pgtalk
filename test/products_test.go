@@ -179,7 +179,12 @@ func TestUpdateProductRowsAffected(t *testing.T) {
 		t.Skip("no connection")
 	}
 	createProduct(t, 123456, 1)
-	m := products.Update(products.Code.Set(convert.StringToText("G1"))).Where(products.ID.Equals(123456))
+
+	// this is an example of collecting columns before calling products.Update
+	cols := pgtalk.NewColumns()
+	cols.Add(products.Code.Set(convert.StringToText("G1")))
+
+	m := products.Update(cols...).Where(products.ID.Equals(123456))
 	it := m.Exec(context.Background(), testConnect)
 	if it.Err() != nil {
 		t.Fatal(it.Err())
