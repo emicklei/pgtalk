@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.8.2] - 2025-02-10
+
+- allow NewColumns with initial list
+
 ## [v1.8.1] - 2025-01-23
 
 - fix int32Access.Equals to accept int32 too
