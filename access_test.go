@@ -50,3 +50,14 @@ func TestUUID_IN_SQL(t *testing.T) {
 	sql := SQL(ex)
 	t.Log(sql)
 }
+
+func TestNewColumnsAdd(t *testing.T) {
+	cols := NewColumns(polyColumns...)
+	if len(cols) != 2 {
+		t.Error("expected 2 columns")
+	}
+	cols.Add(polyColumns[0])
+	if len(cols) != 3 {
+		t.Error("expected 3 columns")
+	}
+}

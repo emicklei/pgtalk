@@ -18,9 +18,9 @@ var EmptyColumnAccessor = []ColumnAccessor{}
 // ColumnAccessorSlice is a slice of ColumnAccessor
 type ColumnAccessorSlice []ColumnAccessor
 
-// Returns a ColumnAccessorSlice which is an empty list of ColumnAccessor.
-// This can be used to build a list of columns e.g when updating.
-func NewColumns() (list ColumnAccessorSlice) { return }
+// Returns a ColumnAccessorSlice which can be initialized with a list of ColumnAccessor.
+// This can be used to conditionally build a list of columns e.g when updating.
+func NewColumns(cas ...ColumnAccessor) (list ColumnAccessorSlice) { return cas }
 
 // Add appends a non-nil column accessor to the list
 func (s *ColumnAccessorSlice) Add(c ColumnAccessor) {
