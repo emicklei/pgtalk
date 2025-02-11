@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.8.3] - 2025-02-11
+
+- fix return types of boolean operators (SQLExpression)
+
 ## [v1.8.2] - 2025-02-10
 
 - allow NewColumns with initial list

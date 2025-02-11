@@ -51,7 +51,7 @@ func (a int32Access) In(values ...int32) SQLExpression {
 	return makeBinaryOperator(a, "IN", valuesPrinter{vs: vs})
 }
 
-func (a int32Access) Equals(intLike any) binaryExpression {
+func (a int32Access) Equals(intLike any) SQLExpression {
 	if i, ok := intLike.(int); ok {
 		return makeBinaryOperator(a, "=", valuePrinter{v: i})
 	}

@@ -2,17 +2,14 @@ package pgtalk
 
 import (
 	"strings"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 // float64Access can Read a column value (float) and Write a column value and Set a struct field (float64).
 type float64Access struct {
 	unimplementedBooleanExpression
 	ColumnInfo
-	fieldWriter         fieldAccessFunc
-	nullableFieldWriter func(dest any, f pgtype.Float8)
-	valueToInsert       float64
+	fieldWriter   fieldAccessFunc
+	valueToInsert float64
 }
 
 func NewFloat64Access(info ColumnInfo, writer fieldAccessFunc) float64Access {
@@ -30,11 +27,11 @@ func (a float64Access) Set(v float64) float64Access {
 
 func (a float64Access) Column() ColumnInfo { return a.ColumnInfo }
 
-func (a float64Access) Equals(isFloatLike any) binaryExpression {
+func (a float64Access) Equals(isFloatLike any) SQLExpression {
 	return a.Compare("=", isFloatLike)
 }
 
-func (a float64Access) Compare(op string, isFloatLike any) binaryExpression {
+func (a float64Access) Compare(op string, isFloatLike any) SQLExpression {
 	if !strings.Contains(validComparisonOperators, op) {
 		panic("invalid comparison operator:" + op)
 	}

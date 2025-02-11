@@ -26,11 +26,11 @@ func (a textAccess) ValueToInsert() any {
 	return a.valueToInsert
 }
 
-func (a textAccess) Equals(textLike any) binaryExpression {
+func (a textAccess) Equals(textLike any) SQLExpression {
 	return a.Compare("=", textLike)
 }
 
-func (a textAccess) Compare(op string, stringOrTextAccess any) binaryExpression {
+func (a textAccess) Compare(op string, stringOrTextAccess any) SQLExpression {
 	if !strings.Contains(validComparisonOperators, op) {
 		panic("invalid comparison operator:" + op)
 	}
@@ -50,12 +50,12 @@ func (a textAccess) FieldValueToScan(entity any) any {
 	return a.valueFieldWriter(entity)
 }
 
-func (a textAccess) Like(pattern string) binaryExpression {
+func (a textAccess) Like(pattern string) SQLExpression {
 	return makeBinaryOperator(a, "LIKE", newLiteralString(pattern))
 }
 
 // ILIKE can be used instead of LIKE to make the match case-insensitive according to the active locale.
-func (a textAccess) ILike(pattern string) binaryExpression {
+func (a textAccess) ILike(pattern string) SQLExpression {
 	return makeBinaryOperator(a, "ILIKE", newLiteralString(pattern))
 }
 

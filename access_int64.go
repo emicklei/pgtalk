@@ -37,7 +37,7 @@ func (a int64Access) Set(v int64) int64Access {
 	return a
 }
 
-func (a int64Access) Equals(intLike any) binaryExpression {
+func (a int64Access) Equals(intLike any) SQLExpression {
 	if i, ok := intLike.(int); ok {
 		return makeBinaryOperator(a, "=", valuePrinter{v: i})
 	}
@@ -50,7 +50,7 @@ func (a int64Access) Equals(intLike any) binaryExpression {
 	panic("int or Int64Access or *QueryParameter expected")
 }
 
-func (a int64Access) Compare(op string, i int) binaryExpression {
+func (a int64Access) Compare(op string, i int) SQLExpression {
 	if !strings.Contains(validComparisonOperators, op) {
 		panic("invalid comparison operator:" + op)
 	}
