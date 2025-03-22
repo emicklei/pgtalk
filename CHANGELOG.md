@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.9.0] - 2025-03-22
+
+- add other join types for multiJoin
+- add naming a multiJoin
+
 ## [v1.8.3] - 2025-02-11
 
 - fix return types of boolean operators (SQLExpression)

@@ -21,8 +21,6 @@ type join struct {
 	preparedName string
 	leftSet      querySet
 	rightSet     querySet
-	onLeft       ColumnAccessor
-	onRight      ColumnAccessor
 	condition    SQLExpression
 	joinType     joinType
 	limit        int
@@ -186,6 +184,29 @@ func (m multiJoin) LeftOuterJoin(q querySet) multiJoin {
 	return m
 }
 
+func (m multiJoin) Join(q querySet) multiJoin {
+	m.sets = append(m.sets, q)
+	m.joinTypes = append(m.joinTypes, innerJoinType)
+	return m
+}
+
+func (m multiJoin) RightOuterJoin(q querySet) multiJoin {
+	m.sets = append(m.sets, q)
+	m.joinTypes = append(m.joinTypes, rightOuterJoinType)
+	return m
+}
+
+func (m multiJoin) FullOuterJoin(q querySet) multiJoin {
+	m.sets = append(m.sets, q)
+	m.joinTypes = append(m.joinTypes, fullOuterJoinType)
+	return m
+}
+
+func (m multiJoin) Named(preparedName string) multiJoin {
+	m.preparedName = preparedName
+	return m
+}
+
 func (m multiJoin) Exec(ctx context.Context, conn querier) (*multiJoinResultIterator, error) {
 	sql := SQL(m)
 	if m.preparedName != "" {
@@ -198,11 +219,6 @@ func (m multiJoin) Exec(ctx context.Context, conn querier) (*multiJoinResultIter
 	}
 	rows, err := conn.Query(ctx, sql)
 	return &multiJoinResultIterator{queryError: err, querySets: m.sets, rows: rows}, nil
-}
-
-type tableWhere struct {
-	expression SQLExpression
-	tableInfo  TableInfo
 }
 
 func (m multiJoin) SQLOn(w WriteContext) {
