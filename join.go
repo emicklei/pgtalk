@@ -102,9 +102,30 @@ func (i join) Offset(offset int) join {
 	return i
 }
 
+func (i join) Join(q querySet) (m multiJoin) {
+	m.sets = append(m.sets, i.leftSet, i.rightSet, q)
+	m.joinTypes = append(m.joinTypes, i.joinType, innerJoinType)
+	m.conditions = append(m.conditions, i.condition)
+	return
+}
+
+func (i join) RightJoin(q querySet) (m multiJoin) {
+	m.sets = append(m.sets, i.leftSet, i.rightSet, q)
+	m.joinTypes = append(m.joinTypes, i.joinType, rightOuterJoinType)
+	m.conditions = append(m.conditions, i.condition)
+	return
+}
+
 func (i join) LeftOuterJoin(q querySet) (m multiJoin) {
 	m.sets = append(m.sets, i.leftSet, i.rightSet, q)
 	m.joinTypes = append(m.joinTypes, i.joinType, leftOuterJoinType)
+	m.conditions = append(m.conditions, i.condition)
+	return
+}
+
+func (i join) FullOuterJoin(q querySet) (m multiJoin) {
+	m.sets = append(m.sets, i.leftSet, i.rightSet, q)
+	m.joinTypes = append(m.joinTypes, i.joinType, fullOuterJoinType)
 	m.conditions = append(m.conditions, i.condition)
 	return
 }
