@@ -175,16 +175,47 @@ func (i *joinResultIterator) Next(left any, right any) error {
 	if i.queryError != nil {
 		return i.queryError
 	}
-	sw := []any{}
-	// left
-	for _, each := range i.leftSet.selectAccessors() {
-		sw = append(sw, each.FieldValueToScan(left))
+	querySets := []querySet{i.leftSet, i.rightSet}
+	models := []any{left, right}
+
+	// TODO remove duplicate code
+
+	// we cannot scan with all fields for all models because
+	// in a JOIN values for fields per model may all be NULL
+	// so we collect all raw values and inspect them before
+	// scanning them into the fields per model
+	raw := i.rows.RawValues()
+	// where in the raw values are we taking values per model
+	offset := 0
+	// complete type map
+	typeMap := i.rows.Conn().TypeMap()
+	// all fields descriptions
+	fieldDefs := i.rows.FieldDescriptions()
+	for m, eachSet := range querySets {
+		// each set has its own set of accessors
+		modelAccessors := eachSet.selectAccessors()
+		// take a slice of values and fields
+		subvalues := raw[offset : offset+len(modelAccessors)]
+		subFields := fieldDefs[offset : offset+len(modelAccessors)]
+		offset += len(modelAccessors)
+		// check if there is data to scan
+		if hasNullsOnly(subvalues) {
+			continue
+		}
+		// at least one non-zero value is available
+		dest := []any{}
+		// collect the destinations
+		for _, each := range modelAccessors {
+			dest = append(dest, each.FieldValueToScan(models[m]))
+		}
+		// scan the subvalues into all destinations.
+		err := pgx.ScanRow(typeMap, subFields, subvalues, dest...)
+		if err != nil {
+			// abort on the first error
+			return err
+		}
 	}
-	// right
-	for _, each := range i.rightSet.selectAccessors() {
-		sw = append(sw, each.FieldValueToScan(right))
-	}
-	return i.rows.Scan(sw...)
+	return nil
 }
 
 type multiJoin struct {
@@ -321,13 +352,48 @@ func (i *multiJoinResultIterator) Next(models ...any) error {
 	if mc, qc := len(models), countNonEmpty; mc != qc {
 		return fmt.Errorf("number of models [%d] does not match select count [%d]", mc, qc)
 	}
-	// TODO how to check model types?
-	sw := []any{}
-	// all sets
+	// we cannot scan with all fields for all models because
+	// in a JOIN values for fields per model may all be NULL
+	// so we collect all raw values and inspect them before
+	// scanning them into the fields per model
+	raw := i.rows.RawValues()
+	// where in the raw values are we taking values per model
+	offset := 0
+	// complete type map
+	typeMap := i.rows.Conn().TypeMap()
+	// all fields descriptions
+	fieldDefs := i.rows.FieldDescriptions()
 	for m, eachSet := range i.querySets {
-		for _, each := range eachSet.selectAccessors() {
-			sw = append(sw, each.FieldValueToScan(models[m]))
+		// each set has its own set of accessors
+		subAccessors := eachSet.selectAccessors()
+		// take a slice of values and fields
+		subvalues := raw[offset : offset+len(subAccessors)]
+		subFields := fieldDefs[offset : offset+len(subAccessors)]
+		offset += len(subAccessors)
+		// check if there is data to scan
+		if hasNullsOnly(subvalues) {
+			continue
+		}
+		// at least one non-zero value is available
+		dest := []any{}
+		// collect the destinations
+		for _, each := range subAccessors {
+			dest = append(dest, each.FieldValueToScan(models[m]))
+		}
+		// scan the subvalues into all destinations.
+		if err := pgx.ScanRow(typeMap, subFields, subvalues, dest...); err != nil {
+			// abort on the first error
+			return err
 		}
 	}
-	return i.rows.Scan(sw...)
+	return nil
+}
+
+func hasNullsOnly(sub [][]byte) bool {
+	for _, each := range sub {
+		if len(each) != 0 {
+			return false
+		}
+	}
+	return true
 }
