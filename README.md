@@ -131,33 +131,23 @@ or by collecting columns first
 
 ### Multi Join
 
-	q := offer.Select(offer.Columns()...).
-		Where(offer.ID.In("01F674G8MDRAPBWA6SB1HWE2VC").And(offer.IsActive.Equals(true))).
-		LeftOuterJoin(offer_buyer_permission_rel.Select(offer_buyer_permission_rel.BuyerPermission)).
-		On(offer_buyer_permission_rel.OfferId.Equals(offer.ID)).
-		LeftOuterJoin(offer_market_rel.Select(offer_market_rel.MarketId)).
-		On(offer_market_rel.OfferId.Equals(offer.ID)).
-		LeftOuterJoin(buyer_market_rel.Select().Where(buyer_market_rel.BuyerId.Equals("X1010_0100002"))).
-		On(offer_market_rel.MarketId.Equals(offer_market_rel.MarketId))
+	pSet := products.Select(products.ID, products.Code, products.Title)
+	fSet := features.Select(features.ID, features.Code, features.Title)
+	rSet := product_feature.Select(product_feature.ProductId, product_feature.FeatureId)
 
-	t.Log(pgtalk.PrettySQL(q))
+	query := pSet.LeftOuterJoin(rSet).On(product_feature.ProductId.Equals(products.ID)).
+		LeftOuterJoin(fSet).On(product_feature.FeatureId.Equals(features.ID)).
+		Named("products-and-features")
 
-	it, err := q.Exec(context.Background(), testConnect)
-	if err != nil {
-		t.Fatal(err)
-	}
+	it, err := query.Exec(ctx, conn)
+	...
+	
 	for it.HasNext() {
-		offer := new(offer.Offer)
-		permission := new(offer_buyer_permission_rel.OfferBuyerPermissionRel)
-		market := new(offer_market_rel.OfferMarketRel)
-		// The order and types of the entities must match the order of the non-empty Select functions used in the query
-		err := it.Next(offer, permission, market)
-		if err != nil {
-			t.Fatal(err)
-		}
-		t.Log(offer)
-		t.Log(permission)
-		t.Log(market)
+		var product products.Product
+		var feature features.Feature
+		var relation product_feature.ProductFeature
+		err := it.Next(&product, &relation, &feature)
+		...
 	}
 
 ## supported Column Types
@@ -226,4 +216,4 @@ or views
 
 	pgtalk-gen -views -o yourpackage -include "skills.*"
 
-(c) 2023, https://ernestmicklei.com. MIT License.
+(c) 2025, https://ernestmicklei.com. MIT License.
