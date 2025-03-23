@@ -175,47 +175,7 @@ func (i *joinResultIterator) Next(left any, right any) error {
 	if i.queryError != nil {
 		return i.queryError
 	}
-	querySets := []querySet{i.leftSet, i.rightSet}
-	models := []any{left, right}
-
-	// TODO remove duplicate code
-
-	// we cannot scan with all fields for all models because
-	// in a JOIN values for fields per model may all be NULL
-	// so we collect all raw values and inspect them before
-	// scanning them into the fields per model
-	raw := i.rows.RawValues()
-	// where in the raw values are we taking values per model
-	offset := 0
-	// complete type map
-	typeMap := i.rows.Conn().TypeMap()
-	// all fields descriptions
-	fieldDefs := i.rows.FieldDescriptions()
-	for m, eachSet := range querySets {
-		// each set has its own set of accessors
-		modelAccessors := eachSet.selectAccessors()
-		// take a slice of values and fields
-		subvalues := raw[offset : offset+len(modelAccessors)]
-		subFields := fieldDefs[offset : offset+len(modelAccessors)]
-		offset += len(modelAccessors)
-		// check if there is data to scan
-		if hasNullsOnly(subvalues) {
-			continue
-		}
-		// at least one non-zero value is available
-		dest := []any{}
-		// collect the destinations
-		for _, each := range modelAccessors {
-			dest = append(dest, each.FieldValueToScan(models[m]))
-		}
-		// scan the subvalues into all destinations.
-		err := pgx.ScanRow(typeMap, subFields, subvalues, dest...)
-		if err != nil {
-			// abort on the first error
-			return err
-		}
-	}
-	return nil
+	return scanRows(i.rows, []querySet{i.leftSet, i.rightSet}, []any{left, right})
 }
 
 type multiJoin struct {
@@ -352,18 +312,22 @@ func (i *multiJoinResultIterator) Next(models ...any) error {
 	if mc, qc := len(models), countNonEmpty; mc != qc {
 		return fmt.Errorf("number of models [%d] does not match select count [%d]", mc, qc)
 	}
+	return scanRows(i.rows, i.querySets, models)
+}
+
+func scanRows(rows pgx.Rows, querySets []querySet, models []any) error {
 	// we cannot scan with all fields for all models because
 	// in a JOIN values for fields per model may all be NULL
 	// so we collect all raw values and inspect them before
 	// scanning them into the fields per model
-	raw := i.rows.RawValues()
+	raw := rows.RawValues()
 	// where in the raw values are we taking values per model
 	offset := 0
 	// complete type map
-	typeMap := i.rows.Conn().TypeMap()
+	typeMap := rows.Conn().TypeMap()
 	// all fields descriptions
-	fieldDefs := i.rows.FieldDescriptions()
-	for m, eachSet := range i.querySets {
+	fieldDefs := rows.FieldDescriptions()
+	for m, eachSet := range querySets {
 		// each set has its own set of accessors
 		subAccessors := eachSet.selectAccessors()
 		// take a slice of values and fields
