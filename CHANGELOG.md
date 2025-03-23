@@ -2,9 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## [v1.9.1] - 2025-03-23
+## [v1.9.2] - 2025-03-23
 
 - fix handling join results with null result entities
+- joins on join too
 
 ## [v1.9.0] - 2025-03-22
 
