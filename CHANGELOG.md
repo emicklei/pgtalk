@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.9.3] - 2025-03-26
+
+- all nil values in iterator.Next to skip a scan
+- add LIMIT and OFFSET to multijoin
+
 ## [v1.9.2] - 2025-03-23
 
 - fix handling join results with null result entities

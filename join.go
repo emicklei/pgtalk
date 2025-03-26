@@ -171,6 +171,8 @@ func (i *joinResultIterator) Err() error {
 	return i.rows.Err()
 }
 
+// Next scans the row values into structs (models)
+// models can have a nil element which means skip scanning values into that model.
 func (i *joinResultIterator) Next(left any, right any) error {
 	if i.queryError != nil {
 		return i.queryError
@@ -183,6 +185,16 @@ type multiJoin struct {
 	sets         []querySet
 	joinTypes    []joinType
 	conditions   []SQLExpression
+	limit        int
+	offset       int
+}
+
+// Limit is a SQL instruction
+func (m multiJoin) Limit(limit int) multiJoin { m.limit = limit; return m }
+
+func (m multiJoin) Offset(offset int) multiJoin {
+	m.offset = offset
+	return m
 }
 
 func (m multiJoin) On(condition SQLExpression) multiJoin {
@@ -251,7 +263,7 @@ func (m multiJoin) SQLOn(w WriteContext) {
 			wheres = append(wheres, each.whereCondition())
 		}
 	}
-	for j := 0; j < len(m.joinTypes); j++ {
+	for j := range m.joinTypes {
 		jt := m.joinTypes[j]
 		writeJoinType(jt, w)
 		set := m.sets[j+1]
@@ -269,6 +281,12 @@ func (m multiJoin) SQLOn(w WriteContext) {
 			}
 			each.SQLOn(w)
 		}
+	}
+	if m.limit > 0 {
+		fmt.Fprintf(w, " LIMIT %d", m.limit)
+	}
+	if m.offset > 0 {
+		fmt.Fprintf(w, "\nOFFSET %d", m.offset)
 	}
 }
 
@@ -297,6 +315,8 @@ func (i *multiJoinResultIterator) HasNext() bool {
 	return false
 }
 
+// Next scans the row values into structs (models)
+// models can have a nil element which means skip scanning values into that model.
 func (i *multiJoinResultIterator) Next(models ...any) error {
 	if i.queryError != nil {
 		return i.queryError
@@ -315,6 +335,7 @@ func (i *multiJoinResultIterator) Next(models ...any) error {
 	return scanRows(i.rows, i.querySets, models)
 }
 
+// models can have a nil element which means skip scanning values into that model.
 func scanRows(rows pgx.Rows, querySets []querySet, models []any) error {
 	// we cannot scan with all fields for all models because
 	// in a JOIN values for fields per model may all be NULL
@@ -334,6 +355,11 @@ func scanRows(rows pgx.Rows, querySets []querySet, models []any) error {
 		subvalues := raw[offset : offset+len(subAccessors)]
 		subFields := fieldDefs[offset : offset+len(subAccessors)]
 		offset += len(subAccessors)
+		// check for nil model
+		subModel := models[m]
+		if subModel == nil {
+			continue
+		}
 		// check if there is data to scan
 		if hasNullsOnly(subvalues) {
 			continue
@@ -342,7 +368,7 @@ func scanRows(rows pgx.Rows, querySets []querySet, models []any) error {
 		dest := []any{}
 		// collect the destinations
 		for _, each := range subAccessors {
-			dest = append(dest, each.FieldValueToScan(models[m]))
+			dest = append(dest, each.FieldValueToScan(subModel))
 		}
 		// scan the subvalues into all destinations.
 		if err := pgx.ScanRow(typeMap, subFields, subvalues, dest...); err != nil {
