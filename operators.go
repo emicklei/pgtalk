@@ -142,3 +142,20 @@ func (c constantExpression) Or(right SQLExpression) SQLExpression {
 func (c constantExpression) And(right SQLExpression) SQLExpression {
 	return makeBinaryOperator(c, "AND", right)
 }
+
+type sqlExpression struct {
+	sql string
+}
+
+func NewSQLSource(sql string) SQLExpression {
+	return sqlExpression{sql: sql}
+}
+func (s sqlExpression) SQLOn(w WriteContext) {
+	fmt.Fprint(w, s.sql)
+}
+func (s sqlExpression) Or(right SQLExpression) SQLExpression {
+	return makeBinaryOperator(s, "OR", right)
+}
+func (s sqlExpression) And(right SQLExpression) SQLExpression {
+	return makeBinaryOperator(s, "AND", right)
+}

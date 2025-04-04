@@ -152,6 +152,6 @@ func (m MutationSet[T]) setSectionOn(w io.Writer) {
 		if i > 0 {
 			io.WriteString(w, ",")
 		}
-		fmt.Fprintf(w, "%s = $%d", each.Name(), i+1)
+		fmt.Fprintf(w, "%s = %s", each.Name(), each.SetSource(i+1))
 	}
 }
