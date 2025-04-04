@@ -50,3 +50,12 @@ func TestInsertWithQueryArgument(t *testing.T) {
 		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
 	}
 }
+
+func TestInsertTSVector(t *testing.T) {
+	toUpdate := []ColumnAccessor{}
+	toUpdate = append(toUpdate, polyTSVector.Set("help me"))
+	m := MakeMutationSet[poly](polyTable, toUpdate, MutationUpdate)
+	if got, want := oneliner(SQL(m)), "UPDATE public.polies p1 SET fts = to_tsvector($1)"; got != want {
+		t.Errorf("got [%v:%T] want [%v:%T]", got, got, want, want)
+	}
+}

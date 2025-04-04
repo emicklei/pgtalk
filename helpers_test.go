@@ -23,7 +23,8 @@ var (
 		func(dest any) any { return &dest.(*poly).FUUID })
 	polyFString = NewTextAccess(MakeColumnInfo(polyTable, "fstring", NotPrimary, Nullable, 1),
 		func(dest any) any { return &dest.(*poly).FString })
-	polyColumns = append([]ColumnAccessor{}, polyFTime, polyFFloat)
+	polyColumns  = append([]ColumnAccessor{}, polyFTime, polyFFloat)
+	polyTSVector = NewTSVectorWriter(MakeColumnInfo(polyTable, "ftsvector", NotPrimary, true, 1), nil)
 )
 
 type poly struct {

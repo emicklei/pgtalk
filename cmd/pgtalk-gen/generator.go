@@ -3,13 +3,13 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime/debug"
 	"slices"
 	"strings"
+	"text/template"
 
 	"github.com/iancoleman/strcase"
 )

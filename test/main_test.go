@@ -74,7 +74,8 @@ func ensureTables(conn *pgx.Conn) error {
 	drop table IF EXISTS categories;
 	create table categories(
 		id serial primary key,
-		title text
+		title text,
+		title_tokens tsvector
 	);`)
 	if err != nil {
 		tx.Rollback(ctx)

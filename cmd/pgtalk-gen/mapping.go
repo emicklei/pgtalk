@@ -229,4 +229,9 @@ var pgMappings = map[string]mapping{
 		nullableGoFieldType: "pgtype.Interval",
 		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Interval]",
 	},
+	"tsvector": {
+		goFieldType:         "string",
+		nullableGoFieldType: "string",
+		newAccessFuncCall:   "p.NewTSVectorWriter",
+	},
 }

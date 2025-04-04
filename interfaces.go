@@ -9,7 +9,7 @@ import (
 
 type ColumnAccessor interface {
 	SQLWriter
-	Name() string
+	Name() string // TODO can be removed
 	ValueToInsert() any
 	Column() ColumnInfo
 	// FieldValueToScan returns the address of the value of the field in the entity
