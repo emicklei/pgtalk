@@ -217,6 +217,7 @@ func createCategory(t *testing.T, id int32) {
 	q := categories.Insert(
 		categories.ID.Set(id),
 		categories.Title.Set(convert.StringToText("awesome and color full products")),
+		categories.TitleTokens.ToTSVector("awesome and color full products"),
 	)
 	ctx := context.Background()
 	tx, err := testConnect.Begin(ctx)
