@@ -1,6 +1,9 @@
 package pgtalk
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type tsvectorWriteOnly struct {
 	ColumnInfo
@@ -15,13 +18,18 @@ func (a tsvectorWriteOnly) ValueToInsert() any {
 	return a.valueToInsert
 }
 
-func (a tsvectorWriteOnly) Set(v string) tsvectorWriteOnly {
+func (a tsvectorWriteOnly) ToTSVector(v string) tsvectorWriteOnly {
 	a.valueToInsert = v
 	return a
 }
 
+func (a tsvectorWriteOnly) SetSource(parameterIndex int) string {
+	return fmt.Sprintf("to_tsvector($%d)", parameterIndex)
+}
+
 func (a tsvectorWriteOnly) FieldValueToScan(entity any) any {
-	return nil
+	var ignore any
+	return &ignore
 }
 
 func (a tsvectorWriteOnly) Column() ColumnInfo { return a.ColumnInfo }
