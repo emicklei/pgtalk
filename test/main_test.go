@@ -16,10 +16,10 @@ import (
 var testConnect *pgx.Conn
 
 func TestMain(m *testing.M) {
-	connectionString := os.Getenv("PGTALK_CONN") // "postgres://postgres:pgtalk@localhost:7432/postgres"
+	connectionString := "postgres://postgres:pgtalk@localhost:7432/postgres"
 	if len(connectionString) == 0 {
 		println("no database env set")
-		os.Exit(m.Run())
+		os.Exit(1)
 		return
 	}
 	fmt.Println("db open ...", connectionString)
@@ -74,7 +74,8 @@ func ensureTables(conn *pgx.Conn) error {
 	drop table IF EXISTS categories;
 	create table categories(
 		id serial primary key,
-		title text
+		title text,
+		title_tokens tsvector
 	);`)
 	if err != nil {
 		tx.Rollback(ctx)

@@ -21,6 +21,8 @@ type ColumnAccessor interface {
 	// (unfortunately, Go methods cannot have additional type parameters:
 	// Get[V](values map[string]any) V )
 	Get(values map[string]any) any
+	// Returns the SQL expression to set the value in a mutation, defaults to $1 format
+	SetSource(parameterIndex int) string
 }
 
 type SQLWriter interface {

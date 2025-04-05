@@ -34,6 +34,9 @@ func (c *computedField) SQLOn(w WriteContext) {
 	c.Expression.SQLOn(w)
 	fmt.Fprintf(w, " AS %s", c.ResultName)
 }
+func (c *computedField) SetSource(parameterIndex int) string {
+	return fmt.Sprintf("$%d", parameterIndex)
+}
 func (c *computedField) Name() string       { return c.ResultName }
 func (c *computedField) ValueToInsert() any { return nil }
 func (c *computedField) Column() ColumnInfo { return ColumnInfo{columnName: c.ResultName} }

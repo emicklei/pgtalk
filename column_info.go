@@ -26,6 +26,10 @@ func MakeColumnInfo(tableInfo TableInfo, columnName string, isPrimary bool, isNo
 	}
 }
 
+func (c ColumnInfo) SetSource(parameterIndex int) string {
+	return fmt.Sprintf("$%d", parameterIndex)
+}
+
 func (c ColumnInfo) Name() string {
 	if c.isMixedCase {
 		return strconv.Quote(c.columnName)

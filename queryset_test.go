@@ -46,3 +46,14 @@ func TestSelectForSkipLocked(t *testing.T) {
 		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
 	}
 }
+
+func TestSelectTSQuery(t *testing.T) {
+	q := MakeQuerySet[poly](polyTable, polyTable.Columns)
+	q.selectors = []ColumnAccessor{polyFUUID}
+
+	q = q.Where(NewTSQuery(polyTable, "ftsvector", "confidence"))
+
+	if got, want := oneliner(SQL(q)), "SELECT p1.fuuid FROM public.polies p1 WHERE (p1.ftsvector @@ to_tsquery('confidence'))"; got != want {
+		t.Errorf("got [%v]:%T want [%v]:%T", got, got, want, want)
+	}
+}
