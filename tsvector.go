@@ -30,8 +30,6 @@ func (a tsqueryReader) Or(expr SQLExpression) SQLExpression {
 	return makeBinaryOperator(a, "OR", expr)
 }
 
-// NewTSQuery returns a ColumnAccessor for reading the value of tsquery typed column.
-
 type tsvectorWriter struct {
 	ColumnInfo
 	value string

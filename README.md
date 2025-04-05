@@ -150,6 +150,22 @@ or by collecting columns first
 		...
 	}
 
+### Text Search
+
+Setting a string value for a `tsvector` typed column called "title_tokens".
+
+	mut := categories.Insert(
+		categories.ID.Set(1234),
+		categories.Title.Set(convert.StringToText(txt)),
+		pgtalk.NewTSVector("title_tokens", txt),
+	)
+
+Using `tsquery` in a search condition
+
+	q := categories.
+		Select(categories.Columns()...).
+		Where(pgtalk.NewTSQuery(categories.TableInfo(), "title_tokens", "quick"))
+
 ## supported Column Types
 
 - bigint
