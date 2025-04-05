@@ -248,3 +248,46 @@ func (d QuerySet[T]) SkipLocked() QuerySet[T] {
 	d.skipLocked = true
 	return d
 }
+
+func (d QuerySet[T]) Union(o querySet) queryCombination {
+	return queryCombination{
+		leftSet:  d,
+		operator: "UNION",
+		rightSet: o,
+	}
+}
+func (d QuerySet[T]) UnionAll(o querySet) queryCombination {
+	return queryCombination{
+		leftSet:  d,
+		operator: "UNION ALL",
+		rightSet: o,
+	}
+}
+func (d QuerySet[T]) Except(o querySet) queryCombination {
+	return queryCombination{
+		leftSet:  d,
+		operator: "EXCEPT",
+		rightSet: o,
+	}
+}
+func (d QuerySet[T]) ExceptAll(o querySet) queryCombination {
+	return queryCombination{
+		leftSet:  d,
+		operator: "EXCEPT ALL",
+		rightSet: o,
+	}
+}
+func (d QuerySet[T]) Intersect(o querySet) queryCombination {
+	return queryCombination{
+		leftSet:  d,
+		operator: "INTERSECT",
+		rightSet: o,
+	}
+}
+func (d QuerySet[T]) IntersectAll(o querySet) queryCombination {
+	return queryCombination{
+		leftSet:  d,
+		operator: "INTERSECT ALL",
+		rightSet: o,
+	}
+}
