@@ -228,3 +228,36 @@ func createCategory(t *testing.T, id int32) {
 		t.Fatal(err)
 	}
 }
+
+func TestSearchCategoryTitle(t *testing.T) {
+	if testConnect == nil {
+		t.Skip()
+	}
+	txt := "The lazy quick brown fox jumps over the quick lazy jumping dog"
+	mut := categories.Insert(
+		categories.ID.Set(1234),
+		categories.Title.Set(convert.StringToText(txt)),
+		pgtalk.NewTSVector("title_tokens", txt),
+	)
+	t.Log(pgtalk.SQL(mut))
+	ctx := context.Background()
+	tx, err := testConnect.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	it := mut.Exec(context.Background(), testConnect)
+	if it.Err() != nil {
+		t.Fatal(it.Err())
+	}
+	if err := tx.Commit(ctx); err != nil {
+		t.Fatal(err)
+	}
+	// query
+	q := categories.Select(categories.Columns()...).Where(pgtalk.NewTSQuery(categories.TableInfo(), "title_tokens", "quick"))
+	t.Log(pgtalk.SQL(q))
+	list, err := q.Exec(context.Background(), testConnect)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(list)
+}
