@@ -2,13 +2,35 @@ package pgtalk
 
 import "fmt"
 
+// NewTSQuery returns a condition SQL Expression to match @@ a search query with a search vector (column).
 func NewTSQuery(info TableInfo, columnName, query string) SQLExpression {
-	return binaryExpression{
-		Left:     NewSQLSource(fmt.Sprintf("%s.%s", info.Alias, columnName)),
-		Operator: "@@",
-		Right:    NewSQLSource(fmt.Sprintf("to_tsquery('%s')", query)),
-	}
+	return tsqueryReader{tableInfo: info, columnName: columnName, query: query}
 }
+
+type tsqueryReader struct {
+	tableInfo  TableInfo
+	columnName string
+	query      string
+}
+
+func (a tsqueryReader) SQLOn(w WriteContext) {
+	fmt.Fprint(w, "(")
+	fmt.Fprint(w, w.TableAlias(a.tableInfo.Name, a.tableInfo.Alias))
+	fmt.Fprint(w, ".")
+	fmt.Fprint(w, a.columnName)
+	fmt.Fprint(w, " @@ ")
+	fmt.Fprint(w, "to_tsquery('")
+	fmt.Fprint(w, a.query)
+	fmt.Fprint(w, "'))")
+}
+func (a tsqueryReader) And(expr SQLExpression) SQLExpression {
+	return makeBinaryOperator(a, "AND", expr)
+}
+func (a tsqueryReader) Or(expr SQLExpression) SQLExpression {
+	return makeBinaryOperator(a, "OR", expr)
+}
+
+// NewTSQuery returns a ColumnAccessor for reading the value of tsquery typed column.
 
 type tsvectorWriter struct {
 	ColumnInfo
