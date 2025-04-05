@@ -32,13 +32,20 @@ func (a tsqueryReader) Or(expr SQLExpression) SQLExpression {
 
 type tsvectorWriter struct {
 	ColumnInfo
-	value string
+	regconfig string
+	value     string
 }
 
 // NewTSVector returns a ColumnAccessor for writing the value of tsvector typed column.
 // Cannot be used for reading the value of such a column.
 func NewTSVector(columnName string, value string) ColumnAccessor {
 	return tsvectorWriter{ColumnInfo: ColumnInfo{columnName: columnName}, value: value}
+}
+
+// NewTSVectorWithConfig returns a ColumnAccessor for writing the value of tsvector typed column.
+// Cannot be used for reading the value of such a column.
+func NewTSVectorWithConfig(columnName, regconfig, value string) ColumnAccessor {
+	return tsvectorWriter{ColumnInfo: ColumnInfo{columnName: columnName}, regconfig: regconfig, value: value}
 }
 
 // AppendScannable is part of ColumnAccessor
@@ -64,5 +71,8 @@ func (a tsvectorWriter) Get(values map[string]any) any {
 }
 
 func (a tsvectorWriter) SetSource(parameterIndex int) string {
+	if a.regconfig != "" {
+		return fmt.Sprintf("to_tsvector('%s', $%d)", a.regconfig, parameterIndex+1)
+	}
 	return fmt.Sprintf("to_tsvector($%d)", parameterIndex)
 }
