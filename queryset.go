@@ -249,45 +249,24 @@ func (d QuerySet[T]) SkipLocked() QuerySet[T] {
 	return d
 }
 
-func (d QuerySet[T]) Union(o querySet) queryCombination {
+func (d QuerySet[T]) Union(o QueryCombineable, all ...bool) QueryCombineable {
 	return queryCombination{
-		leftSet:  d,
-		operator: "UNION",
-		rightSet: o,
+		left:     d,
+		operator: combineOperator("UNION", all...),
+		right:    o,
 	}
 }
-func (d QuerySet[T]) UnionAll(o querySet) queryCombination {
+func (d QuerySet[T]) Except(o QueryCombineable, all ...bool) QueryCombineable {
 	return queryCombination{
-		leftSet:  d,
-		operator: "UNION ALL",
-		rightSet: o,
+		left:     d,
+		operator: combineOperator("EXCEPT", all...),
+		right:    o,
 	}
 }
-func (d QuerySet[T]) Except(o querySet) queryCombination {
+func (d QuerySet[T]) Intersect(o QueryCombineable, all ...bool) QueryCombineable {
 	return queryCombination{
-		leftSet:  d,
-		operator: "EXCEPT",
-		rightSet: o,
-	}
-}
-func (d QuerySet[T]) ExceptAll(o querySet) queryCombination {
-	return queryCombination{
-		leftSet:  d,
-		operator: "EXCEPT ALL",
-		rightSet: o,
-	}
-}
-func (d QuerySet[T]) Intersect(o querySet) queryCombination {
-	return queryCombination{
-		leftSet:  d,
-		operator: "INTERSECT",
-		rightSet: o,
-	}
-}
-func (d QuerySet[T]) IntersectAll(o querySet) queryCombination {
-	return queryCombination{
-		leftSet:  d,
-		operator: "INTERSECT ALL",
-		rightSet: o,
+		left:     d,
+		operator: combineOperator("INTERSECT", all...),
+		right:    o,
 	}
 }

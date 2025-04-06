@@ -2,33 +2,54 @@ package pgtalk
 
 import (
 	"fmt"
-	"io"
 )
 
+type QueryCombineable interface {
+	SQLWriter
+	Union(o QueryCombineable, all ...bool) QueryCombineable
+	Intersect(o QueryCombineable, all ...bool) QueryCombineable
+	Except(o QueryCombineable, all ...bool) QueryCombineable
+}
+
 type queryCombination struct {
-	leftSet  querySet
+	left     QueryCombineable
 	operator string // UNION,INTERSECT,EXCEPT
-	rightSet querySet
+	right    QueryCombineable
 }
 
-func (u queryCombination) SQLOn(w WriteContext) {
-	fmt.Fprint(w, "(")
-	writeQuerySet(w, u.leftSet)
-	fmt.Fprintf(w, " %s ", u.operator)
-	writeQuerySet(w, u.rightSet)
-	fmt.Fprint(w, ")")
-}
-
-func writeQuerySet(w WriteContext, qs querySet) {
-	fmt.Fprint(w, "(SELECT\n")
-	left := qs.selectAccessors()
-	wl := qs.augmentedContext(w)
-	writeAccessOn(left, wl)
-	fmt.Fprint(w, "\nFROM ")
-	qs.fromSectionOn(wl)
-	if _, ok := qs.whereCondition().(noCondition); !ok {
-		fmt.Fprint(wl, "\nWHERE ")
-		qs.whereCondition().SQLOn(wl)
+func combineOperator(combiner string, all ...bool) string {
+	if len(all) > 0 && all[0] {
+		return combiner + " ALL"
 	}
-	io.WriteString(w, ")")
+	return combiner
+}
+
+func (q queryCombination) SQLOn(w WriteContext) {
+	fmt.Fprint(w, "((")
+	q.left.SQLOn(w)
+	fmt.Fprintf(w, ") %s (", q.operator)
+	q.right.SQLOn(w)
+	fmt.Fprint(w, "))")
+}
+
+func (q queryCombination) Union(o QueryCombineable, all ...bool) QueryCombineable {
+	return queryCombination{
+		left:     q,
+		operator: "UNION",
+		right:    o,
+	}
+}
+func (q queryCombination) Intersect(o QueryCombineable, all ...bool) QueryCombineable {
+	return queryCombination{
+		left:     q,
+		operator: "INTERSECT",
+		right:    o,
+	}
+}
+func (q queryCombination) Except(o QueryCombineable, all ...bool) QueryCombineable {
+	return queryCombination{
+		left:     q,
+		operator: "EXCEPT",
+		right:    o,
+	}
 }
