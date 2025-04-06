@@ -38,8 +38,8 @@ type tsvectorWriter struct {
 
 // NewTSVector returns a ColumnAccessor for writing the value of tsvector typed column.
 // Cannot be used for reading the value of such a column.
-func NewTSVector(columnName string, value string) ColumnAccessor {
-	return tsvectorWriter{ColumnInfo: ColumnInfo{columnName: columnName}, value: value}
+func NewTSVector(columnInfo ColumnInfo, value string) ColumnAccessor {
+	return tsvectorWriter{ColumnInfo: columnInfo, value: value}
 }
 
 // NewTSVectorWithConfig returns a ColumnAccessor for writing the value of tsvector typed column.

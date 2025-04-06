@@ -24,6 +24,9 @@ var (
 	polyFString = NewTextAccess(MakeColumnInfo(polyTable, "fstring", NotPrimary, Nullable, 1),
 		func(dest any) any { return &dest.(*poly).FString })
 	polyColumns = append([]ColumnAccessor{}, polyFTime, polyFFloat)
+
+	//unmapped
+	ftsvector = MakeColumnInfo(polyTable, "ftsvector", NotPrimary, Nullable, 1)
 )
 
 type poly struct {

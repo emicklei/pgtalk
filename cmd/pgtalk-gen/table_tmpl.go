@@ -31,6 +31,15 @@ var (
 	{{.GoName}} = {{.FactoryMethod}}(p.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimarySrc}}, {{.IsNotNullSrc}}, {{.TableAttributeNumber}}),
 		func(dest any) any { return &dest.(*{{$.GoType}}).{{.GoName}} })
 {{- end}}
+{{- if (gt (len .UnmappedFields) 0) }}
+	// unmapped fields
+	//
+{{- range .UnmappedFields}}
+	// {{.GoName}} holds information about the column "{{.Name}}" of with type "{{.DataType}}", nullable:{{not .IsNotNull}}, primary:{{.IsPrimary}}
+	{{.GoName}} = p.MakeColumnInfo(tableInfo, "{{.Name}}", {{.IsPrimarySrc}}, {{.IsNotNullSrc}}, {{.TableAttributeNumber}})
+
+{{- end}}
+{{- end}}
 	// package private
 	_ = c.UUID // for the occasional unused import from convert
 	_ = time.Now 
