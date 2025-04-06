@@ -3,21 +3,20 @@ package pgtalk
 import "fmt"
 
 // NewTSQuery returns a condition SQL Expression to match @@ a search query with a search vector (column).
-func NewTSQuery(info TableInfo, columnName, query string) SQLExpression {
-	return tsqueryReader{tableInfo: info, columnName: columnName, query: query}
+func NewTSQuery(columnInfo ColumnInfo, query string) SQLExpression {
+	return tsqueryReader{columnInfo: columnInfo, query: query}
 }
 
 type tsqueryReader struct {
-	tableInfo  TableInfo
-	columnName string
+	columnInfo ColumnInfo
 	query      string
 }
 
 func (a tsqueryReader) SQLOn(w WriteContext) {
 	fmt.Fprint(w, "(")
-	fmt.Fprint(w, w.TableAlias(a.tableInfo.Name, a.tableInfo.Alias))
+	fmt.Fprint(w, w.TableAlias(a.columnInfo.tableInfo.Name, a.columnInfo.tableInfo.Alias))
 	fmt.Fprint(w, ".")
-	fmt.Fprint(w, a.columnName)
+	fmt.Fprint(w, a.columnInfo.columnName)
 	fmt.Fprint(w, " @@ ")
 	fmt.Fprint(w, "to_tsquery('")
 	fmt.Fprint(w, a.query)
