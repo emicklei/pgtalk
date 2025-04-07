@@ -237,7 +237,7 @@ func TestSearchCategoryTitle(t *testing.T) {
 	mut := categories.Insert(
 		categories.ID.Set(1234),
 		categories.Title.Set(convert.StringToText(txt)),
-		pgtalk.NewTSVector("title_tokens", txt),
+		pgtalk.NewTSVector(categories.TitleTokens, txt),
 	)
 	t.Log(pgtalk.SQL(mut))
 	ctx := context.Background()
