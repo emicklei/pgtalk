@@ -249,6 +249,9 @@ func (d QuerySet[T]) SkipLocked() QuerySet[T] {
 	return d
 }
 
+// There are some mandatory rules for UNION operations such as the
+// number of columns, data types, and other columns must be the same
+// in both UNION statements for the UNION operator to work correctly.
 func (d QuerySet[T]) Union(o QueryCombineable, all ...bool) QueryCombineable {
 	return queryCombination{
 		left:     d,
@@ -256,6 +259,10 @@ func (d QuerySet[T]) Union(o QueryCombineable, all ...bool) QueryCombineable {
 		right:    o,
 	}
 }
+
+// There are some mandatory rules for EXCEPT operations such as the
+// number of columns, data types, and other columns must be the same
+// in both EXCEPT statements for the EXCEPT operator to work correctly.
 func (d QuerySet[T]) Except(o QueryCombineable, all ...bool) QueryCombineable {
 	return queryCombination{
 		left:     d,
@@ -263,6 +270,10 @@ func (d QuerySet[T]) Except(o QueryCombineable, all ...bool) QueryCombineable {
 		right:    o,
 	}
 }
+
+// There are some mandatory rules for INTERSECT operations such as the
+// number of columns, data types, and other columns must be the same
+// in both INTERSECT statements for the INTERSECT operator to work correctly.
 func (d QuerySet[T]) Intersect(o QueryCombineable, all ...bool) QueryCombineable {
 	return queryCombination{
 		left:     d,
