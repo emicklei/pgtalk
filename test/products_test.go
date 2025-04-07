@@ -253,7 +253,7 @@ func TestSearchCategoryTitle(t *testing.T) {
 		t.Fatal(err)
 	}
 	// query
-	q := categories.Select(categories.Columns()...).Where(pgtalk.NewTSQuery(categories.TableInfo(), "title_tokens", "quick"))
+	q := categories.Select(categories.Columns()...).Where(pgtalk.NewTSQuery(categories.TitleTokens, "quick"))
 	t.Log(pgtalk.SQL(q))
 	list, err := q.Exec(context.Background(), testConnect)
 	if err != nil {
