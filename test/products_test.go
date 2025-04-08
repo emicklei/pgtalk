@@ -261,3 +261,18 @@ func TestSearchCategoryTitle(t *testing.T) {
 	}
 	t.Log(list)
 }
+
+func TestUnion(t *testing.T) {
+	createCategory(t, 123)
+	createCategory(t, 456)
+	createProduct(t, 345, 123)
+	createProduct(t, 678, 123)
+	left := categories.Select(categories.ID, pgtalk.SQLAs("'category'", "type"))
+	right := products.Select(products.ID, pgtalk.SQLAs("'product'", "type"))
+	q := left.Union(right)
+	list, err := q.ExecIntoMaps(context.Background(), testConnect)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(list)
+}

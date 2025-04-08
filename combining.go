@@ -1,6 +1,7 @@
 package pgtalk
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -21,6 +22,11 @@ type QueryCombineable interface {
 	// number of columns, data types, and other columns must be the same
 	// in both EXCEPT statements for the EXCEPT operator to work correctly.
 	Except(o QueryCombineable, all ...bool) QueryCombineable
+
+	// ExecIntoMaps executes the query and returns each rows as a map string->any .
+	// To include table information for each, append a custom sqlfunction to each select statement.
+	// For example, adding `pgtalk.SQLAs("'products'", "table")` will add an entry to the map.
+	ExecIntoMaps(ctx context.Context, conn querier, parameters ...*QueryParameter) (list []map[string]any, err error)
 }
 
 type queryCombination struct {
@@ -64,4 +70,16 @@ func (q queryCombination) Except(o QueryCombineable, all ...bool) QueryCombineab
 		operator: "EXCEPT",
 		right:    o,
 	}
+}
+
+// Combine implements QueryCombineable
+func (q queryCombination) ExecIntoMaps(ctx context.Context, conn querier, parameters ...*QueryParameter) (list []map[string]any, err error) {
+	return execIntoMaps(ctx, conn, SQL(q), q.findSet().selectAccessors(), parameters...)
+}
+
+func (q queryCombination) findSet() querySet {
+	if qc, ok := q.left.(queryCombination); ok {
+		return qc.findSet()
+	}
+	return q.left.(querySet)
 }
