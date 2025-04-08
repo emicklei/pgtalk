@@ -1,14 +1,15 @@
 package main
 
 type TableType struct {
-	BuildVersion string
-	Schema       string
-	TableName    string
-	TableAlias   string
-	GoPackage    string
-	GoType       string
-	Fields       []ColumnField
-	Imports      []string
+	BuildVersion   string
+	Schema         string
+	TableName      string
+	TableAlias     string
+	GoPackage      string
+	GoType         string
+	Fields         []ColumnField
+	UnmappedFields []ColumnField
+	Imports        []string
 }
 
 type ColumnField struct {

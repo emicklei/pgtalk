@@ -38,7 +38,17 @@ func generateFromTable(table PgTable, isView bool) {
 	for _, each := range table.Columns {
 		m, ok := pgMappings[each.DataType]
 		if !ok {
-			log.Println("[warn] missing map entry for", each.DataType, "column '", each.Name, "' is skipped")
+			log.Println("[warn] missing map entry for", each.DataType, "column '", each.Name, "' is unmapped")
+			unmapped := ColumnField{
+				Name:         each.Name,
+				GoName:       fieldName(each.Name),
+				DataType:     each.DataType,
+				IsPrimary:    each.IsPrimaryKey,
+				IsPrimarySrc: isPrimarySource(each.IsPrimaryKey),
+				IsNotNull:    each.NotNull,
+				IsNotNullSrc: isNotNullSource(each.NotNull),
+			}
+			tt.UnmappedFields = append(tt.UnmappedFields, unmapped)
 			continue
 		}
 		goType := m.goFieldType
