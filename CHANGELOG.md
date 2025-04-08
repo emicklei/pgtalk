@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.11.0] - 2025-04-08
+
+- add UNION, INTERSECT, EXCEPT
+
 ## [v1.10.0] - 2025-04-05
 
 - add support for tsquery and tsvector (write only)

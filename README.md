@@ -15,6 +15,21 @@ This package is used in production https://ag5.com and https://go-toad.com and i
 
 	go install github.com/emicklei/pgtalk/cmd/pgtalk-gen@latest
 
+## how to run the generator
+
+The user in the connection string must have the right privileges to read schema information.
+
+	PGTALK_CONN=postgresql://usr:pwd@host:5432/database pgtalk-gen -o yourpackage
+	go fmt ./...
+
+If you want to include and/or exclude table names, use additional flags such as:
+
+	pgtalk-gen -o yourpackage -include "address.*,employee.*" -exclude "org.*"
+
+or views
+
+	pgtalk-gen -views -o yourpackage -include "skills.*"
+
 ## examples
 
 These examples are from the test package in which a few database tables files (categories,products,things) are generated.
@@ -166,6 +181,20 @@ Using `tsquery` in a search condition
 		Select(categories.Columns()...).
 		Where(pgtalk.NewTSQuery(categories.TitleTokens, "quick"))
 
+### Union, Intersect, Except
+
+QuerySets can be combined into one using any of UNION, INTERSECT or EXCEPT with nesting.
+Because you typically collect fields from different tables, which are mapped to different Go structs,
+you can only execute the query with Go maps are results.
+
+In the example below, each set is extended with a custom SQL expression to have a type indicator.
+
+	left := categories.Select(categories.ID, pgtalk.SQLAs("'category'", "type"))
+	right := products.Select(products.ID, pgtalk.SQLAs("'product'", "type"))
+	q := left.Union(right)
+	list, err := q.ExecIntoMaps(context.Background(), testConnect)
+
+
 ## supported Column Types
 
 - bigint
@@ -216,20 +245,5 @@ The configuration for this mapping is:
 			"imports": ["github.com/emicklei/pgtalk/test/types"]
 		}
 	}
-
-## how to run the generator
-
-The user in the connection string must have the right privileges to read schema information.
-
-	PGTALK_CONN=postgresql://usr:pwd@host:5432/database pgtalk-gen -o yourpackage
-	go fmt ./...
-
-If you want to include and/or exclude table names, use additional flags such as:
-
-	pgtalk-gen -o yourpackage -include "address.*,employee.*" -exclude "org.*"
-
-or views
-
-	pgtalk-gen -views -o yourpackage -include "skills.*"
 
 (c) 2025, https://ernestmicklei.com. MIT License.
