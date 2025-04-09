@@ -19,16 +19,16 @@ This package is used in production https://ag5.com and https://go-toad.com and i
 
 The user in the connection string must have the right privileges to read schema information.
 
-	PGTALK_CONN=postgresql://usr:pwd@host:5432/database pgtalk-gen -o yourpackage
+	PGTALK_CONN=postgresql://usr:pwd@localhost:5432/database pgtalk-gen -s public -o yourpackage
 	go fmt ./...
 
 If you want to include and/or exclude table names, use additional flags such as:
 
-	pgtalk-gen -o yourpackage -include "address.*,employee.*" -exclude "org.*"
+	-include "address.*,employee.*" -exclude "org.*"
 
 or views
 
-	pgtalk-gen -views -o yourpackage -include "skills.*"
+	-views -o yourpackage -include "skills.*"
 
 ## examples
 
