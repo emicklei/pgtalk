@@ -7,8 +7,14 @@ func NewTSQuery(columnInfo ColumnInfo, query string) SQLExpression {
 	return tsqueryReader{columnInfo: columnInfo, query: query}
 }
 
+// NewTSQuery returns a condition SQL Expression to match @@ a search query with a search vector (column) and a config.
+func NewTSQueryWithConfig(columnInfo ColumnInfo, regconfig, query string) SQLExpression {
+	return tsqueryReader{columnInfo: columnInfo, regconfig: regconfig, query: query}
+}
+
 type tsqueryReader struct {
 	columnInfo ColumnInfo
+	regconfig  string
 	query      string
 }
 
@@ -19,6 +25,10 @@ func (a tsqueryReader) SQLOn(w WriteContext) {
 	fmt.Fprint(w, a.columnInfo.columnName)
 	fmt.Fprint(w, " @@ ")
 	fmt.Fprint(w, "to_tsquery('")
+	if a.regconfig != "" {
+		fmt.Fprint(w, a.regconfig)
+		fmt.Fprint(w, "','")
+	}
 	fmt.Fprint(w, a.query)
 	fmt.Fprint(w, "'))")
 }
@@ -43,8 +53,8 @@ func NewTSVector(columnInfo ColumnInfo, value string) ColumnAccessor {
 
 // NewTSVectorWithConfig returns a ColumnAccessor for writing the value of tsvector typed column.
 // Cannot be used for reading the value of such a column.
-func NewTSVectorWithConfig(columnName, regconfig, value string) ColumnAccessor {
-	return tsvectorWriter{ColumnInfo: ColumnInfo{columnName: columnName}, regconfig: regconfig, value: value}
+func NewTSVectorWithConfig(columnInfo ColumnInfo, regconfig, value string) ColumnAccessor {
+	return tsvectorWriter{ColumnInfo: columnInfo, regconfig: regconfig, value: value}
 }
 
 // AppendScannable is part of ColumnAccessor
