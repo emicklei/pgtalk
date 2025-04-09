@@ -16,7 +16,7 @@ import (
 var testConnect *pgx.Conn
 
 func TestMain(m *testing.M) {
-	connectionString := "postgres://postgres:pgtalk@localhost:7432/postgres"
+	connectionString := os.Getenv("PGTALK_CONN")
 	if len(connectionString) == 0 {
 		println("no database env set")
 		os.Exit(1)
@@ -74,7 +74,7 @@ func ensureTables(conn *pgx.Conn) error {
 	drop table IF EXISTS categories;
 	create table categories(
 		id serial primary key,
-		title text,
+		title character varying(255),
 		title_tokens tsvector
 	);`)
 	if err != nil {

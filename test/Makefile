@@ -1,17 +1,16 @@
 rmdb:
-	docker rm -f pgtalk-db
+	docker rm -f pgtalk-srv
 
 dbsrv:
-	docker run --name pgtalk-db -e POSTGRES_PASSWORD=pgtalk  -p 7432:5432 -d postgres
+	docker run --name pgtalk-srv -e POSTGRES_PASSWORD=pgtalk  -p 5432:5432 -d postgres
 
 db:
-	docker exec -it pgtalk-db createdb -U postgres pgtalk
+	docker exec -it pgtalk-srv createdb -U postgres pgtalk-db
 
 gen:
 	cd ../cmd/pgtalk-gen && go install
-	PGTALK_CONN=postgres://postgres:pgtalk@localhost:7432/postgres pgtalk-gen -v -o . -include things,products,categories -mapping types/mapping.json
+	PGTALK_CONN=postgres://postgres:pgtalk@localhost:5432/pgtalk-db pgtalk-gen -v -o . -include things,products,categories -mapping types/mapping.json
 	# gofmt -w .
 
 test:
-	PGTALK_CONN=postgres://postgres:pgtalk@localhost:7432/postgres go test ${FLAGS}
-
+	PGTALK_CONN=postgres://postgres:pgtalk@localhost:5432/pgtalk-db go test ${FLAGS}

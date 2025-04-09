@@ -3,16 +3,19 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"html/template"
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime/debug"
 	"slices"
 	"strings"
+	"text/template"
 
 	"github.com/iancoleman/strcase"
 )
+
+var varcharPattern = regexp.MustCompile(`character varying\(\d+\)`)
 
 func generateFromTable(table PgTable, isView bool) {
 	if *oVerbose {
@@ -38,18 +41,23 @@ func generateFromTable(table PgTable, isView bool) {
 	for _, each := range table.Columns {
 		m, ok := pgMappings[each.DataType]
 		if !ok {
-			log.Println("[warn] missing map entry for", each.DataType, "column '", each.Name, "' is unmapped")
-			unmapped := ColumnField{
-				Name:         each.Name,
-				GoName:       fieldName(each.Name),
-				DataType:     each.DataType,
-				IsPrimary:    each.IsPrimaryKey,
-				IsPrimarySrc: isPrimarySource(each.IsPrimaryKey),
-				IsNotNull:    each.NotNull,
-				IsNotNullSrc: isNotNullSource(each.NotNull),
+			// handle special cases
+			if varcharPattern.MatchString(each.DataType) {
+				m = pgMappings["character varying"]
+			} else {
+				log.Println("[warn] missing map entry for", each.DataType, "column '", each.Name, "' is unmapped and only known as column info")
+				unmapped := ColumnField{
+					Name:         each.Name,
+					GoName:       fieldName(each.Name),
+					DataType:     each.DataType,
+					IsPrimary:    each.IsPrimaryKey,
+					IsPrimarySrc: isPrimarySource(each.IsPrimaryKey),
+					IsNotNull:    each.NotNull,
+					IsNotNullSrc: isNotNullSource(each.NotNull),
+				}
+				tt.UnmappedFields = append(tt.UnmappedFields, unmapped)
+				continue
 			}
-			tt.UnmappedFields = append(tt.UnmappedFields, unmapped)
-			continue
 		}
 		goType := m.goFieldType
 		if !each.NotNull {
