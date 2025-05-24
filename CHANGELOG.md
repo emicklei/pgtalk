@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.12.0] - 2025-05-24
+
+- add LazySQL, update deps
+
 ## [v1.11.0] - 2025-04-08
 
 - add UNION, INTERSECT, EXCEPT
