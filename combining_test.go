@@ -13,7 +13,7 @@ func TestUnionSQL(t *testing.T) {
 	}
 	middle := MakeQuerySet[poly](polyTable, polyTable.Columns)
 	w := u.Except(middle)
-	if got, want := SQL(w), "((((SELECT FROM public.polies p1) UNION ALL (SELECT FROM public.polies p1))) EXCEPT (SELECT FROM public.polies p1))"; got != want {
+	if got, want := w.String(), "((((SELECT FROM public.polies p1) UNION ALL (SELECT FROM public.polies p1))) EXCEPT (SELECT FROM public.polies p1))"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }

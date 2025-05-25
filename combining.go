@@ -6,6 +6,7 @@ import (
 )
 
 type QueryCombineable interface {
+	fmt.Stringer
 	SQLWriter
 
 	// Every SELECT statement within UNION must have the same number of columns
@@ -82,4 +83,8 @@ func (q queryCombination) findSet() querySet {
 		return qc.findSet()
 	}
 	return q.left.(querySet)
+}
+
+func (q queryCombination) String() string {
+	return SQL(q)
 }
