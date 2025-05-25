@@ -2,9 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-## [v1.12.0] - 2025-05-24
+## [v1.12.1] - 2025-05-25
 
-- add LazySQL, update deps
+- add Stringer to QuerySet and MutationSet, update deps
 
 ## [v1.11.0] - 2025-04-08
 

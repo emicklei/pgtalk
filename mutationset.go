@@ -155,3 +155,9 @@ func (m MutationSet[T]) setSectionOn(w io.Writer) {
 		fmt.Fprintf(w, "%s = %s", each.Name(), each.SetSource(i+1))
 	}
 }
+
+// String implements the Stringer interface for MutationSet.
+// It is used for logging.
+func (m MutationSet[T]) String() string {
+	return SQL(m)
+}

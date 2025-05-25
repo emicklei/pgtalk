@@ -61,15 +61,3 @@ func SQL(some SQLWriter) string {
 	src := IndentedSQL(some)
 	return strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(src, "\t", " "), "\n", " "), "  ", " ")
 }
-
-type lazySQL struct {
-	w SQLWriter
-}
-
-func (l lazySQL) String() string {
-	return SQL(l.w)
-}
-
-// LazySQL is a helper to produce an SQL string when asked for String().
-// It is used to avoid the SQL string being computed for logs when not needed.
-func LazySQL(w SQLWriter) lazySQL { return lazySQL{w: w} }

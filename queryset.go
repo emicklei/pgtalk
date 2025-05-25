@@ -281,3 +281,9 @@ func (d QuerySet[T]) Intersect(o QueryCombineable, all ...bool) QueryCombineable
 		right:    o,
 	}
 }
+
+// String implements the Stringer interface for QuerySet.
+// It is used for logging.
+func (d QuerySet[T]) String() string {
+	return SQL(d)
+}
