@@ -387,3 +387,7 @@ func hasNullsOnly(sub [][]byte) bool {
 	}
 	return true
 }
+
+func (m multiJoin) String() string {
+	return SQL(m)
+}
