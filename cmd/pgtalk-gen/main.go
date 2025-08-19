@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -19,18 +20,47 @@ var (
 	oIncludePatterns = flag.String("include", ".*", "comma separated list of regexp for tables to include")
 	oExludePatterns  = flag.String("exclude", "", "comma separated list of regexp for tables to exclude")
 	oMapping         = flag.String("mapping", "", "mapping file for undefined pg data types")
+	oCache           = flag.String("cache", "", "use cache file for table metadata if present")
 )
 
 func main() {
 	flag.Parse()
+	if err := applyConfiguredMappings(*oMapping); err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to process custom mappings: %v\n", err)
+		os.Exit(1)
+	}
+	var tables []PgTable
+	if *oCache != "" {
+		if result, err := loadPgTablesFromCache(*oCache); err != nil {
+			fmt.Fprintf(os.Stderr, "unable to load cache file: %v\n, continue using database connection", err)
+		} else {
+			tables = result
+		}
+	}
+	if len(tables) == 0 {
+		tables = fetchPgTables()
+		if *oCache != "" {
+			if err := savePgTablesToCache(*oCache, tables); err != nil {
+				fmt.Fprintf(os.Stderr, "unable to save cache file: %v\n", err)
+			}
+		}
+	}
+	filter := NewTableFilter(*oIncludePatterns, *oExludePatterns)
+	for _, each := range tables {
+		if filter.Includes(each.Name) {
+			if *oDryrun {
+				log.Println("[DRYRUN] would generate", each.Name)
+			} else {
+				generateFromTable(each, *oViews)
+			}
+		}
+	}
+}
+
+func fetchPgTables() []PgTable {
 	connectionString := os.Getenv("PGTALK_CONN")
 	if len(connectionString) == 0 {
 		fmt.Fprintf(os.Stderr, "Missing value of environment variable PGTALK_CONN\n")
-		os.Exit(1)
-	}
-
-	if err := applyConfiguredMappings(*oMapping); err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to process custom mappings: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -53,14 +83,28 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-	filter := NewTableFilter(*oIncludePatterns, *oExludePatterns)
-	for _, each := range all {
-		if filter.Includes(each.Name) {
-			if *oDryrun {
-				log.Println("[DRYRUN] would generate", each.Name)
-			} else {
-				generateFromTable(each, *oViews)
-			}
-		}
+	return all
+}
+
+func loadPgTablesFromCache(cacheFile string) ([]PgTable, error) {
+	data, err := os.ReadFile(cacheFile)
+	if err != nil {
+		return nil, fmt.Errorf("unable to read cache file: %w", err)
 	}
+	var tables []PgTable
+	if err := json.Unmarshal(data, &tables); err != nil {
+		return nil, fmt.Errorf("unable to unmarshal cache file: %w", err)
+	}
+	return tables, nil
+}
+
+func savePgTablesToCache(cacheFile string, tables []PgTable) error {
+	data, err := json.MarshalIndent(tables, "", "  ")
+	if err != nil {
+		return fmt.Errorf("unable to marshal tables to JSON: %w", err)
+	}
+	if err := os.WriteFile(cacheFile, data, 0644); err != nil {
+		return fmt.Errorf("unable to write cache file: %w", err)
+	}
+	return nil
 }
