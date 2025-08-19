@@ -32,7 +32,7 @@ func main() {
 	var tables []PgTable
 	if *oCache != "" {
 		if result, err := loadPgTablesFromCache(*oCache); err != nil {
-			fmt.Fprintf(os.Stderr, "unable to load cache file: %v\n, continue using database connection", err)
+			fmt.Fprintf(os.Stderr, "unable to load cache file: %v\ncontinue using database connection", err)
 		} else {
 			tables = result
 		}
