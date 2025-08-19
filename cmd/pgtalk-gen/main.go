@@ -45,7 +45,7 @@ func main() {
 			}
 		}
 	}
-	filter := NewTableFilter(*oIncludePatterns, *oExludePatterns)
+	filter := NewTableFilter(*oIncludePatterns, *oExcludePatterns)
 	for _, each := range tables {
 		if filter.Includes(each.Name) {
 			if *oDryrun {
