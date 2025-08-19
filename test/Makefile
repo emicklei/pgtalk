@@ -1,6 +1,3 @@
-rmdb:
-	docker rm -f pgtalk-srv
-
 dbsrv:
 	docker run --name pgtalk-srv -e POSTGRES_PASSWORD=pgtalk  -p 5432:5432 -d postgres
 
@@ -14,3 +11,6 @@ gen:
 
 test:
 	PGTALK_CONN=postgres://postgres:pgtalk@localhost:5432/pgtalk-db go test ${FLAGS}
+
+rmdb:
+	docker rm -f pgtalk-srv
