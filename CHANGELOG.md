@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.13.0] - 2025-08-19
+
+- add option `-cache` to store table definitions in JSON for generation without db server.
+
 ## [v1.12.1] - 2025-05-25
 
 - add Stringer to QuerySet and MutationSet, update deps

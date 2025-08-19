@@ -246,4 +246,13 @@ The configuration for this mapping is:
 		}
 	}
 
+## cache table definitions read from database
+
+If you do not want to add generated sources to your SCM (source code management system e.g. git) then build systems and other developers need to re-generated them.
+The `pgtalk-gen` uses table definitions from an active database server to generate Go table types.
+With the `-cache` option, this tool can store those definitions in a JSON file which then can be used instead and you add that file to your SCM.
+It is the responsibility of the developer to update it (by deleting it) upon each table definition change in the database.
+See the `test` folder for an example; just run all the tasks in the `Makefile`.
+
+
 (c) 2025, https://ernestmicklei.com. MIT License.

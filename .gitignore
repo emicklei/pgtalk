@@ -1,3 +1,4 @@
 .vscode
 cmd/pgtalk-gen/pgtalk-gen
 test/gen.sh
+test/pgtalk-tables-cache.json
