@@ -9,7 +9,7 @@ db:
 
 gen:
 	cd ../cmd/pgtalk-gen && go install
-	PGTALK_CONN=postgres://postgres:pgtalk@localhost:5432/pgtalk-db pgtalk-gen -v -o . -include things,products,categories -mapping types/mapping.json
+	PGTALK_CONN=postgres://postgres:pgtalk@localhost:5432/pgtalk-db pgtalk-gen -v -o . -include things,products,categories -mapping types/mapping.json -cache pgtalk-tables-cache.json
 	# gofmt -w .
 
 test:

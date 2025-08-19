@@ -63,7 +63,7 @@ func fetchPgTables() []PgTable {
 		fmt.Fprintf(os.Stderr, "Missing value of environment variable PGTALK_CONN\n")
 		os.Exit(1)
 	}
-
+	log.Println("fetching tables from database")
 	conn, err := pgx.Connect(context.Background(), connectionString)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
@@ -87,6 +87,7 @@ func fetchPgTables() []PgTable {
 }
 
 func loadPgTablesFromCache(cacheFile string) ([]PgTable, error) {
+	log.Printf("loading tables from cache: %s", cacheFile)
 	data, err := os.ReadFile(cacheFile)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read cache file: %w", err)
@@ -99,6 +100,7 @@ func loadPgTablesFromCache(cacheFile string) ([]PgTable, error) {
 }
 
 func savePgTablesToCache(cacheFile string, tables []PgTable) error {
+	log.Printf("saving tables to cache: %s", cacheFile)
 	data, err := json.MarshalIndent(tables, "", "  ")
 	if err != nil {
 		return fmt.Errorf("unable to marshal tables to JSON: %w", err)
