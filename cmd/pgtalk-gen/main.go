@@ -18,7 +18,7 @@ var (
 	oViews           = flag.Bool("views", false, "generated from views, default is false = use tables")
 	oVerbose         = flag.Bool("v", false, "use verbose logging")
 	oIncludePatterns = flag.String("include", ".*", "comma separated list of regexp for tables to include")
-	oExludePatterns  = flag.String("exclude", "", "comma separated list of regexp for tables to exclude")
+	oExcludePatterns  = flag.String("exclude", "", "comma separated list of regexp for tables to exclude")
 	oMapping         = flag.String("mapping", "", "mapping file for undefined pg data types")
 	oCache           = flag.String("cache", "", "use cache file for table metadata if present")
 )
