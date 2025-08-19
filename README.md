@@ -9,7 +9,7 @@ This package requires Go SDK version 1.18+ because it uses type parameterization
 
 ## status
 
-This package is used in production https://ag5.com and https://go-toad.com and its programming API is stable since v1.0.0.
+This package is used in production, e.g. https://ag5.com, and its programming API is stable since v1.0.0.
 
 ## install
 
