@@ -57,7 +57,7 @@ type onelineWriter struct {
 }
 
 func newOnelineWriter(b *strings.Builder) *onelineWriter {
-	return &onelineWriter{b: b}
+	return &onelineWriter{b: b, lastCharWasSpace: true}
 }
 
 func (w *onelineWriter) Write(p []byte) (n int, err error) {
@@ -87,5 +87,5 @@ func SQL(some SQLWriter) string {
 	var b strings.Builder
 	w := newOnelineWriter(&b)
 	some.SQLOn(NewWriteContext(w))
-	return strings.TrimSpace(b.String())
+	return strings.TrimRight(b.String(), " ")
 }
