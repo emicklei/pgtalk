@@ -131,7 +131,6 @@ func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...*Q
 			return nil, fmt.Errorf("selector not found for column %s", fd.Name)
 		}
 		ordered[i] = sel
-	}
 
 			return nil, fmt.Errorf("selector not found for column %s", fd.Name)
 		}
