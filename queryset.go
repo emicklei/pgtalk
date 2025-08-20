@@ -132,7 +132,7 @@ func (d QuerySet[T]) Iterate(ctx context.Context, conn querier, parameters ...*Q
 	params := argumentValues(parameters)
 	rows, err := conn.Query(ctx, SQL(d), params...)
 	if err != nil {
-		return &resultIterator[T]{queryError: err}, err
+		return nil, err
 	}
 	// order the selectors once
 	fds := rows.FieldDescriptions()
