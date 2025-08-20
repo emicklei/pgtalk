@@ -7,17 +7,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-var (
-	ti = TableInfo{
-		Name:   "things",
-		Schema: "public",
-		Alias:  "t1",
-	}
-	ci = ColumnInfo{
-		tableInfo:  ti,
-		columnName: "label",
-	}
-)
 
 func TestTextIn(t *testing.T) {
 	ta := NewTextAccess(ci, nil)
