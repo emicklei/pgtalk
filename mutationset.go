@@ -133,7 +133,12 @@ func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...*Q
 		ordered[i] = sel
 	}
 
-	return &resultIterator[T]{queryError: err, rows: rows, orderedSelectors: ordered, params: params}, nil
+			return nil, fmt.Errorf("selector not found for column %s", fd.Name)
+		}
+		ordered[i] = sel
+	}
+
+	return &resultIterator[T]{rows: rows, orderedSelectors: ordered, params: params}, nil
 }
 
 // valuesToInsert returns the parameters values for the mutation query.
