@@ -148,7 +148,6 @@ func (d QuerySet[T]) Iterate(ctx context.Context, conn querier, parameters ...*Q
 		sel, ok := selectorMap[fd.Name]
 		if !ok {
 			// this should not happen
-			return nil, fmt.Errorf("selector not found for column %s", fd.Name)
 		}
 		ordered[i] = sel
 	}
