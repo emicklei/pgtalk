@@ -137,7 +137,6 @@ func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...*Q
 		}
 		ordered[i] = sel
 	}
-
 	return &resultIterator[T]{rows: rows, orderedSelectors: ordered, params: params}, nil
 }
 
