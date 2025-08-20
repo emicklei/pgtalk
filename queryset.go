@@ -149,7 +149,7 @@ func (d QuerySet[T]) Iterate(ctx context.Context, conn querier, parameters ...*Q
 		if !ok {
 			// this should not happen
 			return &resultIterator[T]{queryError: fmt.Errorf("selector not found for column %s", fd.Name)},
-				fmt.Errorf("selector not found for column %s", fd.Name)
+			return nil, fmt.Errorf("selector not found for column %s", fd.Name)
 		}
 		ordered[i] = sel
 	}
