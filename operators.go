@@ -62,9 +62,24 @@ func (o binaryExpression) Like(pattern string) SQLExpression {
 }
 
 type betweenAnd struct {
+	Column SQLExpression
+	Begin  SQLExpression
+	End    SQLExpression
 }
 
-func makeBetweenAnd(_ ColumnAccessor, _, _ SQLExpression) betweenAnd { return betweenAnd{} }
+func (b betweenAnd) SQLOn(w WriteContext) {
+	fmt.Fprint(w, "(")
+	b.Column.SQLOn(w)
+	fmt.Fprint(w, " BETWEEN ")
+	b.Begin.SQLOn(w)
+	fmt.Fprint(w, " AND ")
+	b.End.SQLOn(w)
+	fmt.Fprint(w, ")")
+}
+
+func makeBetweenAnd(col SQLExpression, begin, end SQLExpression) betweenAnd {
+	return betweenAnd{Column: col, Begin: begin, End: end}
+}
 
 type unaryExpression struct {
 	Operator string
