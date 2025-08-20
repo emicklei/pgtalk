@@ -144,6 +144,8 @@ func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...*Q
 // (Removed unreachable duplicated error-handling lines)
 // (Removed unreachable duplicated error-handling lines)
 // (Removed unreachable duplicated error-handling lines)
+// (Removed unreachable duplicated error-handling lines)
+// (Removed unreachable duplicated error-handling lines)
 	return &resultIterator[T]{rows: rows, orderedSelectors: ordered, params: params}, nil
 }
 
