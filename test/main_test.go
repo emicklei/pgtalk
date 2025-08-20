@@ -19,7 +19,6 @@ func TestMain(m *testing.M) {
 	connectionString := os.Getenv("PGTALK_CONN")
 	if len(connectionString) == 0 {
 		println("no database env set")
-		os.Exit(1)
 		return
 	}
 	fmt.Println("db open ...", connectionString)
