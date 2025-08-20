@@ -147,7 +147,7 @@ func (d QuerySet[T]) Iterate(ctx context.Context, conn querier, parameters ...*Q
 	for i, fd := range fds {
 		sel, ok := selectorMap[fd.Name]
 		if !ok {
-			// this should not happen
+			return nil, fmt.Errorf("no selector found for field '%s'", fd.Name)
 		}
 		ordered[i] = sel
 	}
