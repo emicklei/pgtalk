@@ -131,11 +131,34 @@ func (q QuerySet[T]) Exists() unaryExpression {
 func (d QuerySet[T]) Iterate(ctx context.Context, conn querier, parameters ...*QueryParameter) (*resultIterator[T], error) {
 	params := argumentValues(parameters)
 	rows, err := conn.Query(ctx, SQL(d), params...)
+	if err != nil {
+		return &resultIterator[T]{queryError: err}, err
+	}
+	// order the selectors once
+	fds := rows.FieldDescriptions()
+	ordered := make([]ColumnAccessor, len(fds))
+
+	// create a map for faster lookup
+	selectorMap := make(map[string]ColumnAccessor, len(d.selectors))
+	for _, sel := range d.selectors {
+		selectorMap[sel.Column().columnName] = sel
+	}
+
+	for i, fd := range fds {
+		sel, ok := selectorMap[fd.Name]
+		if !ok {
+			// this should not happen
+			return &resultIterator[T]{queryError: fmt.Errorf("selector not found for column %s", fd.Name)},
+				fmt.Errorf("selector not found for column %s", fd.Name)
+		}
+		ordered[i] = sel
+	}
+
 	return &resultIterator[T]{
-		queryError: err,
-		rows:       rows,
-		selectors:  d.selectors,
-		params:     params,
+		queryError:       err,
+		rows:             rows,
+		orderedSelectors: ordered,
+		params:           params,
 	}, err
 }
 

@@ -6,11 +6,11 @@ import (
 )
 
 type resultIterator[T any] struct {
-	queryError error
-	commandTag pgconn.CommandTag
-	rows       pgx.Rows
-	selectors  []ColumnAccessor
-	params     []any
+	queryError       error
+	commandTag       pgconn.CommandTag
+	rows             pgx.Rows
+	orderedSelectors []ColumnAccessor
+	params           []any
 }
 
 // Close closes the rows, making the connection ready for use again. It is safe
@@ -55,15 +55,9 @@ func (i *resultIterator[T]) HasNext() bool {
 
 func (i *resultIterator[T]) Next() (*T, error) {
 	entity := new(T)
-	list := i.rows.FieldDescriptions()
-	// order of list is not the same as selectors?
 	toScan := []any{}
-	for _, each := range list {
-		for _, other := range i.selectors {
-			if other.Column().columnName == each.Name {
-				toScan = append(toScan, other.FieldValueToScan(entity))
-			}
-		}
+	for _, each := range i.orderedSelectors {
+		toScan = append(toScan, each.FieldValueToScan(entity))
 	}
 	if err := i.rows.Scan(toScan...); err != nil {
 		return nil, err

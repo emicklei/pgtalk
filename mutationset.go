@@ -103,10 +103,32 @@ func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...*Q
 		return &resultIterator[T]{queryError: err, commandTag: ct, params: params}
 	}
 	rows, err := conn.Query(ctx, query, params...)
-	if err == nil && !m.canProduceResults() {
+	if err != nil {
+		return &resultIterator[T]{queryError: err}
+	}
+	if !m.canProduceResults() {
 		rows.Close()
 	}
-	return &resultIterator[T]{queryError: err, rows: rows, selectors: m.returning, params: params}
+	// order the selectors once
+	fds := rows.FieldDescriptions()
+	ordered := make([]ColumnAccessor, len(fds))
+
+	// create a map for faster lookup
+	selectorMap := make(map[string]ColumnAccessor, len(m.returning))
+	for _, sel := range m.returning {
+		selectorMap[sel.Column().columnName] = sel
+	}
+
+	for i, fd := range fds {
+		sel, ok := selectorMap[fd.Name]
+		if !ok {
+			// this should not happen
+			return &resultIterator[T]{queryError: fmt.Errorf("selector not found for column %s", fd.Name)}
+		}
+		ordered[i] = sel
+	}
+
+	return &resultIterator[T]{queryError: err, rows: rows, orderedSelectors: ordered, params: params}
 }
 
 // valuesToInsert returns the parameters values for the mutation query.
