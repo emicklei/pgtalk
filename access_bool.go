@@ -1,5 +1,7 @@
 package pgtalk
 
+import "bytes"
+
 type booleanAccess struct {
 	unimplementedBooleanExpression
 	ColumnInfo
@@ -19,6 +21,13 @@ func (a booleanAccess) Set(v bool) booleanAccess {
 }
 func (a booleanAccess) ValueToInsert() any {
 	return a.valueToInsert
+}
+
+func (a booleanAccess) SQL() string {
+	buf := new(bytes.Buffer)
+	w := NewWriteContext(buf)
+	a.SQLOn(w)
+	return buf.String()
 }
 
 func (a booleanAccess) And(e SQLExpression) SQLExpression {
