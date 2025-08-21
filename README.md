@@ -1,6 +1,6 @@
 # pgtalk
 
-[![Go](https://github.com/emicklei/pgtalk/actions/workflows/go.yml/badge.svg)](https://github.com/emicklei/pgtalk/actions/workflows/go.yml)
+[![Go](https://github.com/emicklei/pgtalk/actions/workflows/go-test.yml/badge.svg)](https://github.com/emicklei/pgtalk/actions/workflows/go-test.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/emicklei/pgtalk)](https://goreportcard.com/report/github.com/emicklei/pgtalk)
 [![GoDoc](https://pkg.go.dev/badge/github.com/emicklei/pgtalk)](https://pkg.go.dev/github.com/emicklei/pgtalk)
 [![codecov](https://codecov.io/gh/emicklei/pgtalk/branch/master/graph/badge.svg)](https://codecov.io/gh/emicklei/pgtalk)
