@@ -220,6 +220,23 @@ In the example below, each set is extended with a custom SQL expression to have 
 - citext
 - double precision
 - decimal
+- money
+- xml
+- real
+- smallint
+- time without time zone
+- character
+- line
+- lseg
+- box
+- path
+- polygon
+- circle
+- cidr
+- inet
+- macaddr
+- bit
+- bit varying
 
 Send me a PR for a missing type available from https://www.postgresql.org/docs/9.5/datatype.html by modifying `mapping.go` in the `cmd/pgtalk-gen` package.
 
