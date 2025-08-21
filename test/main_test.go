@@ -75,7 +75,29 @@ func ensureTables(conn *pgx.Conn) error {
 		id serial primary key,
 		title character varying(255),
 		title_tokens tsvector
-	);`)
+	);
+	drop table IF EXISTS new_types;
+	create table new_types(
+		id serial primary key,
+		a_smallint smallint,
+		a_real real,
+		a_time time,
+		a_xml xml,
+		a_money money,
+		a_char char(4),
+		a_line line,
+		a_lseg lseg,
+		a_box box,
+		a_path path,
+		a_polygon polygon,
+		a_circle circle,
+		a_cidr cidr,
+		a_inet inet,
+		a_macaddr macaddr,
+		a_bit bit(8),
+		a_varbit bit varying(8)
+	);
+	`)
 	if err != nil {
 		tx.Rollback(ctx)
 		return err

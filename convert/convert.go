@@ -74,6 +74,14 @@ func TimeToDate(t time.Time) pgtype.Date {
 	return pgtype.Date{Time: t, Valid: true}
 }
 
+func TimeToTime(t time.Time) pgtype.Time {
+	return pgtype.Time{Microseconds: t.UnixMicro(), Valid: true}
+}
+
+func Int16ToInt2(i int16) pgtype.Int2 {
+	return pgtype.Int2{Int16: i, Valid: true}
+}
+
 func StringToText(s string) pgtype.Text {
 	return pgtype.Text{String: s, Valid: true}
 }
