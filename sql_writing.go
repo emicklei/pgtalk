@@ -49,6 +49,32 @@ func (w wc) TableAlias(tableName, defaultAlias string) string {
 	return defaultAlias
 }
 
+// onelineWriter is a writer that replaces newlines and tabs with spaces,
+// and collapses multiple spaces into a single space.
+type onelineWriter struct {
+	b                *strings.Builder
+	lastCharWasSpace bool
+}
+
+func newOnelineWriter(b *strings.Builder) *onelineWriter {
+	return &onelineWriter{b: b, lastCharWasSpace: true}
+}
+
+func (w *onelineWriter) Write(p []byte) (n int, err error) {
+	for _, b := range p {
+		if b == '\n' || b == '\t' || b == ' ' {
+			if !w.lastCharWasSpace {
+				w.b.WriteByte(' ')
+				w.lastCharWasSpace = true
+			}
+		} else {
+			w.b.WriteByte(b)
+			w.lastCharWasSpace = false
+		}
+	}
+	return len(p), nil
+}
+
 // IndentedSQL returns source with tabs and lines trying to have a formatted view.
 func IndentedSQL(some SQLWriter) string {
 	buf := new(bytes.Buffer)
@@ -58,6 +84,8 @@ func IndentedSQL(some SQLWriter) string {
 
 // SQL returns source as a oneliner without tabs or line ends.
 func SQL(some SQLWriter) string {
-	src := IndentedSQL(some)
-	return strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(src, "\t", " "), "\n", " "), "  ", " ")
+	var b strings.Builder
+	w := newOnelineWriter(&b)
+	some.SQLOn(NewWriteContext(w))
+	return strings.TrimRight(b.String(), " ")
 }
