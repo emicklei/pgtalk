@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 )
 
 const (
@@ -181,4 +182,10 @@ func (m MutationSet[T]) setSectionOn(w io.Writer) {
 // It is used for logging.
 func (m MutationSet[T]) String() string {
 	return SQL(m)
+}
+
+// LogValue implements the LogValuer interface for MutationSet.
+// It is used for slog.
+func (m MutationSet[T]) LogValue() slog.Value {
+	return slog.StringValue(SQL(m))
 }

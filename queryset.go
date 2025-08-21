@@ -3,6 +3,7 @@ package pgtalk
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"reflect"
 )
 
@@ -307,4 +308,10 @@ func (d QuerySet[T]) Intersect(o QueryCombineable, all ...bool) QueryCombineable
 // It is used for logging.
 func (d QuerySet[T]) String() string {
 	return SQL(d)
+}
+
+// LogValue implements the LogValuer interface for MutationSet.
+// It is used for slog.
+func (d QuerySet[T]) LogValue() slog.Value {
+	return slog.StringValue(SQL(d))
 }
