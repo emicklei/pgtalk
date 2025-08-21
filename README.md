@@ -1,6 +1,9 @@
 # pgtalk
 
+[![Go](https://github.com/emicklei/pgtalk/actions/workflows/go.yml/badge.svg)](https://github.com/emicklei/pgtalk/actions/workflows/go.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/emicklei/pgtalk)](https://goreportcard.com/report/github.com/emicklei/pgtalk)
 [![GoDoc](https://pkg.go.dev/badge/github.com/emicklei/pgtalk)](https://pkg.go.dev/github.com/emicklei/pgtalk)
+[![codecov](https://codecov.io/gh/emicklei/pgtalk/branch/master/graph/badge.svg)](https://codecov.io/gh/emicklei/pgtalk)
 
 More type safe SQL query building and execution using Go code generated (pgtalk-gen) from PostgreSQL table definitions.
 After code generation, you get a Go type for each table or view with functions to create a QuerySet or MutationSet value.
