@@ -127,26 +127,7 @@ func (m MutationSet[T]) Exec(ctx context.Context, conn querier, parameters ...*Q
 		}
 		ordered[i] = sel
 	}
-
-			return nil, fmt.Errorf("selector not found for column %s", fd.Name)
-		}
-		ordered[i] = sel
-
-			return nil, fmt.Errorf("selector not found for column %s", fd.Name)
-		}
-		ordered[i] = sel
-// (Removed unreachable duplicated error-handling lines)
-// (Removed unreachable duplicated error-handling lines)
-// (Removed unreachable duplicated error-handling lines)
-// (Removed unreachable duplicated error-handling lines)
-
-// (Removed unreachable duplicated error-handling lines)
-// (Removed unreachable duplicated error-handling lines)
-// (Removed unreachable duplicated error-handling lines)
-// (Removed unreachable duplicated error-handling lines)
-// (Removed unreachable duplicated error-handling lines)
-// (Removed unreachable duplicated error-handling lines)
-	return &resultIterator[T]{rows: rows, orderedSelectors: ordered, params: params}, nil
+	return &resultIterator[T]{rows: rows, orderedSelectors: ordered, params: params}
 }
 
 // valuesToInsert returns the parameters values for the mutation query.
