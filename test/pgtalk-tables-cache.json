@@ -1,0 +1,307 @@
+[
+  {
+    "Schema": "public",
+    "Name": "categories",
+    "DataType": 114,
+    "HasAutogeneratingKey": true,
+    "PrimaryKeys": [
+      {
+        "FieldOrdinal": 1,
+        "Name": "id",
+        "DataType": "integer",
+        "DDLType": "serial",
+        "NotNull": true,
+        "DefaultValue": {
+          "String": "nextval('categories_id_seq'::regclass)",
+          "Valid": true
+        },
+        "IsPrimaryKey": true
+      }
+    ],
+    "Columns": [
+      {
+        "FieldOrdinal": 1,
+        "Name": "id",
+        "DataType": "integer",
+        "DDLType": "serial",
+        "NotNull": true,
+        "DefaultValue": {
+          "String": "nextval('categories_id_seq'::regclass)",
+          "Valid": true
+        },
+        "IsPrimaryKey": true
+      },
+      {
+        "FieldOrdinal": 2,
+        "Name": "title",
+        "DataType": "character varying(255)",
+        "DDLType": "character varying(255)",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 3,
+        "Name": "title_tokens",
+        "DataType": "tsvector",
+        "DDLType": "tsvector",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      }
+    ]
+  },
+  {
+    "Schema": "public",
+    "Name": "products",
+    "DataType": 114,
+    "HasAutogeneratingKey": true,
+    "PrimaryKeys": [
+      {
+        "FieldOrdinal": 1,
+        "Name": "id",
+        "DataType": "integer",
+        "DDLType": "serial",
+        "NotNull": true,
+        "DefaultValue": {
+          "String": "nextval('products_id_seq'::regclass)",
+          "Valid": true
+        },
+        "IsPrimaryKey": true
+      }
+    ],
+    "Columns": [
+      {
+        "FieldOrdinal": 1,
+        "Name": "id",
+        "DataType": "integer",
+        "DDLType": "serial",
+        "NotNull": true,
+        "DefaultValue": {
+          "String": "nextval('products_id_seq'::regclass)",
+          "Valid": true
+        },
+        "IsPrimaryKey": true
+      },
+      {
+        "FieldOrdinal": 2,
+        "Name": "created_at",
+        "DataType": "timestamp with time zone",
+        "DDLType": "timestamp with time zone",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 3,
+        "Name": "updated_at",
+        "DataType": "timestamp with time zone",
+        "DDLType": "timestamp with time zone",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 4,
+        "Name": "deleted_at",
+        "DataType": "timestamp with time zone",
+        "DDLType": "timestamp with time zone",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 5,
+        "Name": "code",
+        "DataType": "text",
+        "DDLType": "text",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 6,
+        "Name": "price",
+        "DataType": "bigint",
+        "DDLType": "bigint",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 7,
+        "Name": "category_id",
+        "DataType": "integer",
+        "DDLType": "integer",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      }
+    ]
+  },
+  {
+    "Schema": "public",
+    "Name": "things",
+    "DataType": 114,
+    "HasAutogeneratingKey": false,
+    "PrimaryKeys": null,
+    "Columns": [
+      {
+        "FieldOrdinal": 1,
+        "Name": "id",
+        "DataType": "uuid",
+        "DDLType": "uuid",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 2,
+        "Name": "tdate",
+        "DataType": "date",
+        "DDLType": "date",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 3,
+        "Name": "ttimestamp",
+        "DataType": "timestamp without time zone",
+        "DDLType": "timestamp without time zone",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 4,
+        "Name": "tjsonb",
+        "DataType": "jsonb",
+        "DDLType": "jsonb",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 5,
+        "Name": "tjson",
+        "DataType": "json",
+        "DDLType": "json",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 6,
+        "Name": "ttext",
+        "DataType": "text",
+        "DDLType": "text",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 7,
+        "Name": "tnumeric",
+        "DataType": "numeric",
+        "DDLType": "numeric",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 8,
+        "Name": "tdecimal",
+        "DataType": "numeric",
+        "DDLType": "numeric",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 9,
+        "Name": "ttextarray",
+        "DataType": "text[]",
+        "DDLType": "text[]",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 10,
+        "Name": "tinterval",
+        "DataType": "interval",
+        "DDLType": "interval",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      },
+      {
+        "FieldOrdinal": 11,
+        "Name": "treal",
+        "DataType": "real",
+        "DDLType": "real",
+        "NotNull": false,
+        "DefaultValue": {
+          "String": "",
+          "Valid": true
+        },
+        "IsPrimaryKey": false
+      }
+    ]
+  }
+]
