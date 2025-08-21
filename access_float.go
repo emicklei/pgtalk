@@ -1,6 +1,7 @@
 package pgtalk
 
 import (
+	"bytes"
 	"strings"
 )
 
@@ -26,6 +27,13 @@ func (a float64Access) Set(v float64) float64Access {
 }
 
 func (a float64Access) Column() ColumnInfo { return a.ColumnInfo }
+
+func (a float64Access) SQL() string {
+	buf := new(bytes.Buffer)
+	w := NewWriteContext(buf)
+	a.SQLOn(w)
+	return buf.String()
+}
 
 func (a float64Access) Equals(isFloatLike any) SQLExpression {
 	return a.Compare("=", isFloatLike)

@@ -14,6 +14,15 @@ import (
 )
 
 var (
+	ti = TableInfo{
+		Name:   "things",
+		Schema: "public",
+		Alias:  "t1",
+	}
+	ci = ColumnInfo{
+		tableInfo:  ti,
+		columnName: "label",
+	}
 	polyTable = TableInfo{Name: "polies", Schema: "public", Alias: "p1"}
 	polyFTime = NewTimeAccess(MakeColumnInfo(polyTable, "ftime", NotPrimary, Nullable, 1),
 		func(dest any) any { return &dest.(*poly).FTime })
