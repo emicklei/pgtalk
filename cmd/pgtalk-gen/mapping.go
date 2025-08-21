@@ -94,6 +94,59 @@ func (m mapping) validate() error {
 
 // https://www.postgresql.org/docs/9.1/datatype-numeric.html
 var pgMappings = map[string]mapping{
+	"money": {
+		goFieldType:         "pgtype.Money",
+		nullableGoFieldType: "pgtype.Money",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Money]",
+	},
+	"xml": {
+		goFieldType:         "pgtype.XML",
+		nullableGoFieldType: "pgtype.XML",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.XML]",
+	},
+	"real": {
+		goFieldType:         "float32",
+		nullableGoFieldType: "pgtype.Float4",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Float4]",
+	},
+	"cidr": {
+		nullableGoFieldType: "pgtype.CIDR",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.CIDR]",
+	},
+	"inet": {
+		nullableGoFieldType: "pgtype.Inet",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Inet]",
+	},
+	"macaddr": {
+		nullableGoFieldType: "pgtype.Macaddr",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Macaddr]",
+	},
+	"bit": {
+		nullableGoFieldType: "pgtype.Bit",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Bit]",
+	},
+	"bit varying": {
+		nullableGoFieldType: "pgtype.Varbit",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Varbit]",
+	},
+	"smallint": {
+		goFieldType: "int16",
+		newFuncCall: "p.NewInt16Access",
+
+		nullableValueFieldName: "Int",
+		convertFuncName:        "c.Int16ToInt2",
+		nullableGoFieldType:    "pgtype.Int2",
+		newAccessFuncCall:      "p.NewFieldAccess[pgtype.Int2]",
+	},
+	"time without time zone": {
+		goFieldType: "time.Time",
+		newFuncCall: "p.NewTimeAccess",
+
+		nullableValueFieldName: "Time",
+		convertFuncName:        "c.TimeToTime",
+		nullableGoFieldType:    "pgtype.Time",
+		newAccessFuncCall:      "p.NewFieldAccess[pgtype.Time]",
+	},
 	"timestamp with time zone": {
 		goFieldType: "time.Time",
 		newFuncCall: "p.NewTimeAccess",
@@ -122,6 +175,15 @@ var pgMappings = map[string]mapping{
 		newAccessFuncCall:      "p.NewFieldAccess[pgtype.Date]",
 	},
 	"citext": {
+		goFieldType: "string",
+		newFuncCall: "p.NewTextAccess",
+
+		nullableValueFieldName: "String",
+		convertFuncName:        "c.StringToText",
+		nullableGoFieldType:    "pgtype.Text",
+		newAccessFuncCall:      "p.NewFieldAccess[pgtype.Text]",
+	},
+	"character": {
 		goFieldType: "string",
 		newFuncCall: "p.NewTextAccess",
 
@@ -228,5 +290,29 @@ var pgMappings = map[string]mapping{
 	"interval": {
 		nullableGoFieldType: "pgtype.Interval",
 		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Interval]",
+	},
+	"line": {
+		nullableGoFieldType: "pgtype.Line",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Line]",
+	},
+	"lseg": {
+		nullableGoFieldType: "pgtype.Lseg",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Lseg]",
+	},
+	"box": {
+		nullableGoFieldType: "pgtype.Box",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Box]",
+	},
+	"path": {
+		nullableGoFieldType: "pgtype.Path",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Path]",
+	},
+	"polygon": {
+		nullableGoFieldType: "pgtype.Polygon",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Polygon]",
+	},
+	"circle": {
+		nullableGoFieldType: "pgtype.Circle",
+		newAccessFuncCall:   "p.NewFieldAccess[pgtype.Circle]",
 	},
 }
