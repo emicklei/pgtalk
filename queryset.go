@@ -158,6 +158,7 @@ func (d QuerySet[T]) Iterate(ctx context.Context, conn querier, parameters ...*Q
 		rows:             rows,
 		orderedSelectors: ordered,
 		params:           params,
+		scanValues:       make([]any, len(ordered)),
 	}, err
 }
 
@@ -168,11 +169,11 @@ func (d QuerySet[T]) Exec(ctx context.Context, conn querier, parameters ...*Quer
 		return
 	}
 	defer rows.Close()
+	sw := make([]any, len(d.selectors))
 	for rows.Next() {
 		entity := new(T)
-		sw := []any{}
-		for _, each := range d.selectors {
-			sw = append(sw, each.FieldValueToScan(entity))
+		for i, each := range d.selectors {
+			sw[i] = each.FieldValueToScan(entity)
 		}
 		if err := rows.Scan(sw...); err != nil {
 			return list, err
@@ -195,15 +196,16 @@ func execIntoMaps(ctx context.Context, conn querier, query string, selectors []C
 		return
 	}
 	defer rows.Close()
+	// sw holds addresses to the valueToInsert
+	sw := make([]any, 0, len(selectors))
+	for _, each := range selectors {
+		sw = each.AppendScannable(sw)
+	}
 	for rows.Next() {
-		sw := []any{} // sw holds addresses to the valueToInsert
-		for _, each := range selectors {
-			sw = each.AppendScannable(sw)
-		}
 		if err := rows.Scan(sw...); err != nil {
 			return list, err
 		}
-		row := map[string]any{}
+		row := make(map[string]any, len(selectors))
 		for i, each := range selectors {
 			// sw[i] is the address of the valueToInsert of each (ColumnAccessor)
 			// use reflect version of dereferencing

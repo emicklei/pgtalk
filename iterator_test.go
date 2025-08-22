@@ -25,6 +25,7 @@ func TestResultIterator_Next(t *testing.T) {
 		i := &resultIterator[testEntity]{
 			rows:             rows,
 			orderedSelectors: selectors,
+			scanValues:       make([]any, len(selectors)),
 		}
 		if !i.HasNext() {
 			t.Fatal("expected next")
