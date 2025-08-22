@@ -196,16 +196,15 @@ func execIntoMaps(ctx context.Context, conn querier, query string, selectors []C
 		return
 	}
 	defer rows.Close()
-	// sw holds addresses to the valueToInsert
-	sw := make([]any, 0, len(selectors))
-	for _, each := range selectors {
-		sw = each.AppendScannable(sw)
-	}
 	for rows.Next() {
+		sw := []any{} // sw holds addresses to the valueToInsert
+		for _, each := range selectors {
+			sw = each.AppendScannable(sw)
+		}
 		if err := rows.Scan(sw...); err != nil {
 			return list, err
 		}
-		row := make(map[string]any, len(selectors))
+		row := map[string]any{}
 		for i, each := range selectors {
 			// sw[i] is the address of the valueToInsert of each (ColumnAccessor)
 			// use reflect version of dereferencing
