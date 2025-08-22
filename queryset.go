@@ -158,6 +158,7 @@ func (d QuerySet[T]) Iterate(ctx context.Context, conn querier, parameters ...*Q
 		rows:             rows,
 		orderedSelectors: ordered,
 		params:           params,
+		scanValues:       make([]any, len(ordered)),
 	}, err
 }
 
@@ -168,11 +169,11 @@ func (d QuerySet[T]) Exec(ctx context.Context, conn querier, parameters ...*Quer
 		return
 	}
 	defer rows.Close()
+	sw := make([]any, len(d.selectors))
 	for rows.Next() {
 		entity := new(T)
-		sw := []any{}
-		for _, each := range d.selectors {
-			sw = append(sw, each.FieldValueToScan(entity))
+		for i, each := range d.selectors {
+			sw[i] = each.FieldValueToScan(entity)
 		}
 		if err := rows.Scan(sw...); err != nil {
 			return list, err

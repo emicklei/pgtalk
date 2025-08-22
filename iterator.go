@@ -11,6 +11,7 @@ type resultIterator[T any] struct {
 	rows             pgx.Rows
 	orderedSelectors []ColumnAccessor
 	params           []any
+	scanValues       []any
 }
 
 // Close closes the rows, making the connection ready for use again. It is safe
@@ -55,11 +56,10 @@ func (i *resultIterator[T]) HasNext() bool {
 
 func (i *resultIterator[T]) Next() (*T, error) {
 	entity := new(T)
-	toScan := []any{}
-	for _, each := range i.orderedSelectors {
-		toScan = append(toScan, each.FieldValueToScan(entity))
+	for j, each := range i.orderedSelectors {
+		i.scanValues[j] = each.FieldValueToScan(entity)
 	}
-	if err := i.rows.Scan(toScan...); err != nil {
+	if err := i.rows.Scan(i.scanValues...); err != nil {
 		return nil, err
 	}
 	return entity, nil
