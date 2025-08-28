@@ -42,7 +42,7 @@ func applyConfiguredMappings(location string) error {
 			// make sure existing is not replaced
 			_, ok = pgMappings[k]
 			if ok {
-				return fmt.Errorf("cannot replace mapping: %s", k)
+				return fmt.Errorf("cannot replace existing mapping: %s (remove it?)", k)
 			}
 			log.Printf("add datatype mapping %s => %s\n", k, v.Use)
 			pgMappings[k] = existing
@@ -51,7 +51,7 @@ func applyConfiguredMappings(location string) error {
 			// make sure existing is not replaced
 			_, ok := pgMappings[k]
 			if ok {
-				return fmt.Errorf("cannot replace mapping: %s", k)
+				return fmt.Errorf("cannot replace existing mapping: %s (remove it?)", k)
 			}
 			newMapping := mapping{
 				nullableGoFieldType:    v.NullableGoFieldType,
