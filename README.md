@@ -39,12 +39,12 @@ These examples are from the test package in which a few database tables files (c
 
 ### Insert
 
-	m := products.Insert(
+	mut := products.Insert(
 		products.ID.Set(10),
 		products.Code.Set("testit"),
 		products.CategoryID.Set(1))
 
-	it := m.Exec(aConnection)
+	it := mut.Exec(conn)
 	if err := it.Err(); err != nil {
 		....
 	}
@@ -53,17 +53,19 @@ or by example:
 
 	p := new(products.Product)
 	p.SetID(10).SetCode("testit").SetCategoryID(1)		
-	m := products.Insert(p.Setters()...)
+
+	mut := products.Insert(p.Setters()...)
+	err := mut.Exec(conn)
 
 ### Update
 
-	m := products.Update(
+	mut := products.Update(
 			products.Code.Set("testme"),
 			products.CategoryID.Set(1)).
 		Where(products.ID.Equals(10)).
 		Returning(products.Code)
 
-	it := m.Exec(aConnection)	
+	it := mut.Exec(conn)	
 	for it.HasNext() {
 		p, err := products.Next(p) // p is a *product.Product
 		t.Logf("%s,%s", *p.Code)
@@ -73,7 +75,7 @@ or by example
 
 	p := new(products.Product)
 	p.SetID(10).SetCode("testme").SetCategoryID(1)		
-	m := products.Update(p.Setters()...).
+	mut := products.Update(p.Setters()...).
 			Where(products.ID.Equals(p.ID)).
 			Returning(products.Code)
 
@@ -84,19 +86,19 @@ or by collecting columns first
 	if categoryWhasChanged {
 		cols.Add(products.CategoryID.Set(changedValue))
 	}
-	m := products.Update(cols...).Where(products.ID.Equals(10)).
+	mut := products.Update(cols...).Where(products.ID.Equals(10)).
 
 ### Delete
 
-	m := products.Delete().Where(products.ID.Equals(10))
+	mut := products.Delete().Where(products.ID.Equals(10))
 
-	_ = m.Exec(aConnection)
+	_ = mut.Exec(conn)
 
 ### Select
 
 	q := products.Select(products.Code).Where(products.Code.Equals("F42"))
 
-	products, err := q.Exec(aConnection) // products is a []*product.Product
+	products, err := q.Exec(conn) // products is a []*product.Product
 
 ### Arbitrary SQL expressions
 
@@ -104,7 +106,7 @@ or by collecting columns first
 	
 	// SELECT p1.id,UPPER(p1.Code) AS upper FROM public.products p1
 	
-	list, _ := q.Exec(context.Background(),aConnection)
+	list, _ := q.Exec(context.Background(),conn)
 	for _, each := range list {
 		upper := each.GetExpressionResult("upper").(string)
 		...
@@ -116,7 +118,7 @@ or by collecting columns first
 
 	// SELECT p1.id,UPPER(p1.Code) AS upper FROM public.products p1
 
-	listOfMaps, _ := q.ExecIntoMaps(context.Background(),aConnection)
+	listOfMaps, _ := q.ExecIntoMaps(context.Background(),conn)
 	for _, each := range listOfMaps {
 		id := products.ID.Get(each).(pgtype.UUID)
 		upper := each["upper"].(string)
@@ -139,7 +141,7 @@ or by collecting columns first
         LeftOuterJoin(categories.Select(categories.Title)).
         On(products.ID.Equals(categories.ID))
 
-	it, _ := q.Exec(aConnection)
+	it, _ := q.Exec(conn)
 	for it.HasNext() {
 		p := new(products.Product)
 		c := new(categories.Category)

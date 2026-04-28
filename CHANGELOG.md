@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.14.2] - 2025-08-21
+
+ - improve log about mapping
+ - add tests
+ - Optimize memory allocations in query execution (#20)
+ - upgrade dependencies
+
 ## [v1.14.0] - 2025-08-21
 
 - support more datatypes, see README.md
