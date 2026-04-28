@@ -45,8 +45,8 @@ These examples are from the test package in which a few database tables files (c
 		products.CategoryID.Set(1))
 
 	it := mut.Exec(conn)
-	if err := it.Err(); err != nil {
-		....
+	if it.Err() != nil {
+		...
 	}
 
 or by example:
@@ -55,7 +55,10 @@ or by example:
 	p.SetID(10).SetCode("testit").SetCategoryID(1)		
 
 	mut := products.Insert(p.Setters()...)
-	err := mut.Exec(conn)
+	it := mut.Exec(conn)
+	if it.Err() != nil {
+		...
+	}	
 
 ### Update
 
